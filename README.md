@@ -43,6 +43,7 @@
 | [0004](docs/decisions/0004-streaming-roll-call.md) | 收作业是流式 REPL，不是批量差集 | 第一个人交的时候就得能用，不能等名单齐全 |
 | [0005](docs/decisions/0005-motion-layers.md) | 动效分三层，功能层不许华丽 | 23:57 数人头的时候不能有粒子在眼前飞 |
 | [0006](docs/decisions/0006-mobile-first.md) | 手机优先：课堂是现场，桌面是后台 | 一只手拿作业、另一只手点手机，还得离线能用 |
+| [0007](docs/decisions/0007-no-qr-checkin-for-now.md) | 扫码签到搁置，两位学号改作搜索 | 29 人算下来扫码更慢，还多三个失败模式 |
 
 ## 怎么一起讨论
 
