@@ -35,6 +35,8 @@
 
 `prefers-reduced-motion: reduce` 时两种全部关闭。
 
+上面这两条是**功能层**的动效——它们服务于判断，所以必须克制。你想要的华丽效果放在**装饰层**，三层模型见 [09-appearance.md](09-appearance.md) 与 [ADR-0005](decisions/0005-motion-layers.md)：装饰层默认关闭、可选「华丽」包、对账台永久禁入。
+
 ## 色板
 
 ### 学委端（深空）

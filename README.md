@@ -28,6 +28,8 @@
 | [docs/06-screens.md](docs/06-screens.md) | 界面清单与规格、状态设计、文案表 |
 | [docs/07-tech.md](docs/07-tech.md) | 技术选型、存储与成本、隐私边界 |
 | [docs/08-roadmap.md](docs/08-roadmap.md) | 分期计划与待决问题（讨论入口） |
+| [docs/09-appearance.md](docs/09-appearance.md) | 外观层：壁纸、预设主题、密度；动效三层模型与「华丽」清单 |
+| [docs/10-tasks.md](docs/10-tasks.md) | 任务拆解：M0–M5 纵向切片、依赖、出口标准、节奏 |
 | [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
 
 ## 已定决策
@@ -38,6 +40,7 @@
 | [0002](docs/decisions/0002-names-never-disappear.md) | 名字永不消失，只降权；位置恒定位 | 勾一个少一个会重排，手指立刻失去记忆 |
 | [0003](docs/decisions/0003-cohort-as-source-of-truth.md) | 花名册是一等公民，班级与课程解耦 | 换班、跨学期、一门课带两个班都要能活 |
 | [0004](docs/decisions/0004-streaming-roll-call.md) | 收作业是流式 REPL，不是批量差集 | 第一个人交的时候就得能用，不能等名单齐全 |
+| [0005](docs/decisions/0005-motion-layers.md) | 动效分三层，功能层不许华丽 | 23:57 数人头的时候不能有粒子在眼前飞 |
 
 ## 怎么一起讨论
 
