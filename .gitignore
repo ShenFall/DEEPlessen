@@ -20,6 +20,9 @@ dist-ssr/
 *.log
 npm-debug.log*
 
+# 发布暂存区（推到 GitHub 用的副本，不重复入库）
+publish/
+
 # 真实名单与个人数据（含姓名/学号，永不入库）
 fixtures/real/
 exports/
