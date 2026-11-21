@@ -30,6 +30,7 @@
 | [docs/08-roadmap.md](docs/08-roadmap.md) | 分期计划与待决问题（讨论入口） |
 | [docs/09-appearance.md](docs/09-appearance.md) | 外观层：壁纸、预设主题、密度；动效三层模型与「华丽」清单 |
 | [docs/10-tasks.md](docs/10-tasks.md) | 任务拆解：M0–M5 纵向切片、依赖、出口标准、节奏 |
+| [docs/11-mobile.md](docs/11-mobile.md) | 手机端规格（主场景）：课堂现场、4 列网格、离线、强光 |
 | [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
 
 ## 已定决策
@@ -41,6 +42,7 @@
 | [0003](docs/decisions/0003-cohort-as-source-of-truth.md) | 花名册是一等公民，班级与课程解耦 | 换班、跨学期、一门课带两个班都要能活 |
 | [0004](docs/decisions/0004-streaming-roll-call.md) | 收作业是流式 REPL，不是批量差集 | 第一个人交的时候就得能用，不能等名单齐全 |
 | [0005](docs/decisions/0005-motion-layers.md) | 动效分三层，功能层不许华丽 | 23:57 数人头的时候不能有粒子在眼前飞 |
+| [0006](docs/decisions/0006-mobile-first.md) | 手机优先：课堂是现场，桌面是后台 | 一只手拿作业、另一只手点手机，还得离线能用 |
 
 ## 怎么一起讨论
 
