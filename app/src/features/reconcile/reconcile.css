@@ -148,7 +148,26 @@
   transform: scale(0.94);
 }
 
+/* 命中反馈的主通道：iOS 没有震动，只能靠这一下 */
+.cell[data-flash='true'] {
+  animation: cell-flash 240ms var(--ease);
+}
+
+@keyframes cell-flash {
+  0% {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+  100% {
+    outline: 2px solid transparent;
+    outline-offset: 5px;
+  }
+}
+
 .rs-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -158,9 +177,14 @@
   background: var(--bg);
 }
 
-.rs-hint {
+.rs-toggle {
   font-size: var(--fs-11);
   color: var(--mute);
+  padding: 8px 0;
+}
+
+.rs-toggle[data-on='true'] {
+  color: var(--amber);
 }
 
 .rs-remain {
