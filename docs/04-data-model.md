@@ -70,7 +70,8 @@ erDiagram
 | `dueAt` | ISO8601 | 绝对时间，必须带时区 |
 | `dueText` | string? | 老师原话：「下周三之前」 |
 | `requiresPaper` | boolean | 要交纸质版 |
-| `status` | enum | `open` / `reconciling` / `closed` |
+| `status` | enum | `open` / `reconciling` / `closed`。`closed` 可 **reopen** 回 `reconciling`，状态原样保留 |
+| `clonedFrom` | string? | 复制来源的作业 id。复制只带名单，不带已交状态 |
 | `sourceText` | string? | 原始通知，用于回溯 |
 
 ### Submission 提交状态
