@@ -17,40 +17,39 @@ const FILTERS: { key: Filter; label: string }[] = [
 ]
 
 const TAP_MAX_DIST = 8
-const TAP_MAX_MS = 500
 const REMOVE_DELAY = 220
+const RESTORE_HOLD = 350
 const LONG_PRESS = 600
 const STORAGE_KEY = `deep.paid.${ASSIGNMENT.id}`
 
-type Saved = { paid: string[]; history: string[] }
-
 const VALID_IDS = new Set(ACTIVE_ROSTER.map((s) => s.id))
 
-function loadSaved(): Saved {
+function loadSaved(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { paid: [], history: [] }
-    const parsed = JSON.parse(raw) as Partial<Saved>
-    const keep = (ids?: string[]) => (ids ?? []).filter((id) => VALID_IDS.has(id))
-    return { paid: keep(parsed.paid), history: keep(parsed.history) }
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as { paid?: string[] }
+    return (parsed.paid ?? []).filter((id) => VALID_IDS.has(id))
   } catch {
-    return { paid: [], history: [] }
+    return []
   }
 }
 
 export default function ReconcileScreen() {
-  const [saved] = useState(loadSaved)
-  const [paid, setPaid] = useState<Set<string>>(() => new Set(saved.paid))
+  const [initial] = useState(loadSaved)
+  const [paid, setPaid] = useState<Set<string>>(() => new Set(initial))
   const [filter, setFilter] = useState<Filter>('all')
-  const [toast, setToast] = useState<{ id: string; name: string } | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
+  const [holdingId, setHoldingId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
-  const [history, setHistory] = useState<string[]>(saved.history)
   const [forceGrid, setForceGrid] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const movedRef = useRef(false)
+  const holdFiredRef = useRef(false)
+  const holdTimer = useRef<number | undefined>(undefined)
   const titleTimer = useRef<number | undefined>(undefined)
 
   const total = ACTIVE_ROSTER.length
@@ -71,36 +70,34 @@ export default function ReconcileScreen() {
     return ACTIVE_ROSTER
   }, [filter, paid, fading])
 
-  const lastId = history[history.length - 1]
-  const lastName = lastId
-    ? ACTIVE_ROSTER.find((s) => s.id === lastId)?.name ?? ''
-    : ''
-
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ paid: [...paid], history }),
-    )
-  }, [paid, history])
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ paid: [...paid] }))
+  }, [paid])
 
   useEffect(() => {
     if (!toast) return
-    const timer = window.setTimeout(() => setToast(null), 3500)
+    const timer = window.setTimeout(() => setToast(null), 1800)
     return () => window.clearTimeout(timer)
   }, [toast])
 
   useEffect(() => {
     if (!notice) return
-    const timer = window.setTimeout(() => setNotice(null), 2200)
+    const timer = window.setTimeout(() => setNotice(null), 1400)
     return () => window.clearTimeout(timer)
   }, [notice])
 
+  function clearHold() {
+    window.clearTimeout(holdTimer.current)
+    setHoldingId(null)
+  }
+
   function mark(id: string, name: string) {
-    const next = new Set(paid)
-    next.add(id)
-    setPaid(next)
-    setHistory((h) => [...h, id])
-    setToast({ id, name })
+    setPaid((prev) => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
+    setToast(name)
     setForceGrid(false)
 
     setFlashId(id)
@@ -116,52 +113,69 @@ export default function ReconcileScreen() {
   }
 
   function unmark(id: string) {
-    const next = new Set(paid)
-    next.delete(id)
-    setPaid(next)
-    setHistory((h) => h.filter((x) => x !== id))
-    setToast((cur) => (cur?.id === id ? null : cur))
-  }
-
-  function undoLast() {
-    if (!lastId) return
-    unmark(lastId)
-    setToast(null)
+    setPaid((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }
 
   function resetAll() {
     localStorage.removeItem(STORAGE_KEY)
     setPaid(new Set())
-    setHistory([])
     setFading([])
     setToast(null)
     setForceGrid(false)
     setNotice('已清空本地数据')
   }
 
-  function handleClick(id: string, name: string) {
-    const press = pressRef.current
-    const wasMoved = movedRef.current
-    pressRef.current = null
-    movedRef.current = false
-
-    if (wasMoved) return
-    if (press && performance.now() - press.t > TAP_MAX_MS) return
-
-    if (paid.has(id)) unmark(id)
-    else mark(id, name)
-  }
-
-  function handlePointerDown(e: ReactPointerEvent<HTMLButtonElement>) {
+  function handlePointerDown(
+    e: ReactPointerEvent<HTMLButtonElement>,
+    id: string,
+    isPaid: boolean,
+  ) {
     pressRef.current = { x: e.clientX, y: e.clientY, t: performance.now() }
     movedRef.current = false
+    holdFiredRef.current = false
+    window.clearTimeout(holdTimer.current)
+
+    if (!isPaid) return
+
+    setHoldingId(id)
+    holdTimer.current = window.setTimeout(() => {
+      holdFiredRef.current = true
+      setHoldingId(null)
+      unmark(id)
+      navigator.vibrate?.(10)
+      setToast(null)
+    }, RESTORE_HOLD)
   }
 
   function handlePointerMove(e: ReactPointerEvent<HTMLButtonElement>) {
     const press = pressRef.current
     if (!press || movedRef.current) return
     const dist = Math.hypot(e.clientX - press.x, e.clientY - press.y)
-    if (dist > TAP_MAX_DIST) movedRef.current = true
+    if (dist > TAP_MAX_DIST) {
+      movedRef.current = true
+      clearHold()
+    }
+  }
+
+  function handleClick(id: string, name: string, isPaid: boolean) {
+    const wasMoved = movedRef.current
+    const wasHeld = holdFiredRef.current
+    pressRef.current = null
+    movedRef.current = false
+    holdFiredRef.current = false
+    clearHold()
+
+    if (wasMoved || wasHeld) return
+
+    if (isPaid) {
+      setNotice('长按可恢复')
+      return
+    }
+    mark(id, name)
   }
 
   const dueText = new Date(ASSIGNMENT.due).toLocaleString('zh-CN', {
@@ -188,7 +202,6 @@ export default function ReconcileScreen() {
 
         <h1
           className="rs-title"
-          title="长按清空本地数据"
           onPointerDown={() => {
             titleTimer.current = window.setTimeout(resetAll, LONG_PRESS)
           }}
@@ -276,15 +289,14 @@ export default function ReconcileScreen() {
                 className="cell"
                 data-state={isPaid ? 'paid' : 'unpaid'}
                 data-flash={flashId === s.id}
+                data-holding={holdingId === s.id}
                 aria-pressed={isPaid}
                 aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
-                onPointerDown={handlePointerDown}
+                onPointerDown={(e) => handlePointerDown(e, s.id, isPaid)}
                 onPointerMove={handlePointerMove}
-                onPointerCancel={() => {
-                  pressRef.current = null
-                  movedRef.current = false
-                }}
-                onClick={() => handleClick(s.id, s.name)}
+                onPointerUp={clearHold}
+                onPointerCancel={clearHold}
+                onClick={() => handleClick(s.id, s.name, isPaid)}
               >
                 {s.name}
               </button>
@@ -294,14 +306,7 @@ export default function ReconcileScreen() {
       )}
 
       <div className="rs-bottom">
-        <button
-          type="button"
-          className="rs-undo"
-          disabled={!lastId}
-          onClick={undoLast}
-        >
-          撤销{lastName ? ` · ${lastName}` : ''}
-        </button>
+        <span className="rs-hint">点名字标记 · 长按恢复</span>
         <button type="button" className="rs-remain" onClick={() => setFilter('unpaid')}>
           剩 {unpaidCount}
         </button>
@@ -310,11 +315,8 @@ export default function ReconcileScreen() {
       {toast && (
         <div className="rs-toast" role="status" aria-live="polite">
           <span>
-            已标记 <b>{toast.name}</b>
+            已标记 <b>{toast}</b>
           </span>
-          <button type="button" onClick={() => unmark(toast.id)}>
-            撤销
-          </button>
         </div>
       )}
 

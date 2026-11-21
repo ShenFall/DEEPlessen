@@ -149,6 +149,14 @@
   transform: scale(0.94);
 }
 
+/* 长按恢复中：先给一个视觉承诺，350ms 后真的复原 */
+.cell[data-holding='true'] {
+  outline: 1px dashed var(--amber);
+  outline-offset: -2px;
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
 /* 命中反馈的主通道：iOS 没有震动，只能靠这一下 */
 .cell[data-flash='true'] {
   animation: cell-flash 240ms var(--ease);
@@ -178,18 +186,8 @@
   background: var(--bg);
 }
 
-.rs-undo {
+.rs-hint {
   font-size: var(--fs-11);
-  color: var(--amber);
-  padding: 8px 0;
-  min-height: 40px;
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rs-undo:disabled {
   color: var(--mute);
 }
 
