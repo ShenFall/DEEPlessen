@@ -248,3 +248,66 @@
     transform: translate(-50%, 0);
   }
 }
+
+.rs-finish {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px var(--pad-x) 28px;
+}
+
+.rs-finish-eyebrow {
+  margin: 0 0 2px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: 0.08em;
+  color: var(--amber);
+}
+
+.rs-finish-name {
+  margin: 0;
+  font-size: var(--fs-20);
+  font-weight: 500;
+}
+
+.rs-finish-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--cell-edge);
+  border-radius: var(--r-lg);
+  background: var(--cell);
+}
+
+.rs-finish-row button {
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  background: var(--amber);
+  color: #1a1206;
+  font-size: var(--fs-12);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+[data-theme='paper'] .rs-finish-row button {
+  color: #fffdf9;
+}
+
+.rs-finish-sub {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.rs-finish-link {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 0;
+  font-size: var(--fs-11);
+  color: var(--dim);
+}

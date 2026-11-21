@@ -1,14 +1,3 @@
-/**
- * 对账台 · 手机版
- *
- * 三件事：
- * 1. 一屏放下 28 个人，点一下标记，位置永不重排（ADR-0002）
- * 2. 手指抖动不算点击（8px / 500ms），滚动时不会误标
- * 3. 标错了随时能退：toast 里 3.5 秒内可撤，底栏常驻可撤
- *
- * 刻意没做的：按名单顺序"引导下一个"——学生是随机走上来的，
- * 顺序引导在真实场景里没有意义（见 docs/decisions/0009）。
- */
 import {
   useEffect,
   useMemo,
@@ -27,34 +16,55 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'paid', label: '已交' },
 ]
 
-/** 手指抖动容忍度：超过这个位移就认为是在滚动，不是点击 */
 const TAP_MAX_DIST = 8
-/** 超过这个时长认为不是点击（留给将来的长按菜单） */
 const TAP_MAX_MS = 500
-/** 「未交」视图里延迟移除，避免格子瞬间前移导致手指点到别人 */
 const REMOVE_DELAY = 220
+const LONG_PRESS = 600
+const STORAGE_KEY = `deep.paid.${ASSIGNMENT.id}`
+
+type Saved = { paid: string[]; history: string[] }
+
+const VALID_IDS = new Set(ACTIVE_ROSTER.map((s) => s.id))
+
+function loadSaved(): Saved {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return { paid: [], history: [] }
+    const parsed = JSON.parse(raw) as Partial<Saved>
+    const keep = (ids?: string[]) => (ids ?? []).filter((id) => VALID_IDS.has(id))
+    return { paid: keep(parsed.paid), history: keep(parsed.history) }
+  } catch {
+    return { paid: [], history: [] }
+  }
+}
 
 export default function ReconcileScreen() {
-  /** 已交的人。用 Set 而不是数组：判断「这个人交没交」是 O(1) */
-  const [paid, setPaid] = useState<Set<string>>(() => new Set())
+  const [saved] = useState(loadSaved)
+  const [paid, setPaid] = useState<Set<string>>(() => new Set(saved.paid))
   const [filter, setFilter] = useState<Filter>('all')
   const [toast, setToast] = useState<{ id: string; name: string } | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
-  /** 标记历史，栈顶就是「上一步」 */
-  const [history, setHistory] = useState<string[]>([])
+  const [history, setHistory] = useState<string[]>(saved.history)
+  const [forceGrid, setForceGrid] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const movedRef = useRef(false)
+  const titleTimer = useRef<number | undefined>(undefined)
 
   const total = ACTIVE_ROSTER.length
   const paidCount = paid.size
   const unpaidCount = total - paidCount
   const percent = total === 0 ? 0 : (paidCount / total) * 100
+  const remaining = useMemo(
+    () => ACTIVE_ROSTER.filter((s) => !paid.has(s.id)),
+    [paid],
+  )
+  const takeover = !forceGrid && remaining.length <= 2
 
   const students = useMemo(() => {
     if (filter === 'unpaid') {
-      // 刚标记的人先留在原位淡出，再移除
       return ACTIVE_ROSTER.filter((s) => !paid.has(s.id) || fading.includes(s.id))
     }
     if (filter === 'paid') return ACTIVE_ROSTER.filter((s) => paid.has(s.id))
@@ -66,19 +76,37 @@ export default function ReconcileScreen() {
     ? ACTIVE_ROSTER.find((s) => s.id === lastId)?.name ?? ''
     : ''
 
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ paid: [...paid], history }),
+    )
+  }, [paid, history])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = window.setTimeout(() => setToast(null), 3500)
+    return () => window.clearTimeout(timer)
+  }, [toast])
+
+  useEffect(() => {
+    if (!notice) return
+    const timer = window.setTimeout(() => setNotice(null), 2200)
+    return () => window.clearTimeout(timer)
+  }, [notice])
+
   function mark(id: string, name: string) {
     const next = new Set(paid)
     next.add(id)
     setPaid(next)
     setHistory((h) => [...h, id])
     setToast({ id, name })
+    setForceGrid(false)
 
-    // 视觉反馈是主通道（部分安卓机的震动被系统关掉了）
     setFlashId(id)
     window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 260)
     navigator.vibrate?.(15)
 
-    // 「未交」视图是队列语义：先淡出，再移除
     if (filter === 'unpaid') {
       setFading((list) => [...list, id])
       window.setTimeout(() => {
@@ -93,6 +121,22 @@ export default function ReconcileScreen() {
     setPaid(next)
     setHistory((h) => h.filter((x) => x !== id))
     setToast((cur) => (cur?.id === id ? null : cur))
+  }
+
+  function undoLast() {
+    if (!lastId) return
+    unmark(lastId)
+    setToast(null)
+  }
+
+  function resetAll() {
+    localStorage.removeItem(STORAGE_KEY)
+    setPaid(new Set())
+    setHistory([])
+    setFading([])
+    setToast(null)
+    setForceGrid(false)
+    setNotice('已清空本地数据')
   }
 
   function handleClick(id: string, name: string) {
@@ -120,18 +164,6 @@ export default function ReconcileScreen() {
     if (dist > TAP_MAX_DIST) movedRef.current = true
   }
 
-  function undoLast() {
-    if (!lastId) return
-    unmark(lastId)
-    setToast(null)
-  }
-
-  useEffect(() => {
-    if (!toast) return
-    const timer = window.setTimeout(() => setToast(null), 3500)
-    return () => window.clearTimeout(timer)
-  }, [toast])
-
   const dueText = new Date(ASSIGNMENT.due).toLocaleString('zh-CN', {
     month: '2-digit',
     day: '2-digit',
@@ -154,7 +186,15 @@ export default function ReconcileScreen() {
           </span>
         </div>
 
-        <h1 className="rs-title">
+        <h1
+          className="rs-title"
+          title="长按清空本地数据"
+          onPointerDown={() => {
+            titleTimer.current = window.setTimeout(resetAll, LONG_PRESS)
+          }}
+          onPointerUp={() => window.clearTimeout(titleTimer.current)}
+          onPointerLeave={() => window.clearTimeout(titleTimer.current)}
+        >
           {ASSIGNMENT.course} · {ASSIGNMENT.title}
         </h1>
 
@@ -169,7 +209,7 @@ export default function ReconcileScreen() {
         </div>
 
         <div className="rs-meta">
-          <span>● 演示数据 · 刷新还原</span>
+          <span>● 已存本地</span>
           <span>{dueText} 截止</span>
         </div>
 
@@ -192,31 +232,66 @@ export default function ReconcileScreen() {
         </div>
       </header>
 
-      <div className="rs-grid">
-        {students.map((s) => {
-          const isPaid = paid.has(s.id)
-          return (
-            <button
-              key={s.id}
-              type="button"
-              className="cell"
-              data-state={isPaid ? 'paid' : 'unpaid'}
-              data-flash={flashId === s.id}
-              aria-pressed={isPaid}
-              aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerCancel={() => {
-                pressRef.current = null
-                movedRef.current = false
-              }}
-              onClick={() => handleClick(s.id, s.name)}
-            >
-              {s.name}
-            </button>
-          )
-        })}
-      </div>
+      {takeover ? (
+        <section className="rs-finish">
+          {remaining.length > 0 ? (
+            <>
+              <p className="rs-finish-eyebrow">还剩 {remaining.length} 人</p>
+              {remaining.map((s) => (
+                <div key={s.id} className="rs-finish-row">
+                  <div>
+                    <p className="rs-finish-name">{s.name}</p>
+                    <p className="rs-finish-sub">{s.sid.slice(-2)} 号</p>
+                  </div>
+                  <button type="button" onClick={() => mark(s.id, s.name)}>
+                    标记已交
+                  </button>
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <p className="rs-finish-eyebrow">[OK]</p>
+              <p className="rs-finish-name">
+                {total}/{total} 齐了
+              </p>
+            </>
+          )}
+          <button
+            type="button"
+            className="rs-finish-link"
+            onClick={() => setForceGrid(true)}
+          >
+            查看名单
+          </button>
+        </section>
+      ) : (
+        <div className="rs-grid">
+          {students.map((s) => {
+            const isPaid = paid.has(s.id)
+            return (
+              <button
+                key={s.id}
+                type="button"
+                className="cell"
+                data-state={isPaid ? 'paid' : 'unpaid'}
+                data-flash={flashId === s.id}
+                aria-pressed={isPaid}
+                aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerCancel={() => {
+                  pressRef.current = null
+                  movedRef.current = false
+                }}
+                onClick={() => handleClick(s.id, s.name)}
+              >
+                {s.name}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div className="rs-bottom">
         <button
@@ -240,6 +315,12 @@ export default function ReconcileScreen() {
           <button type="button" onClick={() => unmark(toast.id)}>
             撤销
           </button>
+        </div>
+      )}
+
+      {notice && (
+        <div className="rs-toast" role="status" aria-live="polite">
+          <span>{notice}</span>
         </div>
       )}
     </main>
