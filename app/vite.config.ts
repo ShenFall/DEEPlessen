@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5178,
-    host: '127.0.0.1',
+    // 对外监听：手机真机要在同一局域网访问
+    host: true,
   },
   build: {
     target: 'es2020',
