@@ -21,6 +21,9 @@ const REMOVE_DELAY = 220
 const RESTORE_HOLD = 350
 const LONG_PRESS = 600
 const STORAGE_KEY = `deep.paid.${ASSIGNMENT.id}`
+const HINT_KEY = 'deep.hint.restore'
+/** 「长按可恢复」最多提示两次，之后静默 */
+const HINT_LIMIT = 2
 
 const VALID_IDS = new Set(ACTIVE_ROSTER.map((s) => s.id))
 
@@ -161,6 +164,13 @@ export default function ReconcileScreen() {
     }
   }
 
+  function hintRestore() {
+    const used = Number(localStorage.getItem(HINT_KEY) ?? '0')
+    if (used >= HINT_LIMIT) return
+    localStorage.setItem(HINT_KEY, String(used + 1))
+    setNotice('长按可恢复')
+  }
+
   function handleClick(id: string, name: string, isPaid: boolean) {
     const wasMoved = movedRef.current
     const wasHeld = holdFiredRef.current
@@ -172,7 +182,7 @@ export default function ReconcileScreen() {
     if (wasMoved || wasHeld) return
 
     if (isPaid) {
-      setNotice('长按可恢复')
+      hintRestore()
       return
     }
     mark(id, name)
@@ -296,6 +306,7 @@ export default function ReconcileScreen() {
                 onPointerMove={handlePointerMove}
                 onPointerUp={clearHold}
                 onPointerCancel={clearHold}
+                onContextMenu={(e) => e.preventDefault()}
                 onClick={() => handleClick(s.id, s.name, isPaid)}
               >
                 {s.name}
