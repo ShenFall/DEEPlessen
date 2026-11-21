@@ -1,0 +1,60 @@
+/* 设计令牌：结构不可换，色彩可换（见 docs/09-appearance.md） */
+
+:root {
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-15: 15px;
+  --fs-20: 20px;
+
+  --font-mono: ui-monospace, "Sarasa Mono SC", "JetBrains Mono", Consolas,
+    "Microsoft YaHei", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+
+  --pad-x: 14px;
+
+  /* 动效：L1 功能层，永不超过 250ms */
+  --t-fall: 220ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 深空（默认）：手机端比桌面提一档，抗教室强光 */
+[data-theme="void"] {
+  --bg: #0f1620;
+  --surface: #16233a;
+  --cell: #1b3152;
+  --line: rgba(242, 237, 228, 0.12);
+  --text: #f2ede4;
+  --dim: #9aa6b8;
+  --mute: #5c6878;
+  --gold: #d38a43;
+  --amber: #e9a341;
+  --red: #e2603f;
+  --green: #7fa36b;
+  --signal: #4c7be0;
+  --cell-edge: rgba(233, 163, 65, 0.45);
+  color-scheme: dark;
+}
+
+/* 旧纸：白天 / 教室强光下用 */
+[data-theme="paper"] {
+  --bg: #f7f4ee;
+  --surface: #ffffff;
+  --cell: #ffffff;
+  --line: #e2dcd1;
+  --text: #1a1f2a;
+  --dim: #6b7280;
+  --mute: #9a958c;
+  --gold: #b4762c;
+  --amber: #b4762c;
+  --red: #c0432a;
+  --green: #4e7a3f;
+  --signal: #2f5bd8;
+  --cell-edge: #dcc8a6;
+  color-scheme: light;
+}
