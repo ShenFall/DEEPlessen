@@ -19,3 +19,9 @@ dist-ssr/
 # 日志与临时文件
 *.log
 npm-debug.log*
+
+# 真实名单与个人数据（含姓名/学号，永不入库）
+fixtures/real/
+exports/
+*.private.xlsx
+*.private.json
