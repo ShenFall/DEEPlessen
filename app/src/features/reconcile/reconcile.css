@@ -113,6 +113,7 @@
 }
 
 .cell {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,12 +137,28 @@
 }
 
 .cell[data-state='paid'] {
-  background: transparent;
+  background: var(--paid-fill);
   border-color: transparent;
   color: var(--mute);
-  opacity: 0.3;
+  opacity: 0.38;
   font-weight: 400;
   transform: scale(0.96);
+}
+
+/* 下一个该点的人：内嵌一圈极细金线，不抢戏但指得清 */
+.cell[data-next='true'] {
+  outline: 1px solid rgba(233, 163, 65, 0.55);
+  outline-offset: -2px;
+}
+
+.cell-caret {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
 }
 
 .cell:active {

@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
 import { ACTIVE_ROSTER, ASSIGNMENT } from '../../data/roster'
 import './reconcile.css'
 
@@ -14,6 +20,8 @@ const FILTERS: { key: Filter; label: string }[] = [
 const TAP_MAX_DIST = 8
 /** 超过这个时长认为不是点击（留给将来的长按菜单） */
 const TAP_MAX_MS = 500
+/** 「未交」视图里延迟移除，避免格子瞬间前移导致手指点到别人 */
+const REMOVE_DELAY = 220
 
 const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -23,6 +31,8 @@ export default function ReconcileScreen() {
   const [filter, setFilter] = useState<Filter>('all')
   const [toast, setToast] = useState<{ id: string; name: string } | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
+  const [nextId, setNextId] = useState<string | null>(null)
+  const [fading, setFading] = useState<string[]>([])
   const [autoAdvance, setAutoAdvance] = useState(true)
 
   const gridRef = useRef<HTMLDivElement>(null)
@@ -36,20 +46,31 @@ export default function ReconcileScreen() {
   const percent = total === 0 ? 0 : (paidCount / total) * 100
 
   const students = useMemo(() => {
-    if (filter === 'unpaid') return ACTIVE_ROSTER.filter((s) => !paid.has(s.id))
+    if (filter === 'unpaid') {
+      // 刚标记的人先留在原位淡出，再移除
+      return ACTIVE_ROSTER.filter((s) => !paid.has(s.id) || fading.includes(s.id))
+    }
     if (filter === 'paid') return ACTIVE_ROSTER.filter((s) => paid.has(s.id))
     return ACTIVE_ROSTER
-  }, [filter, paid])
+  }, [filter, paid, fading])
 
-  /** 标记后把下一个未交的人滚到屏幕中间；没有下一个就回到第一个 */
-  function advanceFrom(index: number) {
-    const nodes = gridRef.current?.querySelectorAll<HTMLButtonElement>('.cell')
-    if (!nodes) return
-    const list = Array.from(nodes)
-    const next =
-      list.slice(index + 1).find((n) => n.dataset.state === 'unpaid') ??
-      list.find((n) => n.dataset.state === 'unpaid')
-    next?.scrollIntoView({
+  /** 把「下一个该点的人」标出来——这才是自动前进真正要解决的事 */
+  function pointToNext(index: number, marked: Set<string>) {
+    const after = ACTIVE_ROSTER.slice(index + 1).find((s) => !marked.has(s.id))
+    const wrap = ACTIVE_ROSTER.find((s) => !marked.has(s.id))
+    const target = after ?? wrap
+    setNextId(target ? target.id : null)
+    return target?.id ?? null
+  }
+
+  function scrollToNext() {
+    const el = gridRef.current?.querySelector<HTMLElement>('[data-next="true"]')
+    if (!el) return
+    const box = el.getBoundingClientRect()
+    const offScreen = box.top < 60 || box.bottom > window.innerHeight - 70
+    // 整屏放得下时不起作用也没关系，视觉上的高亮已经够指路
+    if (!offScreen) return
+    el.scrollIntoView({
       block: 'center',
       behavior: prefersReducedMotion() ? 'auto' : 'smooth',
     })
@@ -69,16 +90,26 @@ export default function ReconcileScreen() {
 
     setToast({ id, name })
 
-    // 视觉反馈是主通道（iOS 没有震动）
+    // 视觉反馈是主通道（震动在部分安卓机上也可能被系统关掉）
     setFlashId(id)
     window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 260)
 
-    // 震动只在支持的设备上生效，拿不到就算了
     navigator.vibrate?.(15)
 
-    if (autoAdvance && filter === 'all') {
+    if (filter === 'unpaid') {
+      setFading((list) => [...list, id])
+      window.setTimeout(() => {
+        setFading((list) => list.filter((x) => x !== id))
+      }, REMOVE_DELAY)
+      return
+    }
+
+    if (filter === 'all' && autoAdvance) {
+      const target = pointToNext(index, next)
       window.clearTimeout(advanceTimer.current)
-      advanceTimer.current = window.setTimeout(() => advanceFrom(index), 300)
+      advanceTimer.current = window.setTimeout(() => {
+        if (target) scrollToNext()
+      }, 300)
     }
   }
 
@@ -100,7 +131,6 @@ export default function ReconcileScreen() {
     pressRef.current = null
     movedRef.current = false
 
-    // 滚动过就不算点击
     if (wasMoved) return
     if (press && performance.now() - press.t > TAP_MAX_MS) return
 
@@ -122,6 +152,11 @@ export default function ReconcileScreen() {
   }, [toast])
 
   useEffect(() => () => window.clearTimeout(advanceTimer.current), [])
+
+  // 切换视图时，之前指的目标可能已经不在屏幕上了
+  useEffect(() => {
+    setNextId(null)
+  }, [filter])
 
   const dueText = new Date(ASSIGNMENT.due).toLocaleString('zh-CN', {
     month: '2-digit',
@@ -193,6 +228,7 @@ export default function ReconcileScreen() {
               className="cell"
               data-state={isPaid ? 'paid' : 'unpaid'}
               data-flash={flashId === s.id}
+              data-next={nextId === s.id}
               aria-pressed={isPaid}
               aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
               onPointerDown={handlePointerDown}
@@ -204,6 +240,7 @@ export default function ReconcileScreen() {
               onClick={() => handleClick(s.id, s.name, index)}
             >
               {s.name}
+              {nextId === s.id && <span className="cell-caret" aria-hidden="true" />}
             </button>
           )
         })}
@@ -216,7 +253,7 @@ export default function ReconcileScreen() {
           data-on={autoAdvance}
           onClick={() => setAutoAdvance((v) => !v)}
         >
-          自动跳下一个 · {autoAdvance ? '开' : '关'}
+          自动指下一个 · {autoAdvance ? '开' : '关'}
         </button>
         <button type="button" className="rs-remain" onClick={() => setFilter('unpaid')}>
           剩 {unpaidCount}
