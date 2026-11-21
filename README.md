@@ -37,6 +37,7 @@
 | [0001](docs/decisions/0001-single-operator.md) | 单人后台 + 公开取件页，不做双角色系统 | 同学不会为了拿一份资料注册账号 |
 | [0002](docs/decisions/0002-names-never-disappear.md) | 名字永不消失，只降权；位置恒定位 | 勾一个少一个会重排，手指立刻失去记忆 |
 | [0003](docs/decisions/0003-cohort-as-source-of-truth.md) | 花名册是一等公民，班级与课程解耦 | 换班、跨学期、一门课带两个班都要能活 |
+| [0004](docs/decisions/0004-streaming-roll-call.md) | 收作业是流式 REPL，不是批量差集 | 第一个人交的时候就得能用，不能等名单齐全 |
 
 ## 怎么一起讨论
 

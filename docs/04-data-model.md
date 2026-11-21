@@ -77,12 +77,13 @@ erDiagram
 |---|---|---|
 | `assignmentId` | string | |
 | `studentId` | string | |
-| `state` | enum | `unpaid` / `paid` / `suspect` |
-| `matchedBy` | enum | `import` / `manual` / `alias` / `fuzzy` |
-| `evidence` | string? | 匹配到的原始字符串，比如那天接龙里的「李梓衿」 |
+| `state` | enum | `unpaid` / `paid` / `suspect`（`suspect` 只在批量补录路径短暂存在） |
+| `submittedAt` | ISO8601 | 标记时间。流式收作业时每次标记自动打，期末算超时用 |
+| `matchedBy` | enum | `drop` / `cli` / `paste` / `import` / `manual` |
+| `evidence` | string? | 匹配到的原始字符串，比如那次接龙里的「李梓衿」 |
 | `updatedAt` | ISO8601 | |
 
-**三态而不是两态**，是整个产品最重要的数据决定：`suspect` 存在的意义是「系统不确定时不撒谎」。一份「李梓衿」对不上花名册里的「李子衿」，它既不进已交也不进未交，单独列出来等你一句话。没有这个状态，对账就会悄悄漏人。
+**主路径两态，补录路径三态。** 流式收作业时，每次标记背后都有一个具体的人为动作（拖了个文件、敲了个名字），匹配不上就当场问「这是谁」，所以不需要持久化的中间态。只有批量补录（粘贴 20 个名字）时，才会出现「不确定这是谁」的悬空记录，这时用 `suspect` 单独列出来等你一句话——**系统不确定时不撒谎**，没有这个状态，批量补录就会悄悄漏人。
 
 ### Material 资料
 
