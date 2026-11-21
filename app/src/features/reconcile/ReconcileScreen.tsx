@@ -1,3 +1,14 @@
+/**
+ * 对账台 · 手机版
+ *
+ * 三件事：
+ * 1. 一屏放下 28 个人，点一下标记，位置永不重排（ADR-0002）
+ * 2. 手指抖动不算点击（8px / 500ms），滚动时不会误标
+ * 3. 标错了随时能退：toast 里 3.5 秒内可撤，底栏常驻可撤
+ *
+ * 刻意没做的：按名单顺序"引导下一个"——学生是随机走上来的，
+ * 顺序引导在真实场景里没有意义（见 docs/decisions/0009）。
+ */
 import {
   useEffect,
   useMemo,
@@ -23,22 +34,18 @@ const TAP_MAX_MS = 500
 /** 「未交」视图里延迟移除，避免格子瞬间前移导致手指点到别人 */
 const REMOVE_DELAY = 220
 
-const prefersReducedMotion = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 export default function ReconcileScreen() {
+  /** 已交的人。用 Set 而不是数组：判断「这个人交没交」是 O(1) */
   const [paid, setPaid] = useState<Set<string>>(() => new Set())
   const [filter, setFilter] = useState<Filter>('all')
   const [toast, setToast] = useState<{ id: string; name: string } | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
-  const [nextId, setNextId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
-  const [autoAdvance, setAutoAdvance] = useState(true)
+  /** 标记历史，栈顶就是「上一步」 */
+  const [history, setHistory] = useState<string[]>([])
 
-  const gridRef = useRef<HTMLDivElement>(null)
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const movedRef = useRef(false)
-  const advanceTimer = useRef<number | undefined>(undefined)
 
   const total = ACTIVE_ROSTER.length
   const paidCount = paid.size
@@ -54,63 +61,51 @@ export default function ReconcileScreen() {
     return ACTIVE_ROSTER
   }, [filter, paid, fading])
 
-  /** 把「下一个该点的人」标出来——这才是自动前进真正要解决的事 */
-  function pointToNext(index: number, marked: Set<string>) {
-    const after = ACTIVE_ROSTER.slice(index + 1).find((s) => !marked.has(s.id))
-    const wrap = ACTIVE_ROSTER.find((s) => !marked.has(s.id))
-    const target = after ?? wrap
-    setNextId(target ? target.id : null)
-    return target?.id ?? null
-  }
+  const lastId = history[history.length - 1]
+  const lastName = lastId
+    ? ACTIVE_ROSTER.find((s) => s.id === lastId)?.name ?? ''
+    : ''
 
-  function scrollToNext() {
-    const el = gridRef.current?.querySelector<HTMLElement>('[data-next="true"]')
-    if (!el) return
-    const box = el.getBoundingClientRect()
-    const offScreen = box.top < 60 || box.bottom > window.innerHeight - 70
-    // 整屏放得下时不起作用也没关系，视觉上的高亮已经够指路
-    if (!offScreen) return
-    el.scrollIntoView({
-      block: 'center',
-      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-    })
-  }
-
-  function toggle(id: string, name: string, index: number) {
-    const wasPaid = paid.has(id)
+  function mark(id: string, name: string) {
     const next = new Set(paid)
-    if (wasPaid) next.delete(id)
-    else next.add(id)
+    next.add(id)
     setPaid(next)
-
-    if (wasPaid) {
-      setToast(null)
-      return
-    }
-
+    setHistory((h) => [...h, id])
     setToast({ id, name })
 
-    // 视觉反馈是主通道（震动在部分安卓机上也可能被系统关掉）
+    // 视觉反馈是主通道（部分安卓机的震动被系统关掉了）
     setFlashId(id)
     window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 260)
-
     navigator.vibrate?.(15)
 
+    // 「未交」视图是队列语义：先淡出，再移除
     if (filter === 'unpaid') {
       setFading((list) => [...list, id])
       window.setTimeout(() => {
         setFading((list) => list.filter((x) => x !== id))
       }, REMOVE_DELAY)
-      return
     }
+  }
 
-    if (filter === 'all' && autoAdvance) {
-      const target = pointToNext(index, next)
-      window.clearTimeout(advanceTimer.current)
-      advanceTimer.current = window.setTimeout(() => {
-        if (target) scrollToNext()
-      }, 300)
-    }
+  function unmark(id: string) {
+    const next = new Set(paid)
+    next.delete(id)
+    setPaid(next)
+    setHistory((h) => h.filter((x) => x !== id))
+    setToast((cur) => (cur?.id === id ? null : cur))
+  }
+
+  function handleClick(id: string, name: string) {
+    const press = pressRef.current
+    const wasMoved = movedRef.current
+    pressRef.current = null
+    movedRef.current = false
+
+    if (wasMoved) return
+    if (press && performance.now() - press.t > TAP_MAX_MS) return
+
+    if (paid.has(id)) unmark(id)
+    else mark(id, name)
   }
 
   function handlePointerDown(e: ReactPointerEvent<HTMLButtonElement>) {
@@ -125,23 +120,9 @@ export default function ReconcileScreen() {
     if (dist > TAP_MAX_DIST) movedRef.current = true
   }
 
-  function handleClick(id: string, name: string, index: number) {
-    const press = pressRef.current
-    const wasMoved = movedRef.current
-    pressRef.current = null
-    movedRef.current = false
-
-    if (wasMoved) return
-    if (press && performance.now() - press.t > TAP_MAX_MS) return
-
-    toggle(id, name, index)
-  }
-
-  function undo() {
-    if (!toast) return
-    const next = new Set(paid)
-    next.delete(toast.id)
-    setPaid(next)
+  function undoLast() {
+    if (!lastId) return
+    unmark(lastId)
     setToast(null)
   }
 
@@ -150,13 +131,6 @@ export default function ReconcileScreen() {
     const timer = window.setTimeout(() => setToast(null), 3500)
     return () => window.clearTimeout(timer)
   }, [toast])
-
-  useEffect(() => () => window.clearTimeout(advanceTimer.current), [])
-
-  // 切换视图时，之前指的目标可能已经不在屏幕上了
-  useEffect(() => {
-    setNextId(null)
-  }, [filter])
 
   const dueText = new Date(ASSIGNMENT.due).toLocaleString('zh-CN', {
     month: '2-digit',
@@ -218,8 +192,8 @@ export default function ReconcileScreen() {
         </div>
       </header>
 
-      <div className="rs-grid" ref={gridRef}>
-        {students.map((s, index) => {
+      <div className="rs-grid">
+        {students.map((s) => {
           const isPaid = paid.has(s.id)
           return (
             <button
@@ -228,7 +202,6 @@ export default function ReconcileScreen() {
               className="cell"
               data-state={isPaid ? 'paid' : 'unpaid'}
               data-flash={flashId === s.id}
-              data-next={nextId === s.id}
               aria-pressed={isPaid}
               aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
               onPointerDown={handlePointerDown}
@@ -237,10 +210,9 @@ export default function ReconcileScreen() {
                 pressRef.current = null
                 movedRef.current = false
               }}
-              onClick={() => handleClick(s.id, s.name, index)}
+              onClick={() => handleClick(s.id, s.name)}
             >
               {s.name}
-              {nextId === s.id && <span className="cell-caret" aria-hidden="true" />}
             </button>
           )
         })}
@@ -249,11 +221,11 @@ export default function ReconcileScreen() {
       <div className="rs-bottom">
         <button
           type="button"
-          className="rs-toggle"
-          data-on={autoAdvance}
-          onClick={() => setAutoAdvance((v) => !v)}
+          className="rs-undo"
+          disabled={!lastId}
+          onClick={undoLast}
         >
-          自动指下一个 · {autoAdvance ? '开' : '关'}
+          撤销{lastName ? ` · ${lastName}` : ''}
         </button>
         <button type="button" className="rs-remain" onClick={() => setFilter('unpaid')}>
           剩 {unpaidCount}
@@ -265,7 +237,7 @@ export default function ReconcileScreen() {
           <span>
             已标记 <b>{toast.name}</b>
           </span>
-          <button type="button" onClick={undo}>
+          <button type="button" onClick={() => unmark(toast.id)}>
             撤销
           </button>
         </div>
