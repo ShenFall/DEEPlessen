@@ -50,6 +50,7 @@ export default function ReconcileScreen({
   const [flashId, setFlashId] = useState<string | null>(null)
   const [holdingId, setHoldingId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
+  const [listMode, setListMode] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -62,8 +63,8 @@ export default function ReconcileScreen({
   const paidCount = paid.size
   const unpaidCount = total - paidCount
   const percent = total === 0 ? 0 : (paidCount / total) * 100
-  /** 全部 = 面板式网格；未交 / 已交 = 清单 */
-  const isList = filter !== 'all'
+  /** 全部 = 固定面板式网格；未交 / 已交 = 默认清单，可切回网格 */
+  const isList = filter !== 'all' && listMode
 
   const visible = useMemo(() => {
     if (filter === 'unpaid') {
@@ -258,6 +259,24 @@ export default function ReconcileScreen({
               </button>
             )
           })}
+          {filter !== 'all' && (
+            <div className="rs-views">
+              <button
+                type="button"
+                data-on={!listMode}
+                onClick={() => setListMode(false)}
+              >
+                网格
+              </button>
+              <button
+                type="button"
+                data-on={listMode}
+                onClick={() => setListMode(true)}
+              >
+                列表
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
