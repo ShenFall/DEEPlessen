@@ -15,10 +15,11 @@ import {
 } from './db'
 import AssignmentListScreen from './features/assignments/AssignmentListScreen'
 import ImportScreen from './features/import/ImportScreen'
+import LibraryScreen from './features/library/LibraryScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
 import TodayScreen from './features/today/TodayScreen'
 
-type View = 'today' | 'reconcile' | 'list' | 'import'
+type View = 'today' | 'reconcile' | 'list' | 'import' | 'library'
 
 export default function App() {
   const [ws, setWs] = useState<Workspace | null>(null)
@@ -124,6 +125,10 @@ export default function App() {
     )
   }
 
+  if (view === 'library') {
+    return <LibraryScreen onBack={() => setView('today')} />
+  }
+
   if (view === 'today' && ws) {
     return (
       <TodayScreen
@@ -131,6 +136,7 @@ export default function App() {
         paidCounts={counts}
         onOpen={(id) => void open(id)}
         onAll={() => setView('list')}
+        onLibrary={() => setView('library')}
       />
     )
   }

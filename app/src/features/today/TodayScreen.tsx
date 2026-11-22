@@ -7,6 +7,7 @@ type Props = {
   paidCounts: Record<string, number>
   onOpen: (id: string) => void
   onAll: () => void
+  onLibrary: () => void
 }
 
 export default function TodayScreen({
@@ -14,6 +15,7 @@ export default function TodayScreen({
   paidCounts,
   onOpen,
   onAll,
+  onLibrary,
 }: Props) {
   const open = assignments
     .filter((a) => a.status !== 'closed')
@@ -29,9 +31,14 @@ export default function TodayScreen({
     <main className="td">
       <header className="td-top">
         <span className="td-brand">拾课</span>
-        <button type="button" className="td-link" onClick={onAll}>
-          全部清点
-        </button>
+        <span className="td-actions">
+          <button type="button" className="td-link" onClick={onLibrary}>
+            资料
+          </button>
+          <button type="button" className="td-link" onClick={onAll}>
+            全部清点
+          </button>
+        </span>
       </header>
 
       <div className="td-body">

@@ -32,11 +32,15 @@ export type Submission = {
 
 export type Meta = { key: string; value: string }
 
+/** 存放不可序列化成 JSON 的东西，比如 FileSystemDirectoryHandle */
+export type HandleRecord = { key: string; value: unknown }
+
 class DeepDB extends Dexie {
   students!: Table<Student, string>
   assignments!: Table<Assignment, string>
   submissions!: Table<Submission, string>
   meta!: Table<Meta, string>
+  handles!: Table<HandleRecord, string>
 
   constructor() {
     super('deep')
@@ -59,6 +63,10 @@ class DeepDB extends Dexie {
             if (!a.createdAt) a.createdAt = a.due ?? new Date().toISOString()
           })
       })
+    // v3：存目录句柄
+    this.version(3).stores({
+      handles: 'key',
+    })
   }
 }
 
@@ -219,8 +227,16 @@ export async function clearAssignment(assignmentId: string) {
   await db.submissions.where('assignmentId').equals(assignmentId).delete()
 }
 
-/** 清空所有本地数据，回到随包的那份示例名单 */
-export async function resetToSeed() {
+export async function saveHandle(key: string, value: unknown) {
+  await db.handles.put({ key, value })
+}
+
+export async function loadHandle<T>(key: string): Promise<T | null> {
+  const row = await db.handles.get(key)
+  return (row?.value as T) ?? null
+}
+
+/** 清空所有本地数据，回到随包的那份示例名单 */export async function resetToSeed() {
   await db.transaction(
     'rw',
     [db.students, db.assignments, db.submissions, db.meta],
