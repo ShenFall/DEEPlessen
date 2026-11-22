@@ -26,6 +26,35 @@ function courseOf(path: string) {
   return path.split('/')[1] ?? '未分类'
 }
 
+type Kind = 'slide' | 'doc' | 'sheet' | 'image' | 'code' | 'other'
+
+const KIND_LABEL: Record<Kind, string> = {
+  slide: '讲义',
+  doc: '文档',
+  sheet: '表格',
+  image: '图片',
+  code: '压缩/代码',
+  other: '其他',
+}
+
+const KIND_ORDER: Kind[] = ['slide', 'doc', 'sheet', 'image', 'code', 'other']
+
+/** 按扩展名自动归类，不要求你手工打标 */
+function kindOf(name: string): Kind {
+  const ext = name.split('.').pop()?.toLowerCase() ?? ''
+  if (['pdf', 'ppt', 'pptx', 'key'].includes(ext)) return 'slide'
+  if (['doc', 'docx', 'md', 'txt', 'rtf'].includes(ext)) return 'doc'
+  if (['xls', 'xlsx', 'csv', 'numbers'].includes(ext)) return 'sheet'
+  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) return 'image'
+  if (
+    ['zip', 'rar', '7z', 'tar', 'gz', 'py', 'c', 'cpp', 'java', 'js', 'ts'].includes(
+      ext,
+    )
+  )
+    return 'code'
+  return 'other'
+}
+
 export default function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null)
   const [granted, setGranted] = useState(false)
@@ -35,15 +64,18 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [notice, setNotice] = useState<string | null>(null)
   const [over, setOver] = useState(false)
   const [query, setQuery] = useState('')
+  const [kind, setKind] = useState<Kind | 'all'>('all')
+  const [sort, setSort] = useState<'recent' | 'name'>('recent')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase()
     const hit = entries.filter(
       (e) =>
-        !q ||
-        e.name.toLowerCase().includes(q) ||
-        courseOf(e.path).toLowerCase().includes(q),
+        (kind === 'all' || kindOf(e.name) === kind) &&
+        (!q ||
+          e.name.toLowerCase().includes(q) ||
+          courseOf(e.path).toLowerCase().includes(q)),
     )
     const map = new Map<string, LibraryEntry[]>()
     for (const e of hit) {
@@ -52,8 +84,24 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
       if (list) list.push(e)
       else map.set(course, [e])
     }
+    for (const list of map.values()) {
+      list.sort((a, b) =>
+        sort === 'name'
+          ? a.name.localeCompare(b.name, 'zh')
+          : b.lastModified - a.lastModified,
+      )
+    }
     return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh'))
-  }, [entries, query])
+  }, [entries, query, kind, sort])
+
+  const kindCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const e of entries) {
+      const k = kindOf(e.name)
+      counts[k] = (counts[k] ?? 0) + 1
+    }
+    return counts
+  }, [entries])
 
   const totalSize = useMemo(
     () => entries.reduce((sum, e) => sum + e.size, 0),
@@ -232,6 +280,35 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
               placeholder="搜文件名或课程"
               onChange={(e) => setQuery(e.target.value)}
             />
+
+            <div className="lb-filters">
+              <div className="lb-chips">
+                <button
+                  type="button"
+                  data-on={kind === 'all'}
+                  onClick={() => setKind('all')}
+                >
+                  全部 {entries.length}
+                </button>
+                {KIND_ORDER.filter((k) => kindCounts[k]).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    data-on={kind === k}
+                    onClick={() => setKind(k)}
+                  >
+                    {KIND_LABEL[k]} {kindCounts[k]}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="lb-sort"
+                onClick={() => setSort((s) => (s === 'recent' ? 'name' : 'recent'))}
+              >
+                {sort === 'recent' ? '最近' : '名称'}
+              </button>
+            </div>
 
             {entries.length === 0 && <p className="lb-empty">资料库还是空的</p>}
             {entries.length > 0 && groups.length === 0 && (

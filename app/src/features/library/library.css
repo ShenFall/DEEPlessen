@@ -219,6 +219,50 @@
   margin-top: 18px;
 }
 
+.lb-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+}
+
+.lb-chips {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lb-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.lb-chips button {
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: var(--fs-11);
+  color: var(--mute);
+  white-space: nowrap;
+}
+
+.lb-chips button[data-on='true'] {
+  border-color: var(--cell-edge);
+  background: var(--cell);
+  color: var(--amber);
+}
+
+.lb-sort {
+  flex: none;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: var(--fs-11);
+  color: var(--dim);
+}
+
 .lb-group-head {
   display: flex;
   align-items: baseline;
