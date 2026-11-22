@@ -31,14 +31,24 @@ function toInputValue(d: Date) {
   )}:${p(d.getMinutes())}`
 }
 
-function dueText(iso: string) {
-  return new Date(iso).toLocaleString('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
+/** 今天 / 明天 / 已逾期 比 "11/22 23:59" 更快读懂 */
+function dueLabel(iso: string) {
+  const d = new Date(iso)
+  const now = new Date()
+  const time = d.toLocaleTimeString('zh-CN', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   })
+  if (d.getTime() < now.getTime()) return { text: `已逾期 · ${time}`, overdue: true }
+
+  const tomorrow = new Date(now)
+  tomorrow.setDate(now.getDate() + 1)
+
+  if (d.toDateString() === now.toDateString()) return { text: `今天 ${time}`, overdue: false }
+  if (d.toDateString() === tomorrow.toDateString())
+    return { text: `明天 ${time}`, overdue: false }
+  return { text: `${d.getMonth() + 1}/${d.getDate()} ${time}`, overdue: false }
 }
 
 export default function AssignmentListScreen({
@@ -115,47 +125,50 @@ export default function AssignmentListScreen({
           <p className="al-empty">还没有清点，先建一个</p>
         )}
 
-        {assignments.map((a) => (
-          <button
-            key={a.id}
-            type="button"
-            className="al-card"
-            data-status={a.status}
-            onPointerDown={() => {
-              longFired.current = false
-              window.clearTimeout(pressTimer.current)
-              pressTimer.current = window.setTimeout(() => {
-                longFired.current = true
-                navigator.vibrate?.(10)
-                setDeleteArmed(false)
-                setMenuFor(a)
-              }, LONG_PRESS)
-            }}
-            onPointerUp={() => window.clearTimeout(pressTimer.current)}
-            onPointerLeave={() => window.clearTimeout(pressTimer.current)}
-            onPointerCancel={() => window.clearTimeout(pressTimer.current)}
-            onContextMenu={(e) => e.preventDefault()}
-            onClick={() => {
-              if (longFired.current) {
+        {assignments.map((a) => {
+          const due = dueLabel(a.due)
+          return (
+            <button
+              key={a.id}
+              type="button"
+              className="al-card"
+              data-status={a.status}
+              onPointerDown={() => {
                 longFired.current = false
-                return
-              }
-              onOpen(a.id)
-            }}
-          >
-            <span className="al-card-top">
-              <span className="al-card-title">
-                {a.course} · {a.title}
+                window.clearTimeout(pressTimer.current)
+                pressTimer.current = window.setTimeout(() => {
+                  longFired.current = true
+                  navigator.vibrate?.(10)
+                  setDeleteArmed(false)
+                  setMenuFor(a)
+                }, LONG_PRESS)
+              }}
+              onPointerUp={() => window.clearTimeout(pressTimer.current)}
+              onPointerLeave={() => window.clearTimeout(pressTimer.current)}
+              onPointerCancel={() => window.clearTimeout(pressTimer.current)}
+              onContextMenu={(e) => e.preventDefault()}
+              onClick={() => {
+                if (longFired.current) {
+                  longFired.current = false
+                  return
+                }
+                onOpen(a.id)
+              }}
+            >
+              <span className="al-card-top">
+                <span className="al-card-title">
+                  {a.course} · {a.title}
+                </span>
+                <span className="al-badge" data-status={a.status}>
+                  {STATUS_LABEL[a.status] ?? a.status}
+                </span>
               </span>
-              <span className="al-badge" data-status={a.status}>
-                {STATUS_LABEL[a.status] ?? a.status}
+              <span className="al-card-meta" data-overdue={due.overdue}>
+                {due.text} 截止 · {paidCounts[a.id] ?? 0}/{a.total} 已交
               </span>
-            </span>
-            <span className="al-card-meta">
-              {dueText(a.due)} 截止 · {paidCounts[a.id] ?? 0}/{a.total} 已交
-            </span>
-          </button>
-        ))}
+            </button>
+          )
+        })}
       </div>
 
       <div className="al-bottom">

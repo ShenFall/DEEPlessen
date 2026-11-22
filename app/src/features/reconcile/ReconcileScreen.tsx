@@ -211,13 +211,13 @@ export default function ReconcileScreen({
         <div className="rs-nav">
           <button
             type="button"
-            className="rs-back"
+            className="rs-backbtn"
             onClick={onBack}
-            aria-label="返回列表"
+            aria-label="返回清点列表"
           >
-            ←
+            <span aria-hidden="true">←</span>
+            清点
           </button>
-          <span className="rs-crumb">作业</span>
           <span className="rs-count">
             <b>{paidCount}</b>
             <i>/{total}</i>

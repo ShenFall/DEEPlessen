@@ -104,6 +104,10 @@
   color: var(--mute);
 }
 
+.al-card-meta[data-overdue='true'] {
+  color: var(--red);
+}
+
 .al-bottom {
   margin-top: auto;
   padding: 10px var(--pad-x) calc(14px + env(safe-area-inset-bottom));
