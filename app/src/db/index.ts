@@ -81,6 +81,7 @@ class DeepDB extends Dexie {
     // v4：发布记录
     this.version(4).stores({
       publishes: 'id, createdAt, state',
+      submissions: 'key, assignmentId, studentId, state, submittedAt',
     })
   }
 }
@@ -258,6 +259,69 @@ export async function savePublish(p: Publish) {
 export async function listPublishes(): Promise<Publish[]> {
   const all = await db.publishes.toArray()
   return all.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+export type MarkRecord = {
+  studentName: string
+  at: string
+  course: string
+  title: string
+}
+
+export type DashboardData = {
+  running: Assignment[]
+  openCount: number
+  unpaidCount: number
+  publishCount: number
+  materialCount: number
+  marks: MarkRecord[]
+}
+
+/** 看板一次取全，避免页面里散着查 */
+export async function loadDashboard(): Promise<DashboardData> {
+  const [assignments, subs, students, pubs] = await Promise.all([
+    listAssignments(),
+    db.submissions.where('state').equals('paid').toArray(),
+    db.students.toArray(),
+    db.publishes.toArray(),
+  ])
+
+  const paidBy = new Map<string, number>()
+  for (const s of subs) {
+    paidBy.set(s.assignmentId, (paidBy.get(s.assignmentId) ?? 0) + 1)
+  }
+
+  const running = assignments.filter((a) => a.status !== 'closed')
+  const unpaidCount = running.reduce(
+    (sum, a) => sum + Math.max(0, a.total - (paidBy.get(a.id) ?? 0)),
+    0,
+  )
+
+  const nameOf = new Map(students.map((s) => [s.id, s.name]))
+  const assignmentOf = new Map(assignments.map((a) => [a.id, a]))
+
+  const marks: MarkRecord[] = subs
+    .filter((s) => s.submittedAt)
+    .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''))
+    .slice(0, 6)
+    .map((s) => {
+      const a = assignmentOf.get(s.assignmentId)
+      return {
+        studentName: nameOf.get(s.studentId) ?? '未知',
+        at: s.submittedAt!,
+        course: a?.course ?? '',
+        title: a?.title ?? '',
+      }
+    })
+
+  return {
+    running,
+    openCount: running.length,
+    unpaidCount,
+    publishCount: pubs.filter((p) => p.state !== 'offline').length,
+    materialCount: pubs.reduce((sum, p) => sum + p.items.length, 0),
+    marks,
+  }
 }
 
 /** 清空所有本地数据，回到随包的那份示例名单 */export async function resetToSeed() {

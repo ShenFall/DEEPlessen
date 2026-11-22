@@ -157,7 +157,7 @@ export default function AssignmentListScreen({
         <span className="al-brand">拾课</span>
         <span className="al-actions">
           <button type="button" className="al-import" onClick={onToday}>
-            今日
+            看板
           </button>
           <button type="button" className="al-import" onClick={onImportRoster}>
             名单
