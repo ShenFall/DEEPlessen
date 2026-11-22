@@ -71,7 +71,9 @@ export default function DashboardScreen({
   return (
     <main className="db">
       <nav className="db-rail" aria-label="主导航">
-        <span className="db-rail-logo">泽</span>
+        <span className="db-rail-logo" title="ShenFall" aria-label="深 ShenFall">
+          深
+        </span>
         <button type="button" className="db-rail-item" data-on="true">
           看板
         </button>
