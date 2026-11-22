@@ -33,12 +33,14 @@ type Props = {
   students: Student[]
   assignment: Assignment
   initialPaid: string[]
+  onOpenImport: () => void
 }
 
 export default function ReconcileScreen({
   students,
   assignment,
   initialPaid,
+  onOpenImport,
 }: Props) {
   const roster = useMemo(() => students.filter((s) => s.active), [students])
   const [paid, setPaid] = useState<Set<string>>(() => new Set(initialPaid))
@@ -209,16 +211,21 @@ export default function ReconcileScreen({
           </span>
         </div>
 
-        <h1
-          className="rs-title"
-          onPointerDown={() => {
-            titleTimer.current = window.setTimeout(resetAll, LONG_PRESS)
-          }}
-          onPointerUp={() => window.clearTimeout(titleTimer.current)}
-          onPointerLeave={() => window.clearTimeout(titleTimer.current)}
-        >
-          {assignment.course} · {assignment.title}
-        </h1>
+        <div className="rs-titlerow">
+          <h1
+            className="rs-title"
+            onPointerDown={() => {
+              titleTimer.current = window.setTimeout(resetAll, LONG_PRESS)
+            }}
+            onPointerUp={() => window.clearTimeout(titleTimer.current)}
+            onPointerLeave={() => window.clearTimeout(titleTimer.current)}
+          >
+            {assignment.course} · {assignment.title}
+          </h1>
+          <button type="button" className="rs-import" onClick={onOpenImport}>
+            导入名单
+          </button>
+        </div>
 
         <div
           className="rs-progress"

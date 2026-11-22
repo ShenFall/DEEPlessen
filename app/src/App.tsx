@@ -1,24 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { loadWorkspace, type Workspace } from './db'
+import ImportScreen from './features/import/ImportScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
+
+type View = 'reconcile' | 'import'
 
 export default function App() {
   const [ws, setWs] = useState<Workspace | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [view, setView] = useState<View>('reconcile')
+
+  const refresh = useCallback(async () => {
+    const data = await loadWorkspace()
+    setWs(data)
+  }, [])
 
   useEffect(() => {
     let alive = true
-    loadWorkspace()
-      .then((data) => {
-        if (alive) setWs(data)
-      })
-      .catch((e: unknown) => {
-        if (alive) setError(e instanceof Error ? e.message : String(e))
-      })
+    refresh().catch((e: unknown) => {
+      if (alive) setError(e instanceof Error ? e.message : String(e))
+    })
     return () => {
       alive = false
     }
-  }, [])
+  }, [refresh])
 
   if (error) {
     return (
@@ -37,11 +42,23 @@ export default function App() {
     )
   }
 
+  if (view === 'import') {
+    return (
+      <ImportScreen
+        onCancel={() => setView('reconcile')}
+        onDone={() => {
+          void refresh().finally(() => setView('reconcile'))
+        }}
+      />
+    )
+  }
+
   return (
     <ReconcileScreen
       students={ws.students}
       assignment={ws.assignment}
       initialPaid={ws.paid}
+      onOpenImport={() => setView('import')}
     />
   )
 }

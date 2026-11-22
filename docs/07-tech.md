@@ -82,7 +82,10 @@
 
 原则：**能装库就别自己写**。这个项目真正需要自己写的只有「对账交互」，其余都是胶水。
 
-### Excel 解析：选 SheetJS，但**不要 `npm i xlsx`**
+### Excel 解析：只做 .xlsx，用 `read-excel-file`
+
+> **v0.8 定案**：不支持 `.xls`。用 `read-excel-file/browser`，gzip 17.8KB，且**按需 import**，不进首屏。
+> 下面关于 SheetJS 的内容保留作参考——哪天必须支持 `.xls` 再回来看。
 
 这是唯一一个必须小心的地方：
 
