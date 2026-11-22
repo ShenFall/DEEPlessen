@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { loadHandle, saveHandle, savePublish } from '../../db'
-import { publishCourseLocal } from '../../storage/local'
+import {
+  listPublishes,
+  loadHandle,
+  saveHandle,
+  savePublish,
+  type Publish,
+} from '../../db'
+import { publishCourseLocal, unpublishLocal } from '../../storage/local'
 import {
   copyIntoLibrary,
   ensureDir,
@@ -66,6 +72,8 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [query, setQuery] = useState('')
   const [kind, setKind] = useState<Kind | 'all'>('all')
   const [sort, setSort] = useState<'recent' | 'name'>('recent')
+  const [publishes, setPublishes] = useState<Publish[]>([])
+  const [offarm, setOffarm] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
@@ -112,6 +120,14 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
     setEntries(await listMaterials(handle))
   }, [])
 
+  const refreshPublishes = useCallback(async () => {
+    setPublishes(await listPublishes())
+  }, [])
+
+  useEffect(() => {
+    void refreshPublishes()
+  }, [refreshPublishes])
+
   useEffect(() => {
     if (!isSupported()) return
     void (async () => {
@@ -157,11 +173,42 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
         files.map((f) => ({ name: f.name, size: f.size })),
       )
       await savePublish(result)
+      await refreshPublishes()
       setNotice(`已发布 publish/${result.id}（${result.items.length} 个文件）`)
     } catch (e) {
       setNotice(e instanceof Error ? e.message : '发布失败')
     } finally {
       setBusy(false)
+    }
+  }
+
+  async function unpublish(p: Publish) {
+    if (!root || busy) return
+    if (offarm !== p.id) {
+      setOffarm(p.id)
+      window.setTimeout(() => setOffarm((cur) => (cur === p.id ? null : cur)), 3000)
+      return
+    }
+    setBusy(true)
+    try {
+      await unpublishLocal(root, p.id)
+      await savePublish({ ...p, state: 'offline' })
+      await refreshPublishes()
+      setOffarm(null)
+      setNotice(`已下架 ${p.id}`)
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '下架失败')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function copySlug(slug: string) {
+    try {
+      await navigator.clipboard.writeText(slug)
+      setNotice('已复制 slug')
+    } catch {
+      setNotice(slug)
     }
   }
 
@@ -340,6 +387,49 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
                 </ul>
               </section>
             ))}
+
+            {publishes.length > 0 && (
+              <section className="lb-group">
+                <div className="lb-group-head">
+                  <p className="lb-group-title">
+                    已发布
+                    <span>{publishes.length}</span>
+                  </p>
+                </div>
+                <ul className="lb-list">
+                  {publishes.map((p) => (
+                    <li key={p.id} className="lb-pub-row">
+                      <span className="lb-pub-main">
+                        <span className="lb-name">
+                          {p.course} · {p.items.length} 个文件
+                        </span>
+                        <span className="lb-pub-slug">
+                          {p.id}
+                          {p.state === 'offline' ? ' · 已下架' : ''}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        className="lb-pub-act"
+                        onClick={() => void copySlug(p.id)}
+                      >
+                        复制
+                      </button>
+                      {p.state !== 'offline' && (
+                        <button
+                          type="button"
+                          className="lb-pub-act"
+                          data-armed={offarm === p.id}
+                          onClick={() => void unpublish(p)}
+                        >
+                          {offarm === p.id ? '确认下架' : '下架'}
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </>
         )}
 

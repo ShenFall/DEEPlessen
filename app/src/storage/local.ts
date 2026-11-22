@@ -44,3 +44,18 @@ export async function publishCourseLocal(
 
   return { id: slug, course, state: 'local', items, createdAt }
 }
+
+/** 下架：删掉 publish/<slug> 整个目录，本地库不动 */
+export async function unpublishLocal(
+  root: FileSystemDirectoryHandle,
+  slug: string,
+): Promise<void> {
+  try {
+    const dir = (await root.getDirectoryHandle('publish')) as FileSystemDirectoryHandle & {
+      removeEntry(name: string, options?: { recursive?: boolean }): Promise<void>
+    }
+    await dir.removeEntry(slug, { recursive: true })
+  } catch {
+    // 目录已经不在了，视为成功
+  }
+}

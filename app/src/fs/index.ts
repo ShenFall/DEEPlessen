@@ -27,6 +27,7 @@ export const isSupported = () =>
 /** TS 的 lib.dom 还没带 entries()，这里补一个 */
 type DirHandle = FileSystemDirectoryHandle & {
   entries(): AsyncIterableIterator<[string, FileSystemHandle]>
+  removeEntry(name: string, options?: { recursive?: boolean }): Promise<void>
 }
 
 export async function pickLibraryRoot(): Promise<FileSystemDirectoryHandle | null> {
