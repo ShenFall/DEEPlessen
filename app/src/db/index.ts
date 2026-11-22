@@ -272,6 +272,7 @@ export type DashboardData = {
   running: Assignment[]
   openCount: number
   unpaidCount: number
+  paidTotal: number
   publishCount: number
   materialCount: number
   marks: MarkRecord[]
@@ -318,6 +319,7 @@ export async function loadDashboard(): Promise<DashboardData> {
     running,
     openCount: running.length,
     unpaidCount,
+    paidTotal: running.reduce((sum, a) => sum + (paidBy.get(a.id) ?? 0), 0),
     publishCount: pubs.filter((p) => p.state !== 'offline').length,
     materialCount: pubs.reduce((sum, p) => sum + p.items.length, 0),
     marks,

@@ -7,10 +7,17 @@
 }
 
 .db-top {
+  padding: 16px var(--pad-x) 10px;
+}
+
+.db-top-inner {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 16px var(--pad-x) 10px;
+  gap: 12px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .db-brand {
@@ -23,6 +30,7 @@
   font-family: var(--font-mono);
   font-size: var(--fs-11);
   color: var(--mute);
+  white-space: nowrap;
 }
 
 .db-body {

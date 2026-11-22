@@ -29,6 +29,7 @@ export default function DashboardScreen({
 }: Props) {
   const running = [...data.running].sort((a, b) => a.due.localeCompare(b.due))
   const lead = running[0]
+  const others = running.slice(1, 5)
   const leadPaid = lead ? paidCounts[lead.id] ?? 0 : 0
   const leadLeft = lead ? Math.max(0, lead.total - leadPaid) : 0
   const pct = lead && lead.total > 0 ? (leadPaid / lead.total) * 100 : 0
@@ -36,14 +37,16 @@ export default function DashboardScreen({
   const dateText = new Date().toLocaleDateString('zh-CN', {
     month: 'long',
     day: 'numeric',
-    weekday: 'long',
+    weekday: 'short',
   })
 
   return (
     <main className="db">
       <header className="db-top">
-        <span className="db-brand">拾课</span>
-        <span className="db-date">{dateText}</span>
+        <div className="db-top-inner">
+          <span className="db-brand">拾课</span>
+          <span className="db-date">{dateText}</span>
+        </div>
       </header>
 
       <div className="db-body">
@@ -57,8 +60,8 @@ export default function DashboardScreen({
             <span>待收人次</span>
           </div>
           <div>
-            <b>{data.publishCount}</b>
-            <span>已发布</span>
+            <b>{data.paidTotal}</b>
+            <span>已收份</span>
           </div>
         </div>
 
@@ -80,7 +83,7 @@ export default function DashboardScreen({
               <i style={{ width: `${pct}%` }} />
             </div>
             <p className="db-lead-meta">
-              {leadPaid}/{lead.total} 已交
+              已收 {leadPaid} / {lead.total}
             </p>
             <button
               type="button"
@@ -101,14 +104,14 @@ export default function DashboardScreen({
 
         <section className="db-block">
           <div className="db-block-head">
-            <p className="db-block-title">近期清点</p>
+            <p className="db-block-title">其他清点</p>
             <button type="button" className="db-link" onClick={onAll}>
               全部
             </button>
           </div>
-          {running.length === 0 && <p className="db-empty">暂无</p>}
+          {others.length === 0 && <p className="db-empty">没有其他进行中的清点</p>}
           <ul className="db-list">
-            {running.slice(0, 4).map((a) => {
+            {others.map((a) => {
               const paid = paidCounts[a.id] ?? 0
               const left = Math.max(0, a.total - paid)
               const due = dueLabel(a.due)
