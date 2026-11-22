@@ -33,7 +33,12 @@
 | [docs/11-mobile.md](docs/11-mobile.md) | 手机端规格（主场景）：课堂现场、4 列网格、离线、强光 |
 | [docs/12-m0-plan.md](docs/12-m0-plan.md) | M0 细分任务表（0.1–0.12）与真机暴露的问题 |
 | [docs/13-status.md](docs/13-status.md) | **当前进度**：今天做到哪、明天从哪继续 |
-| [docs/14-ui-system.md](docs/14-ui-system.md) | UI 设计方案：组件层、关键界面、响应式、微交互与无障碍核验 |
+| [docs/14-ui-system.md](docs/14-ui-system.md) | UI 组件层、对账台、响应式、微交互与无障碍核验 |
+| [docs/15-m3-plan.md](docs/15-m3-plan.md) | M3 细分任务表与路线取舍 |
+| [docs/16-assets-generation.md](docs/16-assets-generation.md) | 视觉素材生成对接单：需求队列、生成规格与验收记录（当前暂停派生） |
+| [docs/17-dashboard-ui.md](docs/17-dashboard-ui.md) | UI v2 视觉气质与动效：双端看板、个人空间、Orbit Plotter 加载动画 |
+| [docs/18-reference-materials.md](docs/18-reference-materials.md) | 参考素材库说明：6 张风格参考的提取边界与禁用项 |
+| [docs/19-ui-execution-brief.md](docs/19-ui-execution-brief.md) | **UI 执行规格（内容优先）**：待办 / 时间 / 作业 / 资料 / 通知；点名为二级功能 |
 | [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
 
 ## 已定决策
@@ -49,6 +54,8 @@
 | [0007](docs/decisions/0007-no-qr-checkin-for-now.md) | 扫码签到搁置，两位学号改作搜索 | 29 人算下来扫码更慢，还多三个失败模式 |
 | [0008](docs/decisions/0008-local-library-tauri.md) | 本地库 + Tauri 壳，分发只走对象存储 | 微信目录里混着私人文件，不能给自动化开门 |
 | [0009](docs/decisions/0009-no-sequential-guide.md) | 不做顺序引导，做常驻撤销 | 学生是随机走上来的，"下一个"不在你面前 |
+| [0010](docs/decisions/0010-edge-only-and-student-lite.md) | 学委桌面 Edge Only；学生端独立轻量构建 | 两端兼容性与体积目标完全不同 |
+| [0011](docs/decisions/0011-dashboard-first-and-precision-visuals.md) | 仪表盘优先；看板升级精密视觉，点名保持工具化 | 首页要总览全局，高级感不靠霓虹堆叠 |
 
 ## 怎么一起讨论
 
