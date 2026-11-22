@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { loadHandle, saveHandle } from '../../db'
+import { loadHandle, saveHandle, savePublish } from '../../db'
+import { publishCourseLocal } from '../../storage/local'
 import {
   copyIntoLibrary,
   ensureDir,
@@ -95,6 +96,24 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
       setNotice('已授权')
     } else {
       setNotice('未获授权，无法读写')
+    }
+  }
+
+  async function publish(course: string, files: LibraryEntry[]) {
+    if (!root || busy) return
+    setBusy(true)
+    try {
+      const result = await publishCourseLocal(
+        root,
+        course,
+        files.map((f) => ({ name: f.name, size: f.size })),
+      )
+      await savePublish(result)
+      setNotice(`已发布 publish/${result.id}（${result.items.length} 个文件）`)
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '发布失败')
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -221,10 +240,19 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
 
             {groups.map(([course, list]) => (
               <section className="lb-group" key={course}>
-                <p className="lb-group-title">
-                  {course}
-                  <span>{list.length}</span>
-                </p>
+                <div className="lb-group-head">
+                  <p className="lb-group-title">
+                    {course}
+                    <span>{list.length}</span>
+                  </p>
+                  <button
+                    type="button"
+                    className="lb-publish"
+                    onClick={() => void publish(course, list)}
+                  >
+                    发布
+                  </button>
+                </div>
                 <ul className="lb-list">
                   {list.map((e) => (
                     <li key={e.path}>

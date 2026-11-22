@@ -219,6 +219,22 @@
   margin-top: 18px;
 }
 
+.lb-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lb-publish {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid var(--cell-edge);
+  border-radius: 12px;
+  font-size: var(--fs-11);
+  color: var(--amber);
+}
+
 .lb-group-title {
   display: flex;
   align-items: baseline;
