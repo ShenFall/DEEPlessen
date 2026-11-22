@@ -270,7 +270,9 @@ export default function ReconcileScreen({
                 <div key={s.id} className="rs-finish-row">
                   <div>
                     <p className="rs-finish-name">{s.name}</p>
-                    <p className="rs-finish-sub">{s.sid.slice(-2)} 号</p>
+                    <p className="rs-finish-sub">
+                      {s.sid ? `${s.sid.slice(-2)} 号` : '无学号'}
+                    </p>
                   </div>
                   <button type="button" onClick={() => mark(s.id, s.name)}>
                     标记已交

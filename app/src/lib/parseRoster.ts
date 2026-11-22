@@ -124,8 +124,11 @@ export async function parseRoster(file: File): Promise<ParseResult> {
     }
 
     if (!sid) {
-      state = 'bad'
-      note = note || '没有学号'
+      // 学号可选：只有姓名也能导，靠姓名识别
+      if (state !== 'bad') {
+        state = 'warn'
+        note = '没有学号，按姓名匹配'
+      }
     } else if (!SID_RE.test(sid)) {
       // Excel 把学号当数字时，前导 0 会消失，甚至会变成科学计数法
       if (/^\d+$/.test(sid) && sid.length < 10) {
@@ -144,9 +147,14 @@ export async function parseRoster(file: File): Promise<ParseResult> {
       seenSid.set(sid, rows.length)
     }
 
-    if (name && seenName.has(name) && state !== 'bad') {
-      state = 'warn'
-      note = `与第 ${seenName.get(name)! + 1} 行同名`
+    if (name && seenName.has(name)) {
+      if (!sid) {
+        state = 'bad'
+        note = '同名又没有学号，无法区分'
+      } else if (state !== 'bad') {
+        state = 'warn'
+        note = `与第 ${seenName.get(name)! + 1} 行同名`
+      }
     } else if (name) {
       seenName.set(name, rows.length)
     }

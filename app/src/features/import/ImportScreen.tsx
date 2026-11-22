@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { db, type Student } from '../../db'
+import { db, resetToSeed, type Student } from '../../db'
 import type { ParseResult } from '../../lib/parseRoster'
 import './import.css'
 
@@ -14,6 +14,7 @@ export default function ImportScreen({ onCancel, onDone }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const okCount = result?.rows.filter((r) => r.state === 'ok').length ?? 0
@@ -41,12 +42,15 @@ export default function ImportScreen({ onCancel, onDone }: Props) {
     setBusy(true)
     try {
       const existing = await db.students.toArray()
-      const bySid = new Map(existing.map((s) => [s.sid, s]))
+      const bySid = new Map(
+        existing.filter((s) => s.sid).map((s) => [s.sid, s]),
+      )
+      const byName = new Map(existing.map((s) => [s.name, s]))
       const keep = new Set<string>()
 
       const next: Student[] = usable.map((r, i) => {
-        const old = bySid.get(r.sid)
-        const id = old?.id ?? `s_${r.sid || `n${i}`}`
+        const old = r.sid ? bySid.get(r.sid) : byName.get(r.name)
+        const id = old?.id ?? `s_${r.sid || r.name || `n${i}`}`
         keep.add(id)
         return { id, sid: r.sid, name: r.name, active: true }
       })
@@ -70,6 +74,21 @@ export default function ImportScreen({ onCancel, onDone }: Props) {
     setFileName('')
     setError(null)
     if (inputRef.current) inputRef.current.value = ''
+  }
+
+  async function handleReset() {
+    if (!confirmReset) {
+      setConfirmReset(true)
+      window.setTimeout(() => setConfirmReset(false), 3000)
+      return
+    }
+    setBusy(true)
+    try {
+      await resetToSeed()
+      onDone()
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -167,6 +186,16 @@ export default function ImportScreen({ onCancel, onDone }: Props) {
             </button>
           </>
         )}
+
+        <button
+          type="button"
+          className="imp-reset"
+          data-armed={confirmReset}
+          disabled={busy}
+          onClick={() => void handleReset()}
+        >
+          {confirmReset ? '再点一次，清空并回到示例名单' : '重置为示例名单'}
+        </button>
       </div>
     </main>
   )

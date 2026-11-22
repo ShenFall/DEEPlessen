@@ -111,3 +111,18 @@ export async function setPaid(
 export async function clearAssignment(assignmentId: string) {
   await db.submissions.where('assignmentId').equals(assignmentId).delete()
 }
+
+/** 清空所有本地数据，回到随包的那份示例名单 */
+export async function resetToSeed() {
+  await db.transaction(
+    'rw',
+    [db.students, db.assignments, db.submissions, db.meta],
+    async () => {
+      await db.submissions.clear()
+      await db.students.clear()
+      await db.assignments.clear()
+      await db.meta.clear()
+    },
+  )
+  await seed()
+}
