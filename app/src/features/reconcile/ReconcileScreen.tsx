@@ -5,7 +5,12 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
-import { ACTIVE_ROSTER, ASSIGNMENT } from '../../data/roster'
+import {
+  clearAssignment,
+  setPaid as persistPaid,
+  type Assignment,
+  type Student,
+} from '../../db'
 import './reconcile.css'
 
 type Filter = 'all' | 'unpaid' | 'paid'
@@ -20,27 +25,23 @@ const TAP_MAX_DIST = 8
 const REMOVE_DELAY = 220
 const RESTORE_HOLD = 350
 const LONG_PRESS = 600
-const STORAGE_KEY = `deep.paid.${ASSIGNMENT.id}`
 const HINT_KEY = 'deep.hint.restore'
 /** 「长按可恢复」最多提示两次，之后静默 */
 const HINT_LIMIT = 2
 
-const VALID_IDS = new Set(ACTIVE_ROSTER.map((s) => s.id))
-
-function loadSaved(): string[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw) as { paid?: string[] }
-    return (parsed.paid ?? []).filter((id) => VALID_IDS.has(id))
-  } catch {
-    return []
-  }
+type Props = {
+  students: Student[]
+  assignment: Assignment
+  initialPaid: string[]
 }
 
-export default function ReconcileScreen() {
-  const [initial] = useState(loadSaved)
-  const [paid, setPaid] = useState<Set<string>>(() => new Set(initial))
+export default function ReconcileScreen({
+  students,
+  assignment,
+  initialPaid,
+}: Props) {
+  const roster = useMemo(() => students.filter((s) => s.active), [students])
+  const [paid, setPaid] = useState<Set<string>>(() => new Set(initialPaid))
   const [filter, setFilter] = useState<Filter>('all')
   const [toast, setToast] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -55,27 +56,23 @@ export default function ReconcileScreen() {
   const holdTimer = useRef<number | undefined>(undefined)
   const titleTimer = useRef<number | undefined>(undefined)
 
-  const total = ACTIVE_ROSTER.length
+  const total = roster.length
   const paidCount = paid.size
   const unpaidCount = total - paidCount
   const percent = total === 0 ? 0 : (paidCount / total) * 100
   const remaining = useMemo(
-    () => ACTIVE_ROSTER.filter((s) => !paid.has(s.id)),
-    [paid],
+    () => roster.filter((s) => !paid.has(s.id)),
+    [roster, paid],
   )
   const takeover = !forceGrid && remaining.length <= 2
 
-  const students = useMemo(() => {
+  const visible = useMemo(() => {
     if (filter === 'unpaid') {
-      return ACTIVE_ROSTER.filter((s) => !paid.has(s.id) || fading.includes(s.id))
+      return roster.filter((s) => !paid.has(s.id) || fading.includes(s.id))
     }
-    if (filter === 'paid') return ACTIVE_ROSTER.filter((s) => paid.has(s.id))
-    return ACTIVE_ROSTER
-  }, [filter, paid, fading])
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ paid: [...paid] }))
-  }, [paid])
+    if (filter === 'paid') return roster.filter((s) => paid.has(s.id))
+    return roster
+  }, [filter, roster, paid, fading])
 
   useEffect(() => {
     if (!toast) return
@@ -102,6 +99,7 @@ export default function ReconcileScreen() {
     })
     setToast(name)
     setForceGrid(false)
+    void persistPaid(assignment.id, id, true)
 
     setFlashId(id)
     window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 260)
@@ -121,10 +119,11 @@ export default function ReconcileScreen() {
       next.delete(id)
       return next
     })
+    void persistPaid(assignment.id, id, false)
   }
 
   function resetAll() {
-    localStorage.removeItem(STORAGE_KEY)
+    void clearAssignment(assignment.id)
     setPaid(new Set())
     setFading([])
     setToast(null)
@@ -188,7 +187,7 @@ export default function ReconcileScreen() {
     mark(id, name)
   }
 
-  const dueText = new Date(ASSIGNMENT.due).toLocaleString('zh-CN', {
+  const dueText = new Date(assignment.due).toLocaleString('zh-CN', {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -218,7 +217,7 @@ export default function ReconcileScreen() {
           onPointerUp={() => window.clearTimeout(titleTimer.current)}
           onPointerLeave={() => window.clearTimeout(titleTimer.current)}
         >
-          {ASSIGNMENT.course} · {ASSIGNMENT.title}
+          {assignment.course} · {assignment.title}
         </h1>
 
         <div
@@ -290,7 +289,7 @@ export default function ReconcileScreen() {
         </section>
       ) : (
         <div className="rs-grid">
-          {students.map((s) => {
+          {visible.map((s) => {
             const isPaid = paid.has(s.id)
             return (
               <button

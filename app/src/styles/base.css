@@ -55,6 +55,31 @@ button {
   color: #1a1206;
 }
 
+.boot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 100dvh;
+  padding: var(--pad-x);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--mute);
+}
+
+.boot-line,
+.boot-sub {
+  margin: 0;
+  text-align: center;
+}
+
+.boot-sub {
+  font-size: var(--fs-11);
+  color: var(--red);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
