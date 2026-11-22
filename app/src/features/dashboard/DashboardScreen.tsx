@@ -1,4 +1,4 @@
-import type { DashboardData } from '../../db'
+import type { Assignment, DashboardData } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './dashboard.css'
 
@@ -10,14 +10,38 @@ type Props = {
   onLibrary: () => void
 }
 
-function clockText(iso: string) {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return '--:--'
-  return d.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
+type ActionItem = {
+  id: string
+  title: string
+  source: string
+  time: string
+  overdue: boolean
+  left: number
+}
+
+/** 从真实数据里推出来的行动项，不编造业务 */
+function collectActions(
+  running: Assignment[],
+  paidCounts: Record<string, number>,
+): ActionItem[] {
+  return running
+    .filter((a) => a.status !== 'closed')
+    .map((a) => {
+      const paid = paidCounts[a.id] ?? 0
+      const due = dueLabel(a.due)
+      return {
+        id: a.id,
+        title: `${a.course} · ${a.title}`,
+        source: '作业',
+        time: due.text,
+        overdue: due.overdue,
+        left: Math.max(0, a.total - paid),
+      }
+    })
+    .sort((a, b) => {
+      if (a.overdue !== b.overdue) return a.overdue ? -1 : 1
+      return a.time.localeCompare(b.time)
+    })
 }
 
 export default function DashboardScreen({
@@ -28,11 +52,8 @@ export default function DashboardScreen({
   onLibrary,
 }: Props) {
   const running = [...data.running].sort((a, b) => a.due.localeCompare(b.due))
-  const lead = running[0]
-  const others = running.slice(1, 5)
-  const leadPaid = lead ? paidCounts[lead.id] ?? 0 : 0
-  const leadLeft = lead ? Math.max(0, lead.total - leadPaid) : 0
-  const pct = lead && lead.total > 0 ? (leadPaid / lead.total) * 100 : 0
+  const actions = collectActions(running, paidCounts).slice(0, 5)
+  const upcoming = running.slice(0, 4)
 
   const dateText = new Date().toLocaleDateString('zh-CN', {
     month: 'long',
@@ -40,133 +61,142 @@ export default function DashboardScreen({
     weekday: 'short',
   })
 
+  const headline =
+    data.unpaidCount > 0
+      ? `还有 ${data.unpaidCount} 人次没收`
+      : data.openCount > 0
+        ? '都收齐了'
+        : '暂时没有要收的'
+
   return (
     <main className="db">
-      <header className="db-top">
-        <div className="db-top-inner">
-          <span className="db-brand">拾课</span>
-          <span className="db-date">{dateText}</span>
-        </div>
-      </header>
+      <nav className="db-rail" aria-label="主导航">
+        <span className="db-rail-logo">泽</span>
+        <button type="button" className="db-rail-item" data-on="true">
+          看板
+        </button>
+        <button type="button" className="db-rail-item" onClick={onAll}>
+          作业
+        </button>
+        <button type="button" className="db-rail-item" onClick={onLibrary}>
+          资料
+        </button>
+        <span className="db-rail-soon">待办</span>
+        <span className="db-rail-soon">通知</span>
+      </nav>
 
-      <div className="db-body">
-        <div className="db-kpis">
+      <div className="db-main">
+        <header className="db-head">
           <div>
-            <b>{data.openCount}</b>
-            <span>进行中</span>
+            <p className="db-eyebrow">{dateText}</p>
+            <h1 className="db-headline">{headline}</h1>
           </div>
-          <div data-tone={data.unpaidCount > 0 ? 'warn' : undefined}>
-            <b>{data.unpaidCount}</b>
-            <span>待收人次</span>
-          </div>
-          <div>
-            <b>{data.paidTotal}</b>
-            <span>已收份</span>
-          </div>
-        </div>
+          <span className="db-mark">拾课</span>
+        </header>
 
-        {lead ? (
-          <section className="db-lead">
-            <div className="db-lead-head">
-              <p className="db-lead-eyebrow">最紧要</p>
-              <span className="db-lead-due" data-overdue={dueLabel(lead.due).overdue}>
-                {dueLabel(lead.due).text}
-              </span>
+        <div className="db-grid">
+          <section className="db-panel db-panel--now">
+            <div className="db-panel-head">
+              <p className="db-panel-title">现在要做</p>
+              <span className="db-panel-meta">{actions.length} 项</span>
             </div>
-            <p className="db-lead-title">
-              {lead.course} · {lead.title}
-            </p>
-            <p className="db-lead-num">
-              剩 <b>{leadLeft}</b> 人
-            </p>
-            <div className="db-bar">
-              <i style={{ width: `${pct}%` }} />
-            </div>
-            <p className="db-lead-meta">
-              已收 {leadPaid} / {lead.total}
-            </p>
-            <button
-              type="button"
-              className="db-primary"
-              onClick={() => onOpen(lead.id)}
-            >
-              去点名
-            </button>
-          </section>
-        ) : (
-          <section className="db-lead db-lead--empty">
-            <p className="db-empty-title">没有要收的作业</p>
-            <button type="button" className="db-ghost" onClick={onAll}>
-              新建清点
-            </button>
-          </section>
-        )}
 
-        <section className="db-block">
-          <div className="db-block-head">
-            <p className="db-block-title">其他清点</p>
-            <button type="button" className="db-link" onClick={onAll}>
-              全部
-            </button>
-          </div>
-          {others.length === 0 && <p className="db-empty">没有其他进行中的清点</p>}
-          <ul className="db-list">
-            {others.map((a) => {
-              const paid = paidCounts[a.id] ?? 0
-              const left = Math.max(0, a.total - paid)
-              const due = dueLabel(a.due)
-              return (
+            {actions.length === 0 && (
+              <p className="db-quiet">没有待处理的事</p>
+            )}
+
+            <ul className="db-actions">
+              {actions.map((a) => (
                 <li key={a.id}>
                   <button
                     type="button"
-                    className="db-row"
+                    className="db-action"
                     onClick={() => onOpen(a.id)}
                   >
-                    <span className="db-row-main">
-                      <span className="db-row-title">
-                        {a.course} · {a.title}
-                      </span>
-                      <span className="db-row-meta" data-overdue={due.overdue}>
-                        {due.text} · {paid}/{a.total}
+                    <span className="db-action-main">
+                      <span className="db-action-title">{a.title}</span>
+                      <span className="db-action-sub">
+                        <span className="db-tag">作业</span>
+                        <span data-overdue={a.overdue}>{a.time}</span>
+                        <span>剩 {a.left}</span>
                       </span>
                     </span>
-                    <span className="db-row-left">{left === 0 ? '齐' : left}</span>
+                    <span className="db-action-go">去点名</span>
                   </button>
                 </li>
-              )
-            })}
-          </ul>
-        </section>
+              ))}
+            </ul>
 
-        <section className="db-block">
-          <div className="db-block-head">
-            <p className="db-block-title">最近标记</p>
-          </div>
-          {data.marks.length === 0 && <p className="db-empty">还没有记录</p>}
-          <ul className="db-list db-list--plain">
-            {data.marks.map((m, i) => (
-              <li key={`${m.studentName}-${m.at}-${i}`} className="db-mark">
-                <span className="db-mark-name">{m.studentName}</span>
-                <span className="db-mark-what">
-                  {m.course} · {m.title}
-                </span>
-                <span className="db-mark-time">{clockText(m.at)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+            {running.length > actions.length && (
+              <button type="button" className="db-more" onClick={onAll}>
+                查看全部 {running.length} 个清点
+              </button>
+            )}
+          </section>
 
-        <section className="db-block">
-          <div className="db-block-head">
-            <p className="db-block-title">资料</p>
-            <button type="button" className="db-link" onClick={onLibrary}>
-              打开
+          <section className="db-panel db-panel--next">
+            <div className="db-panel-head">
+              <p className="db-panel-title">接下来</p>
+            </div>
+            {upcoming.length === 0 && <p className="db-quiet">暂无截止</p>}
+            <ul className="db-timeline">
+              {upcoming.map((a) => {
+                const due = dueLabel(a.due)
+                return (
+                  <li key={a.id}>
+                    <span className="db-dot" data-overdue={due.overdue} />
+                    <span className="db-time" data-overdue={due.overdue}>
+                      {due.text}
+                    </span>
+                    <span className="db-what">
+                      {a.course} · {a.title}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+
+          <section className="db-panel">
+            <div className="db-panel-head">
+              <p className="db-panel-title">作业</p>
+              <button type="button" className="db-link" onClick={onAll}>
+                全部
+              </button>
+            </div>
+            <div className="db-figures">
+              <div>
+                <b>{data.openCount}</b>
+                <span>进行中</span>
+              </div>
+              <div>
+                <b>{data.unpaidCount}</b>
+                <span>待收</span>
+              </div>
+              <div>
+                <b>{data.paidTotal}</b>
+                <span>已收</span>
+              </div>
+            </div>
+          </section>
+
+          <section className="db-panel">
+            <div className="db-panel-head">
+              <p className="db-panel-title">资料</p>
+              <button type="button" className="db-link" onClick={onLibrary}>
+                打开
+              </button>
+            </div>
+            <p className="db-quiet">
+              {data.publishCount > 0
+                ? `${data.publishCount} 个已发布包 · ${data.materialCount} 个文件`
+                : '还没有发布过的资料包'}
+            </p>
+            <button type="button" className="db-ghost" onClick={onLibrary}>
+              进资料库
             </button>
-          </div>
-          <p className="db-muted">
-            {data.publishCount} 个已发布包 · {data.materialCount} 个文件
-          </p>
-        </section>
+          </section>
+        </div>
       </div>
     </main>
   )
