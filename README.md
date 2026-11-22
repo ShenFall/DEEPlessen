@@ -39,6 +39,7 @@
 | [docs/17-dashboard-ui.md](docs/17-dashboard-ui.md) | UI v2 视觉气质与动效：双端看板、个人空间、Orbit Plotter 加载动画 |
 | [docs/18-reference-materials.md](docs/18-reference-materials.md) | 参考素材库说明：6 张风格参考的提取边界与禁用项 |
 | [docs/19-ui-execution-brief.md](docs/19-ui-execution-brief.md) | **UI 执行规格（内容优先）**：待办 / 时间 / 作业 / 资料 / 通知；点名为二级功能 |
+| [docs/20-handoff.md](docs/20-handoff.md) | **双智能体分工与接口契约**：谁改什么、props 不许动、提交纪律 |
 | [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
 
 ## 已定决策
