@@ -408,3 +408,90 @@
     transform: translateY(14px);
   }
 }
+
+.rs-views {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.rs-views button {
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.rs-views button[data-on='true'] {
+  color: var(--text);
+  background: var(--cell);
+}
+
+.rs-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: view-in 200ms var(--ease);
+}
+
+.rs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 54px;
+  padding: 0 var(--pad-x);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.rs-row-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-15);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rs-row-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.rs-row-state {
+  margin-left: auto;
+  font-size: var(--fs-11);
+  color: var(--amber);
+}
+
+.rs-row[data-state='paid'] {
+  opacity: 0.45;
+}
+
+.rs-row[data-state='paid'] .rs-row-state {
+  color: var(--mute);
+}
+
+.rs-row[data-holding='true'] {
+  background: var(--cell);
+}
+
+.rs-row[data-flash='true'] {
+  animation: row-flash 260ms var(--ease);
+}
+
+@keyframes row-flash {
+  from {
+    background: rgba(233, 163, 65, 0.16);
+  }
+}
+
+.rs-empty {
+  padding: 44px var(--pad-x);
+  text-align: center;
+  font-size: var(--fs-12);
+  color: var(--mute);
+}

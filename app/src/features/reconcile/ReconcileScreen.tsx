@@ -50,7 +50,7 @@ export default function ReconcileScreen({
   const [flashId, setFlashId] = useState<string | null>(null)
   const [holdingId, setHoldingId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
-  const [forceGrid, setForceGrid] = useState(false)
+  const [view, setView] = useState<'grid' | 'list'>('grid')
   const [menuOpen, setMenuOpen] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -63,11 +63,6 @@ export default function ReconcileScreen({
   const paidCount = paid.size
   const unpaidCount = total - paidCount
   const percent = total === 0 ? 0 : (paidCount / total) * 100
-  const remaining = useMemo(
-    () => roster.filter((s) => !paid.has(s.id)),
-    [roster, paid],
-  )
-  const takeover = !forceGrid && remaining.length <= 5
 
   const visible = useMemo(() => {
     if (filter === 'unpaid') {
@@ -101,7 +96,6 @@ export default function ReconcileScreen({
       return next
     })
     setToast(name)
-    setForceGrid(false)
     void persistPaid(assignment.id, id, true)
 
     setFlashId(id)
@@ -130,7 +124,6 @@ export default function ReconcileScreen({
     setPaid(new Set())
     setFading([])
     setToast(null)
-    setForceGrid(false)
     setNotice('已清空本作业的标记')
   }
 
@@ -264,44 +257,57 @@ export default function ReconcileScreen({
               </button>
             )
           })}
+          <div className="rs-views">
+            <button
+              type="button"
+              data-on={view === 'grid'}
+              onClick={() => setView('grid')}
+            >
+              网格
+            </button>
+            <button
+              type="button"
+              data-on={view === 'list'}
+              onClick={() => setView('list')}
+            >
+              列表
+            </button>
+          </div>
         </div>
       </header>
 
-      {takeover ? (
-        <section className="rs-finish">
-          {remaining.length > 0 ? (
-            <>
-              <p className="rs-finish-eyebrow">还剩 {remaining.length} 人</p>
-              {remaining.map((s) => (
-                <div key={s.id} className="rs-finish-row">
-                  <div>
-                    <p className="rs-finish-name">{s.name}</p>
-                    <p className="rs-finish-sub">
-                      {s.sid ? `${s.sid.slice(-2)} 号` : '无学号'}
-                    </p>
-                  </div>
-                  <button type="button" onClick={() => mark(s.id, s.name)}>
-                    标记已交
-                  </button>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <p className="rs-finish-eyebrow">[OK]</p>
-              <p className="rs-finish-name">
-                {total}/{total} 齐了
-              </p>
-            </>
-          )}
-          <button
-            type="button"
-            className="rs-finish-back"
-            onClick={() => setForceGrid(true)}
-          >
-            查看全部 {total} 人
-          </button>
-        </section>
+      {view === 'list' ? (
+        <ul className="rs-list">
+          {visible.length === 0 && <li className="rs-empty">这里没有人</li>}
+          {visible.map((s) => {
+            const isPaid = paid.has(s.id)
+            return (
+              <li key={s.id}>
+                <button
+                  type="button"
+                  className="rs-row"
+                  data-state={isPaid ? 'paid' : 'unpaid'}
+                  data-flash={flashId === s.id}
+                  data-holding={holdingId === s.id}
+                  aria-pressed={isPaid}
+                  aria-label={`${s.name}，${isPaid ? '已交' : '未交'}`}
+                  onPointerDown={(e) => handlePointerDown(e, s.id, isPaid)}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={clearHold}
+                  onPointerCancel={clearHold}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onClick={() => handleClick(s.id, s.name, isPaid)}
+                >
+                  <span className="rs-row-name">{s.name}</span>
+                  <span className="rs-row-meta">
+                    {s.sid ? `${s.sid.slice(-2)} 号` : '无学号'}
+                  </span>
+                  <span className="rs-row-state">{isPaid ? '已交' : '未交'}</span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
       ) : (
         <div className="rs-grid">
           {visible.map((s) => {
@@ -336,8 +342,8 @@ export default function ReconcileScreen({
           type="button"
           className="rs-remain"
           onClick={() => {
-            if (remaining.length <= 5) setForceGrid(false)
-            else setFilter('unpaid')
+            setView('list')
+            setFilter('unpaid')
           }}
         >
           剩 {unpaidCount} 人
@@ -356,15 +362,6 @@ export default function ReconcileScreen({
               }}
             >
               导入名单
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false)
-                setForceGrid((v) => !v)
-              }}
-            >
-              {takeover ? `查看全部 ${total} 人` : '只看剩下的'}
             </button>
             <button
               type="button"
