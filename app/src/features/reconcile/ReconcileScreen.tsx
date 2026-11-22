@@ -51,6 +51,7 @@ export default function ReconcileScreen({
   const [holdingId, setHoldingId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
   const [forceGrid, setForceGrid] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const movedRef = useRef(false)
@@ -66,7 +67,7 @@ export default function ReconcileScreen({
     () => roster.filter((s) => !paid.has(s.id)),
     [roster, paid],
   )
-  const takeover = !forceGrid && remaining.length <= 2
+  const takeover = !forceGrid && remaining.length <= 5
 
   const visible = useMemo(() => {
     if (filter === 'unpaid') {
@@ -130,7 +131,7 @@ export default function ReconcileScreen({
     setFading([])
     setToast(null)
     setForceGrid(false)
-    setNotice('已清空本地数据')
+    setNotice('已清空本作业的标记')
   }
 
   function handlePointerDown(
@@ -222,8 +223,13 @@ export default function ReconcileScreen({
           >
             {assignment.course} · {assignment.title}
           </h1>
-          <button type="button" className="rs-import" onClick={onOpenImport}>
-            导入名单
+          <button
+            type="button"
+            className="rs-more"
+            aria-label="更多操作"
+            onClick={() => setMenuOpen(true)}
+          >
+            ⋯
           </button>
         </div>
 
@@ -290,10 +296,10 @@ export default function ReconcileScreen({
           )}
           <button
             type="button"
-            className="rs-finish-link"
+            className="rs-finish-back"
             onClick={() => setForceGrid(true)}
           >
-            查看名单
+            查看全部 {total} 人
           </button>
         </section>
       ) : (
@@ -330,6 +336,41 @@ export default function ReconcileScreen({
           剩 {unpaidCount}
         </button>
       </div>
+
+      {menuOpen && (
+        <div className="rs-sheet-wrap" onClick={() => setMenuOpen(false)}>
+          <div className="rs-sheet" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                onOpenImport()
+              }}
+            >
+              导入名单
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                setForceGrid((v) => !v)
+              }}
+            >
+              {takeover ? `查看全部 ${total} 人` : '只看剩下的'}
+            </button>
+            <button
+              type="button"
+              className="rs-danger"
+              onClick={() => {
+                setMenuOpen(false)
+                resetAll()
+              }}
+            >
+              重置本作业
+            </button>
+          </div>
+        </div>
+      )}
 
       {toast && (
         <div className="rs-toast" role="status" aria-live="polite">

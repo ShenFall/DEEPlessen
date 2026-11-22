@@ -67,12 +67,14 @@
   text-overflow: ellipsis;
 }
 
-.rs-import {
+.rs-more {
   flex: none;
-  padding: 4px 0;
-  font-size: var(--fs-11);
+  padding: 0 4px;
+  margin-top: -4px;
+  font-size: 18px;
+  line-height: 1;
   color: var(--dim);
-  white-space: nowrap;
+  letter-spacing: 0.08em;
 }
 
 .rs-progress {
@@ -130,6 +132,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 5px;
   padding: 11px var(--pad-x) 0;
+  animation: view-in 200ms var(--ease);
 }
 
 .cell {
@@ -271,9 +274,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
-  padding: 24px var(--pad-x) 28px;
+  padding: 32px var(--pad-x) 28px;
+  animation: view-in 200ms var(--ease);
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 .rs-finish-eyebrow {
@@ -322,10 +333,64 @@
   color: var(--mute);
 }
 
-.rs-finish-link {
-  align-self: flex-start;
-  margin-top: 4px;
-  padding: 6px 0;
-  font-size: var(--fs-11);
+.rs-finish-back {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: var(--fs-12);
   color: var(--dim);
+}
+
+.rs-sheet-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.45);
+  animation: fade-in 160ms var(--ease);
+}
+
+.rs-sheet {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 6px 0 calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  border-radius: 14px 14px 0 0;
+  background: var(--surface);
+  animation: sheet-up 220ms var(--ease);
+}
+
+.rs-sheet button {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  text-align: left;
+  font-size: var(--fs-13);
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+}
+
+.rs-sheet button:last-child {
+  border-bottom: 0;
+}
+
+.rs-danger {
+  color: var(--red);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    opacity: 0.4;
+    transform: translateY(14px);
+  }
 }
