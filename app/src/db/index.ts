@@ -133,6 +133,17 @@ export async function paidCounts(): Promise<Record<string, number>> {
   return map
 }
 
+/** 名单变过之后，未结束的清点人数要跟着改，否则卡片上的 x/y 会失真 */
+export async function syncAssignmentTotals() {
+  const total = await countActiveStudents()
+  const open = await db.assignments
+    .filter((a) => a.status !== 'closed')
+    .toArray()
+  const stale = open.filter((a) => a.total !== total)
+  if (!stale.length) return
+  await db.assignments.bulkPut(stale.map((a) => ({ ...a, total })))
+}
+
 export async function createAssignment(input: {
   course: string
   title: string

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   cloneAssignment,
   createAssignment,
+  ensureSeed,
   listAssignments,
   loadWorkspace,
   paidCounts,
   setAssignmentStatus,
+  syncAssignmentTotals,
   type Assignment,
   type Workspace,
 } from './db'
@@ -22,8 +24,12 @@ export default function App() {
   const [view, setView] = useState<View>('reconcile')
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** 从哪个界面进的导入页，回来就回哪 */
+  const [returnTo, setReturnTo] = useState<View>('reconcile')
 
   const bootstrap = useCallback(async (id?: string) => {
+    await ensureSeed()
+    await syncAssignmentTotals()
     const [workspace, assignments, paid] = await Promise.all([
       loadWorkspace(id),
       listAssignments(),
@@ -85,12 +91,18 @@ export default function App() {
     )
   }
 
+  function openImport(from: View) {
+    setReturnTo(from)
+    setView('import')
+  }
+
   if (view === 'import') {
+    const back = () => setView(ws ? returnTo : 'list')
     return (
       <ImportScreen
-        onCancel={() => setView(ws ? 'reconcile' : 'list')}
+        onCancel={back}
         onDone={() => {
-          void bootstrap(ws?.assignment.id).finally(() => setView('reconcile'))
+          void bootstrap(ws?.assignment.id).finally(back)
         }}
       />
     )
@@ -103,7 +115,7 @@ export default function App() {
         paidCounts={counts}
         onOpen={(id) => void open(id)}
         onCreate={(input) => void create(input)}
-        onImportRoster={() => setView('import')}
+        onImportRoster={() => openImport('list')}
       />
     )
   }
@@ -114,7 +126,7 @@ export default function App() {
       assignment={ws.assignment}
       initialPaid={ws.paid}
       onBack={() => setView('list')}
-      onOpenImport={() => setView('import')}
+      onOpenImport={() => openImport('reconcile')}
       onToggleStatus={() => void toggleStatus()}
       onClone={() => void cloneCurrent()}
     />
