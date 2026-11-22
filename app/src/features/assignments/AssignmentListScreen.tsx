@@ -33,6 +33,13 @@ function toInputValue(d: Date) {
   )}:${p(d.getMinutes())}`
 }
 
+function absDate(iso: string) {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '时间未知'
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
 export default function AssignmentListScreen({
   assignments,
   paidCounts,
@@ -92,6 +99,58 @@ export default function AssignmentListScreen({
     setDeleteArmed(false)
   }
 
+  const running = assignments.filter((a) => a.status !== 'closed')
+  const history = assignments.filter((a) => a.status === 'closed')
+
+  function renderCard(a: Assignment) {
+    const due =
+      a.status === 'closed'
+        ? { text: absDate(a.due), overdue: false }
+        : dueLabel(a.due)
+
+    return (
+      <button
+        key={a.id}
+        type="button"
+        className="al-card"
+        data-status={a.status}
+        onPointerDown={() => {
+          longFired.current = false
+          window.clearTimeout(pressTimer.current)
+          pressTimer.current = window.setTimeout(() => {
+            longFired.current = true
+            navigator.vibrate?.(10)
+            setDeleteArmed(false)
+            setMenuFor(a)
+          }, LONG_PRESS)
+        }}
+        onPointerUp={() => window.clearTimeout(pressTimer.current)}
+        onPointerLeave={() => window.clearTimeout(pressTimer.current)}
+        onPointerCancel={() => window.clearTimeout(pressTimer.current)}
+        onContextMenu={(e) => e.preventDefault()}
+        onClick={() => {
+          if (longFired.current) {
+            longFired.current = false
+            return
+          }
+          onOpen(a.id)
+        }}
+      >
+        <span className="al-card-top">
+          <span className="al-card-title">
+            {a.course} · {a.title}
+          </span>
+          <span className="al-badge" data-status={a.status}>
+            {STATUS_LABEL[a.status] ?? a.status}
+          </span>
+        </span>
+        <span className="al-card-meta" data-overdue={due.overdue}>
+          {due.text} 截止 · {paidCounts[a.id] ?? 0}/{a.total} 已交
+        </span>
+      </button>
+    )
+  }
+
   return (
     <main className="al">
       <header className="al-top">
@@ -107,56 +166,21 @@ export default function AssignmentListScreen({
       </header>
 
       <div className="al-body">
-        <p className="al-eyebrow">清点 · 长按卡片可编辑</p>
+        <p className="al-eyebrow">进行中 · {running.length}</p>
 
-        {assignments.length === 0 && (
-          <p className="al-empty">还没有清点，先建一个</p>
+        {running.length === 0 && (
+          <p className="al-empty">没有进行中的清点</p>
         )}
+        {running.map(renderCard)}
 
-        {assignments.map((a) => {
-          const due = dueLabel(a.due)
-          return (
-            <button
-              key={a.id}
-              type="button"
-              className="al-card"
-              data-status={a.status}
-              onPointerDown={() => {
-                longFired.current = false
-                window.clearTimeout(pressTimer.current)
-                pressTimer.current = window.setTimeout(() => {
-                  longFired.current = true
-                  navigator.vibrate?.(10)
-                  setDeleteArmed(false)
-                  setMenuFor(a)
-                }, LONG_PRESS)
-              }}
-              onPointerUp={() => window.clearTimeout(pressTimer.current)}
-              onPointerLeave={() => window.clearTimeout(pressTimer.current)}
-              onPointerCancel={() => window.clearTimeout(pressTimer.current)}
-              onContextMenu={(e) => e.preventDefault()}
-              onClick={() => {
-                if (longFired.current) {
-                  longFired.current = false
-                  return
-                }
-                onOpen(a.id)
-              }}
-            >
-              <span className="al-card-top">
-                <span className="al-card-title">
-                  {a.course} · {a.title}
-                </span>
-                <span className="al-badge" data-status={a.status}>
-                  {STATUS_LABEL[a.status] ?? a.status}
-                </span>
-              </span>
-              <span className="al-card-meta" data-overdue={due.overdue}>
-                {due.text} 截止 · {paidCounts[a.id] ?? 0}/{a.total} 已交
-              </span>
-            </button>
-          )
-        })}
+        <p className="al-eyebrow al-eyebrow--gap">
+          已结束 · {history.length}
+        </p>
+
+        {history.length === 0 && (
+          <p className="al-empty al-empty--tight">还没有结束的清点</p>
+        )}
+        {history.map(renderCard)}
       </div>
 
       <div className="al-bottom">

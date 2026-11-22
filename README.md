@@ -33,6 +33,7 @@
 | [docs/11-mobile.md](docs/11-mobile.md) | 手机端规格（主场景）：课堂现场、4 列网格、离线、强光 |
 | [docs/12-m0-plan.md](docs/12-m0-plan.md) | M0 细分任务表（0.1–0.12）与真机暴露的问题 |
 | [docs/13-status.md](docs/13-status.md) | **当前进度**：今天做到哪、明天从哪继续 |
+| [docs/14-ui-system.md](docs/14-ui-system.md) | UI 设计方案：组件层、关键界面、响应式、微交互与无障碍核验 |
 | [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
 
 ## 已定决策
