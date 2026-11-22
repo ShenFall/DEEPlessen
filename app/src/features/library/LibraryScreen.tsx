@@ -13,6 +13,7 @@ import {
   hasPermission,
   isSupported,
   listMaterials,
+  listPublishManifests,
   pickLibraryRoot,
   sanitize,
   type LibraryEntry,
@@ -118,6 +119,19 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
 
   const refresh = useCallback(async (handle: FileSystemDirectoryHandle) => {
     setEntries(await listMaterials(handle))
+
+    // 发布记录以磁盘上的 manifest 为准，DB 只是缓存
+    const manifests = await listPublishManifests(handle)
+    for (const m of manifests) {
+      await savePublish({
+        id: m.slug,
+        course: m.course,
+        state: 'local',
+        items: m.items,
+        createdAt: m.createdAt,
+      })
+    }
+    setPublishes(await listPublishes())
   }, [])
 
   const refreshPublishes = useCallback(async () => {

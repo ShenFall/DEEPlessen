@@ -149,3 +149,40 @@ export function sanitize(name: string): string {
     .trim()
   return cleaned || `file-${Date.now()}`
 }
+
+export type PublishManifest = {
+  slug: string
+  course: string
+  createdAt: string
+  items: { name: string; size: number; file: string }[]
+}
+
+/**
+ * 从磁盘读回发布记录。
+ * 事实来源是目录：换端口、换浏览器、清空站点数据都不会丢。
+ */
+export async function listPublishManifests(
+  root: FileSystemDirectoryHandle,
+): Promise<PublishManifest[]> {
+  const out: PublishManifest[] = []
+  try {
+    const dir = (await root.getDirectoryHandle('publish')) as DirHandle
+    for await (const [name, handle] of dir.entries()) {
+      if (handle.kind !== 'directory') continue
+      try {
+        const inner = handle as DirHandle
+        const fileHandle = await inner.getFileHandle('manifest.json')
+        const text = await (await fileHandle.getFile()).text()
+        const parsed = JSON.parse(text) as PublishManifest
+        if (parsed && Array.isArray(parsed.items)) {
+          out.push({ ...parsed, slug: parsed.slug || name })
+        }
+      } catch {
+        // 单个坏包不影响其它
+      }
+    }
+  } catch {
+    // publish 目录还不存在
+  }
+  return out.sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
+}
