@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loadHandle, saveHandle } from '../../db'
 import {
   copyIntoLibrary,
@@ -20,6 +20,11 @@ function sizeText(n: number) {
   return `${(n / 1024 / 1024).toFixed(1)} MB`
 }
 
+/** materials/<课程>/<文件> → 课程 */
+function courseOf(path: string) {
+  return path.split('/')[1] ?? '未分类'
+}
+
 export default function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null)
   const [granted, setGranted] = useState(false)
@@ -28,7 +33,31 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [over, setOver] = useState(false)
+  const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const groups = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const hit = entries.filter(
+      (e) =>
+        !q ||
+        e.name.toLowerCase().includes(q) ||
+        courseOf(e.path).toLowerCase().includes(q),
+    )
+    const map = new Map<string, LibraryEntry[]>()
+    for (const e of hit) {
+      const course = courseOf(e.path)
+      const list = map.get(course)
+      if (list) list.push(e)
+      else map.set(course, [e])
+    }
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh'))
+  }, [entries, query])
+
+  const totalSize = useMemo(
+    () => entries.reduce((sum, e) => sum + e.size, 0),
+    [entries],
+  )
 
   const refresh = useCallback(async (handle: FileSystemDirectoryHandle) => {
     setEntries(await listMaterials(handle))
@@ -134,7 +163,9 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
         {root && granted && (
           <>
             <div className="lb-head">
-              <span className="lb-count">{entries.length} 个文件</span>
+              <span className="lb-count">
+                {entries.length} 个文件 · {sizeText(totalSize)}
+              </span>
               <button
                 type="button"
                 className="lb-link"
@@ -176,17 +207,34 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
               {busy ? '写入中…' : '把文件拖进来，或点击选择'}
             </label>
 
-            <ul className="lb-list">
-              {entries.length === 0 && (
-                <li className="lb-empty">资料库还是空的</li>
-              )}
-              {entries.map((e) => (
-                <li key={e.path}>
-                  <span className="lb-name">{e.name}</span>
-                  <span className="lb-meta">{sizeText(e.size)}</span>
-                </li>
-              ))}
-            </ul>
+            <input
+              className="lb-search"
+              value={query}
+              placeholder="搜文件名或课程"
+              onChange={(e) => setQuery(e.target.value)}
+            />
+
+            {entries.length === 0 && <p className="lb-empty">资料库还是空的</p>}
+            {entries.length > 0 && groups.length === 0 && (
+              <p className="lb-empty">没有匹配的文件</p>
+            )}
+
+            {groups.map(([course, list]) => (
+              <section className="lb-group" key={course}>
+                <p className="lb-group-title">
+                  {course}
+                  <span>{list.length}</span>
+                </p>
+                <ul className="lb-list">
+                  {list.map((e) => (
+                    <li key={e.path}>
+                      <span className="lb-name">{e.name}</span>
+                      <span className="lb-meta">{sizeText(e.size)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
           </>
         )}
 
