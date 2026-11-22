@@ -16,18 +16,21 @@ import {
 import AssignmentListScreen from './features/assignments/AssignmentListScreen'
 import ImportScreen from './features/import/ImportScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
+import TodayScreen from './features/today/TodayScreen'
 
-type View = 'reconcile' | 'list' | 'import'
+type View = 'today' | 'reconcile' | 'list' | 'import'
 
 export default function App() {
   const [ws, setWs] = useState<Workspace | null>(null)
   const [list, setList] = useState<Assignment[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
-  const [view, setView] = useState<View>('reconcile')
+  const [view, setView] = useState<View>('today')
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   /** 从哪个界面进的导入页，回来就回哪 */
   const [returnTo, setReturnTo] = useState<View>('reconcile')
+  /** 从今日还是从清点列表进的对账台，← 就回哪 */
+  const [backTo, setBackTo] = useState<View>('today')
 
   const bootstrap = useCallback(async (id?: string) => {
     await ensureSeed()
@@ -51,6 +54,7 @@ export default function App() {
   }, [bootstrap])
 
   async function open(id: string) {
+    setBackTo(view === 'list' ? 'list' : 'today')
     const workspace = await bootstrap(id)
     if (workspace) setView('reconcile')
   }
@@ -120,6 +124,17 @@ export default function App() {
     )
   }
 
+  if (view === 'today' && ws) {
+    return (
+      <TodayScreen
+        assignments={list}
+        paidCounts={counts}
+        onOpen={(id) => void open(id)}
+        onAll={() => setView('list')}
+      />
+    )
+  }
+
   if (view === 'list' || !ws) {
     return (
       <AssignmentListScreen
@@ -130,6 +145,7 @@ export default function App() {
         onUpdate={(id, input) => void update(id, input)}
         onDelete={(id) => void remove(id)}
         onImportRoster={() => openImport('list')}
+        onToday={() => setView('today')}
       />
     )
   }
@@ -139,7 +155,7 @@ export default function App() {
       students={ws.students}
       assignment={ws.assignment}
       initialPaid={ws.paid}
-      onBack={() => setView('list')}
+      onBack={() => setView(backTo)}
       onOpenImport={() => openImport('reconcile')}
       onToggleStatus={() => void toggleStatus()}
       onClone={() => void cloneCurrent()}

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import type { Assignment } from '../../db'
+import { dueLabel } from '../../lib/due'
 import './assignments.css'
 
 export type FormInput = { course: string; title: string; due: string }
@@ -12,6 +13,7 @@ type Props = {
   onUpdate: (id: string, input: FormInput) => void
   onDelete: (id: string) => void
   onImportRoster: () => void
+  onToday: () => void
 }
 
 type Form = FormInput & { id?: string }
@@ -31,27 +33,6 @@ function toInputValue(d: Date) {
   )}:${p(d.getMinutes())}`
 }
 
-/** 今天 / 明天 / 已逾期 比 "11/22 23:59" 更快读懂 */
-function dueLabel(iso: string) {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return { text: '时间未知', overdue: false }
-  const now = new Date()
-  const time = d.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-  if (d.getTime() < now.getTime()) return { text: `已逾期 · ${time}`, overdue: true }
-
-  const tomorrow = new Date(now)
-  tomorrow.setDate(now.getDate() + 1)
-
-  if (d.toDateString() === now.toDateString()) return { text: `今天 ${time}`, overdue: false }
-  if (d.toDateString() === tomorrow.toDateString())
-    return { text: `明天 ${time}`, overdue: false }
-  return { text: `${d.getMonth() + 1}/${d.getDate()} ${time}`, overdue: false }
-}
-
 export default function AssignmentListScreen({
   assignments,
   paidCounts,
@@ -60,6 +41,7 @@ export default function AssignmentListScreen({
   onUpdate,
   onDelete,
   onImportRoster,
+  onToday,
 }: Props) {
   const [form, setForm] = useState<Form | null>(null)
   const [menuFor, setMenuFor] = useState<Assignment | null>(null)
@@ -114,9 +96,14 @@ export default function AssignmentListScreen({
     <main className="al">
       <header className="al-top">
         <span className="al-brand">拾课</span>
-        <button type="button" className="al-import" onClick={onImportRoster}>
-          名单
-        </button>
+        <span className="al-actions">
+          <button type="button" className="al-import" onClick={onToday}>
+            今日
+          </button>
+          <button type="button" className="al-import" onClick={onImportRoster}>
+            名单
+          </button>
+        </span>
       </header>
 
       <div className="al-body">

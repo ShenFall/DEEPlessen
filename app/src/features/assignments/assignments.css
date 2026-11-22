@@ -28,6 +28,11 @@
   letter-spacing: 0.1em;
 }
 
+.al-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .al-import {
   padding: 6px 10px;
   border: 1px solid var(--line);
