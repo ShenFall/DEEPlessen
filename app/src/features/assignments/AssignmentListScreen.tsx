@@ -34,6 +34,7 @@ function toInputValue(d: Date) {
 /** 今天 / 明天 / 已逾期 比 "11/22 23:59" 更快读懂 */
 function dueLabel(iso: string) {
   const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return { text: '时间未知', overdue: false }
   const now = new Date()
   const time = d.toLocaleTimeString('zh-CN', {
     hour: '2-digit',

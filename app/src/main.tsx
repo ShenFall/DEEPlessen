@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { Boundary } from './Boundary'
 import './styles/tokens.css'
 import './styles/base.css'
 
@@ -16,6 +17,8 @@ lightQuery.addEventListener('change', applyTheme)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <Boundary>
+      <App />
+    </Boundary>
   </StrictMode>,
 )
