@@ -184,6 +184,21 @@ export async function cloneAssignment(id: string): Promise<string | null> {
   })
 }
 
+export async function updateAssignment(
+  id: string,
+  patch: { course: string; title: string; due: string },
+) {
+  await db.assignments.update(id, patch)
+}
+
+/** 删除清点：连同它的提交记录一起删，不可恢复 */
+export async function deleteAssignment(id: string) {
+  await db.transaction('rw', [db.assignments, db.submissions], async () => {
+    await db.submissions.where('assignmentId').equals(id).delete()
+    await db.assignments.delete(id)
+  })
+}
+
 export async function setPaid(
   assignmentId: string,
   studentId: string,

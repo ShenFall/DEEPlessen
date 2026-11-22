@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   cloneAssignment,
   createAssignment,
+  deleteAssignment,
   ensureSeed,
   listAssignments,
   loadWorkspace,
   paidCounts,
   setAssignmentStatus,
   syncAssignmentTotals,
+  updateAssignment,
   type Assignment,
   type Workspace,
 } from './db'
@@ -56,6 +58,16 @@ export default function App() {
   async function create(input: { course: string; title: string; due: string }) {
     await createAssignment(input)
     // 建完留在列表，别把人拽进对账台
+    await bootstrap()
+  }
+
+  async function update(id: string, input: { course: string; title: string; due: string }) {
+    await updateAssignment(id, input)
+    await bootstrap(ws?.assignment.id ?? id)
+  }
+
+  async function remove(id: string) {
+    await deleteAssignment(id)
     await bootstrap()
   }
 
@@ -115,6 +127,8 @@ export default function App() {
         paidCounts={counts}
         onOpen={(id) => void open(id)}
         onCreate={(input) => void create(input)}
+        onUpdate={(id, input) => void update(id, input)}
+        onDelete={(id) => void remove(id)}
         onImportRoster={() => openImport('list')}
       />
     )

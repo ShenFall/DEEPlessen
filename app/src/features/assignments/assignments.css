@@ -206,3 +206,25 @@
   color: var(--mute);
   text-align: center;
 }
+
+.al-menu {
+  display: block;
+  width: 100%;
+  padding: 15px 4px;
+  text-align: left;
+  font-size: var(--fs-13);
+  color: var(--text);
+  border-top: 1px solid var(--line);
+}
+
+.al-menu:first-of-type {
+  border-top: 0;
+}
+
+.al-danger {
+  color: var(--red);
+}
+
+.al-muted {
+  color: var(--mute);
+}
