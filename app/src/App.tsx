@@ -54,9 +54,9 @@ export default function App() {
   }
 
   async function create(input: { course: string; title: string; due: string }) {
-    const id = await createAssignment(input)
-    await bootstrap(id)
-    setView('reconcile')
+    await createAssignment(input)
+    // 建完留在列表，别把人拽进对账台
+    await bootstrap()
   }
 
   async function toggleStatus() {
