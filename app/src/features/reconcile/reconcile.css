@@ -69,12 +69,18 @@
 
 .rs-more {
   flex: none;
-  padding: 0 4px;
-  margin-top: -4px;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 32px;
+  margin-top: -6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: 15px;
   line-height: 1;
   color: var(--dim);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .rs-progress {
@@ -362,6 +368,14 @@
   border-radius: 14px 14px 0 0;
   background: var(--surface);
   animation: sheet-up 220ms var(--ease);
+}
+
+.rs-sheet-title {
+  margin: 8px 20px 4px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: 0.08em;
+  color: var(--mute);
 }
 
 .rs-sheet button {

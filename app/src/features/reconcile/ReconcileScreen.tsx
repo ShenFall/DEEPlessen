@@ -332,14 +332,22 @@ export default function ReconcileScreen({
 
       <div className="rs-bottom">
         <span className="rs-hint">点名字标记 · 长按恢复</span>
-        <button type="button" className="rs-remain" onClick={() => setFilter('unpaid')}>
-          剩 {unpaidCount}
+        <button
+          type="button"
+          className="rs-remain"
+          onClick={() => {
+            if (remaining.length <= 5) setForceGrid(false)
+            else setFilter('unpaid')
+          }}
+        >
+          剩 {unpaidCount} 人
         </button>
       </div>
 
       {menuOpen && (
         <div className="rs-sheet-wrap" onClick={() => setMenuOpen(false)}>
           <div className="rs-sheet" onClick={(e) => e.stopPropagation()}>
+            <p className="rs-sheet-title">更多</p>
             <button
               type="button"
               onClick={() => {
