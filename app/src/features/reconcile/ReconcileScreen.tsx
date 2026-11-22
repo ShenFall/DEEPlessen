@@ -33,16 +33,23 @@ type Props = {
   students: Student[]
   assignment: Assignment
   initialPaid: string[]
+  onBack: () => void
   onOpenImport: () => void
+  onToggleStatus: () => void
+  onClone: () => void
 }
 
 export default function ReconcileScreen({
   students,
   assignment,
   initialPaid,
+  onBack,
   onOpenImport,
+  onToggleStatus,
+  onClone,
 }: Props) {
   const roster = useMemo(() => students.filter((s) => s.active), [students])
+  const readonly = assignment.status === 'closed'
   const [paid, setPaid] = useState<Set<string>>(() => new Set(initialPaid))
   const [filter, setFilter] = useState<Filter>('all')
   const [toast, setToast] = useState<string | null>(null)
@@ -178,6 +185,11 @@ export default function ReconcileScreen({
 
     if (wasMoved || wasHeld) return
 
+    if (readonly) {
+      setNotice('已结束，先在 ⋯ 里恢复')
+      return
+    }
+
     if (isPaid) {
       hintRestore()
       return
@@ -197,9 +209,14 @@ export default function ReconcileScreen({
     <main className="rs">
       <header className="rs-top">
         <div className="rs-nav">
-          <span className="rs-back" aria-hidden="true">
+          <button
+            type="button"
+            className="rs-back"
+            onClick={onBack}
+            aria-label="返回列表"
+          >
             ←
-          </span>
+          </button>
           <span className="rs-crumb">作业</span>
           <span className="rs-count">
             <b>{paidCount}</b>
@@ -239,7 +256,7 @@ export default function ReconcileScreen({
         </div>
 
         <div className="rs-meta">
-          <span>● 已存本地</span>
+          <span>{readonly ? '● 已结束 · 只读' : '● 已存本地'}</span>
           <span>{dueText} 截止</span>
         </div>
 
@@ -367,6 +384,24 @@ export default function ReconcileScreen({
               }}
             >
               导入名单
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                onClone()
+              }}
+            >
+              复制为新的清点
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                onToggleStatus()
+              }}
+            >
+              {readonly ? '恢复清点' : '结束清点'}
             </button>
             <button
               type="button"

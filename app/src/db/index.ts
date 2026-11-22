@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import { ASSIGNMENT, ROSTER } from '../data/roster'
+import { ASSIGNMENT as SEED_ASSIGNMENT, ROSTER } from '../data/roster'
 
 export type Student = {
   id: string
@@ -8,13 +8,17 @@ export type Student = {
   active: boolean
 }
 
+export type AssignmentStatus = 'open' | 'reconciling' | 'closed'
+
 export type Assignment = {
   id: string
   course: string
   title: string
   due: string
-  status: 'open' | 'reconciling' | 'closed'
+  status: AssignmentStatus
   total: number
+  createdAt: string
+  clonedFrom?: string
 }
 
 export type Submission = {
@@ -42,6 +46,19 @@ class DeepDB extends Dexie {
       submissions: 'key, assignmentId, studentId, state',
       meta: 'key',
     })
+    // v2：作业加 createdAt / clonedFrom，便于排序与追溯
+    this.version(2)
+      .stores({
+        assignments: 'id, due, status, createdAt',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('assignments')
+          .toCollection()
+          .modify((a: Assignment) => {
+            if (!a.createdAt) a.createdAt = a.due ?? new Date().toISOString()
+          })
+      })
   }
 }
 
@@ -58,38 +75,102 @@ async function seed() {
   await db.transaction('rw', db.students, db.assignments, async () => {
     await db.students.bulkPut(ROSTER)
     await db.assignments.put({
-      id: ASSIGNMENT.id,
-      course: ASSIGNMENT.course,
-      title: ASSIGNMENT.title,
-      due: ASSIGNMENT.due,
+      id: SEED_ASSIGNMENT.id,
+      course: SEED_ASSIGNMENT.course,
+      title: SEED_ASSIGNMENT.title,
+      due: SEED_ASSIGNMENT.due,
       status: 'reconciling',
       total,
+      createdAt: new Date().toISOString(),
     })
   })
   await db.meta.put({ key: 'seededAt', value: new Date().toISOString() })
 }
 
-export async function loadWorkspace(): Promise<Workspace> {
+export async function ensureSeed() {
   const count = await db.students.count()
   if (count === 0) await seed()
+}
 
-  const [students, assignment] = await Promise.all([
+/** 进行中的排前面，其次按创建时间倒序 */
+export async function listAssignments(): Promise<Assignment[]> {
+  const all = await db.assignments.toArray()
+  return all.sort((a, b) => {
+    const rank = (s: AssignmentStatus) => (s === 'closed' ? 1 : 0)
+    if (rank(a.status) !== rank(b.status)) return rank(a.status) - rank(b.status)
+    return (b.createdAt ?? '').localeCompare(a.createdAt ?? '')
+  })
+}
+
+export async function loadWorkspace(id?: string): Promise<Workspace | null> {
+  await ensureSeed()
+  const list = await listAssignments()
+  const target = id
+    ? list.find((a) => a.id === id)
+    : list.find((a) => a.status !== 'closed') ?? list[0]
+  if (!target) return null
+
+  const [students, subs] = await Promise.all([
     db.students.orderBy('sid').toArray(),
-    db.assignments.get(ASSIGNMENT.id),
+    db.submissions.where('assignmentId').equals(target.id).toArray(),
   ])
-
-  if (!assignment) throw new Error('作业记录缺失')
-
-  const subs = await db.submissions
-    .where('assignmentId')
-    .equals(assignment.id)
-    .toArray()
 
   return {
     students,
-    assignment,
+    assignment: target,
     paid: subs.filter((s) => s.state === 'paid').map((s) => s.studentId),
   }
+}
+
+export async function countActiveStudents() {
+  return db.students.filter((s) => s.active).count()
+}
+
+export async function paidCounts(): Promise<Record<string, number>> {
+  const rows = await db.submissions.where('state').equals('paid').toArray()
+  const map: Record<string, number> = {}
+  for (const r of rows) map[r.assignmentId] = (map[r.assignmentId] ?? 0) + 1
+  return map
+}
+
+export async function createAssignment(input: {
+  course: string
+  title: string
+  due: string
+  clonedFrom?: string
+}): Promise<string> {
+  const total = await countActiveStudents()
+  const id = `a_${Date.now().toString(36)}`
+  await db.assignments.put({
+    id,
+    course: input.course,
+    title: input.title,
+    due: input.due,
+    status: 'reconciling',
+    total,
+    createdAt: new Date().toISOString(),
+    clonedFrom: input.clonedFrom,
+  })
+  return id
+}
+
+export async function setAssignmentStatus(
+  id: string,
+  status: AssignmentStatus,
+) {
+  await db.assignments.update(id, { status })
+}
+
+/** 复制：只带课程与标题，不带任何提交记录 */
+export async function cloneAssignment(id: string): Promise<string | null> {
+  const src = await db.assignments.get(id)
+  if (!src) return null
+  return createAssignment({
+    course: src.course,
+    title: src.title,
+    due: src.due,
+    clonedFrom: src.id,
+  })
 }
 
 export async function setPaid(
