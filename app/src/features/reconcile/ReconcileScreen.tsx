@@ -50,7 +50,6 @@ export default function ReconcileScreen({
   const [flashId, setFlashId] = useState<string | null>(null)
   const [holdingId, setHoldingId] = useState<string | null>(null)
   const [fading, setFading] = useState<string[]>([])
-  const [view, setView] = useState<'grid' | 'list'>('grid')
   const [menuOpen, setMenuOpen] = useState(false)
 
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -63,6 +62,8 @@ export default function ReconcileScreen({
   const paidCount = paid.size
   const unpaidCount = total - paidCount
   const percent = total === 0 ? 0 : (paidCount / total) * 100
+  /** 全部 = 面板式网格；未交 / 已交 = 清单 */
+  const isList = filter !== 'all'
 
   const visible = useMemo(() => {
     if (filter === 'unpaid') {
@@ -257,28 +258,16 @@ export default function ReconcileScreen({
               </button>
             )
           })}
-          <div className="rs-views">
-            <button
-              type="button"
-              data-on={view === 'grid'}
-              onClick={() => setView('grid')}
-            >
-              网格
-            </button>
-            <button
-              type="button"
-              data-on={view === 'list'}
-              onClick={() => setView('list')}
-            >
-              列表
-            </button>
-          </div>
         </div>
       </header>
 
-      {view === 'list' ? (
+      {isList ? (
         <ul className="rs-list">
-          {visible.length === 0 && <li className="rs-empty">这里没有人</li>}
+          {visible.length === 0 && (
+            <li className="rs-empty">
+              {filter === 'unpaid' ? '都交齐了' : '还没有人交'}
+            </li>
+          )}
           {visible.map((s) => {
             const isPaid = paid.has(s.id)
             return (
@@ -341,10 +330,7 @@ export default function ReconcileScreen({
         <button
           type="button"
           className="rs-remain"
-          onClick={() => {
-            setView('list')
-            setFilter('unpaid')
-          }}
+          onClick={() => setFilter('unpaid')}
         >
           剩 {unpaidCount} 人
         </button>
