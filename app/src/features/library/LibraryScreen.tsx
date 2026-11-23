@@ -378,7 +378,7 @@ export default function LibraryScreen({
       const text = await file.text()
       const data = JSON.parse(text) as Backup
       if (data.app !== 'deep' || !Array.isArray(data.students)) {
-        setNotice('这不是拾课的备份文件')
+        setNotice('这不是深时的备份文件')
         return
       }
       setPending(data)

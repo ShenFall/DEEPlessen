@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: {
-        name: '拾课 · DEEP',
-        short_name: '拾课',
-        description: 'ShenFall 的学委工作台',
+        name: '深时 · DEEP',
+        short_name: '深时',
+        description: '深时 · ShenFall 的学委工作台',
         lang: 'zh-CN',
         start_url: '/',
         scope: '/',

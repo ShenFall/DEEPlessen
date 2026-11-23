@@ -371,7 +371,7 @@ export async function exportAll(): Promise<Backup> {
 /** 覆盖式恢复。调用方必须先让用户确认。 */
 export async function importAll(data: Backup): Promise<void> {
   if (data.app !== 'deep' || !Array.isArray(data.students)) {
-    throw new Error('不是拾课的备份文件')
+    throw new Error('不是深时的备份文件')
   }
   await db.transaction(
     'rw',

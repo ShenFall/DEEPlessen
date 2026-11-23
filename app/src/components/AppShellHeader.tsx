@@ -26,8 +26,7 @@ export default function AppShellHeader({ active, onNav, right }: Props) {
           onClick={() => onNav('dashboard')}
           aria-label="回看板"
         >
-          <span className="sh-mark">深</span>
-          <span className="sh-name">拾课</span>
+          <span className="sh-mark">深时</span>
         </button>
         <span className="sh-motto">十年饮冰　难凉热血</span>
 
