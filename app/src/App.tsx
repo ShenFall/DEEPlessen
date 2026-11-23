@@ -29,6 +29,7 @@ import ReconcileScreen from './features/reconcile/ReconcileScreen'
 import TodosScreen from './features/todos/TodosScreen'
 import TodoSheet from './components/TodoSheet'
 import AssignmentSheet from './components/AssignmentSheet'
+import MobileTabs from './components/MobileTabs'
 
 type View = 'dashboard' | 'todos' | 'reconcile' | 'list' | 'import' | 'library'
 
@@ -244,6 +245,7 @@ export default function App() {
             }}
           />
         )}
+        <MobileTabs active="dashboard" onNav={(k) => setView(k)} />
         {editingAssignment && (
           <AssignmentSheet
             assignment={editingAssignment}
@@ -264,16 +266,19 @@ export default function App() {
 
   if (view === 'list' || !ws) {
     return (
-      <AssignmentListScreen
-        assignments={list}
-        paidCounts={counts}
-        onOpen={(id) => void open(id)}
-        onCreate={(input) => void create(input)}
-        onUpdate={(id, input) => void update(id, input)}
-        onDelete={(id) => void remove(id)}
-        onImportRoster={() => openImport('list')}
-        onNav={(k) => setView(k)}
-      />
+      <>
+        <AssignmentListScreen
+          assignments={list}
+          paidCounts={counts}
+          onOpen={(id) => void open(id)}
+          onCreate={(input) => void create(input)}
+          onUpdate={(id, input) => void update(id, input)}
+          onDelete={(id) => void remove(id)}
+          onImportRoster={() => openImport('list')}
+          onNav={(k) => setView(k)}
+        />
+        <MobileTabs active="list" onNav={(k) => setView(k)} />
+      </>
     )
   }
 

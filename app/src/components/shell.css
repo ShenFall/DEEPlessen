@@ -107,3 +107,10 @@
   color: #d38a43;
   background: rgba(211, 138, 67, 0.12);
 }
+
+/* 手机上导航交给底部 tab，顶栏只留品牌 */
+@media (max-width: 720px) {
+  .sh-nav {
+    display: none;
+  }
+}

@@ -113,3 +113,10 @@ button {
     animation-duration: 0.01ms !important;
   }
 }
+
+@media (max-width: 720px) {
+  /* 底部导航占位 */
+  body {
+    padding-bottom: 66px;
+  }
+}
