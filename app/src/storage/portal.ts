@@ -32,6 +32,8 @@ body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rg
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%238c5a20' fill-opacity='0.13'/%3E%3C/svg%3E");
   background-size:24px 24px}
+.emblem{position:fixed;right:-70px;bottom:-90px;width:320px;height:320px;z-index:0;
+  pointer-events:none;opacity:.13;mix-blend-mode:multiply}
 .bp{position:absolute;top:-8px;left:-24px;width:calc(100% + 48px);height:230px;pointer-events:none;opacity:.55}
 .bp .ln{stroke:#d5c5a4}.bp .cn{stroke:#c9b894}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
@@ -59,8 +61,10 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .dl{flex:none;font-size:12px;color:var(--gold)}
 .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
 footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
-.sign{margin:8px 0 0;text-align:center;font-family:Georgia,"Times New Roman","Songti SC",serif;
-  font-style:italic;font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.7}
+.sign{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;
+  font-family:Georgia,"Times New Roman","Songti SC",serif;font-style:italic;
+  font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.75}
+.ava{width:22px;height:22px;border-radius:50%;object-fit:cover;filter:saturate(.85)}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){.g{animation:none}}
@@ -68,6 +72,7 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 </head>
 <body>
 <div class="wrap">
+  <img class="emblem" src="brand/emblem.png" alt="" aria-hidden="true" onerror="this.remove()" />
   <svg class="bp" viewBox="0 0 600 230" fill="none" aria-hidden="true">
     <defs>
       <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -99,7 +104,7 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
   <div class="search"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
   <div id="list" aria-live="polite"></div>
   <footer id="foot"></footer>
-  <p class="sign">ShenFall</p>
+  <p class="sign"><img class="ava" src="brand/avatar.png" alt="" onerror="this.remove()" />ShenFall</p>
 </div>
 <script>
 (function(){
@@ -219,6 +224,23 @@ export async function exportPortal(
   const manifest = {
     generatedAt: new Date().toISOString(),
     courses: [...courses.entries()].map(([name, items]) => ({ name, items })),
+  }
+
+  const brandDir = await portal.getDirectoryHandle('brand', { create: true })
+  for (const [name, from] of [
+    ['emblem.png', '/brand/emblem-line.png'],
+    ['avatar.png', '/brand/avatar.png'],
+  ]) {
+    try {
+      const res = await fetch(from)
+      if (!res.ok) continue
+      const file = await brandDir.getFileHandle(name, { create: true })
+      const w = await file.createWritable()
+      await w.write(await res.blob())
+      await w.close()
+    } catch {
+      // 缺图不影响整站
+    }
   }
 
   await writeText(portal, 'manifest.json', JSON.stringify(manifest, null, 2))
