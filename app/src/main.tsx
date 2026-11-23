@@ -11,7 +11,7 @@ const narrowQuery = window.matchMedia('(max-width: 720px)')
 
 function applyTheme() {
   document.documentElement.dataset.theme = narrowQuery.matches
-    ? 'void'
+    ? 'paper'
     : lightQuery.matches
       ? 'paper'
       : 'void'

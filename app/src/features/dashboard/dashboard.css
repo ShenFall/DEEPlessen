@@ -526,3 +526,37 @@
     display: none;
   }
 }
+
+/* 手机端：看板并入纸白体系，与待办/作业一致 */
+@media (max-width: 720px) {
+  .db {
+    --void: transparent;
+    --panel: #ffffff;
+    --panel-solid: #ffffff;
+    --ink: #1a1f2a;
+    --dim: #616875;
+    --blue: #2f5bd8;
+    --gold: #8c5a20;
+    --hair: #e6e0d5;
+    background: transparent;
+    color: var(--text);
+  }
+
+  .db-panel {
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(26, 31, 42, 0.04);
+  }
+
+  .db-headline {
+    font-size: 24px;
+  }
+
+  /* 深色下的浅色描边在白底上会消失，换成纸白的线色 */
+  .db-check span {
+    border-color: #cfc6b6;
+  }
+
+  .db-actions li:first-child .db-row {
+    border-top: 0;
+  }
+}

@@ -6,8 +6,8 @@
   z-index: 30;
   display: none;
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-  background: rgba(15, 22, 32, 0.94);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(247, 244, 238, 0.94);
+  border-top: 1px solid var(--line);
   backdrop-filter: blur(12px);
 }
 
@@ -19,7 +19,7 @@
   gap: 2px;
   padding: 6px 0;
   border-radius: 10px;
-  color: #9aa6b8;
+  color: var(--mute);
   cursor: pointer;
 }
 
@@ -34,8 +34,8 @@
 }
 
 .mtabs button[data-on='true'] {
-  color: #e9a341;
-  background: rgba(233, 163, 65, 0.1);
+  color: var(--gold);
+  background: rgba(140, 90, 32, 0.08);
 }
 
 @media (max-width: 720px) {

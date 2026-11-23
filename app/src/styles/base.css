@@ -120,3 +120,140 @@ button {
     padding-bottom: 66px;
   }
 }
+
+/* 手机端拼贴底纹：只在 ≤720px 显示 */
+.app-art {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .app-art {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .app-art img {
+    position: absolute;
+    mix-blend-mode: multiply;
+    will-change: transform;
+  }
+
+  .app-art img:first-child {
+    right: -22%;
+    top: -8%;
+    height: 92vh;
+    opacity: 0.13;
+    clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .app-art img:last-child {
+    left: -26%;
+    bottom: -12%;
+    height: 46vh;
+    opacity: 0.07;
+    transform: rotate(180deg);
+    clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* ---------- 手机端：待办 / 作业 的排版与卡片 ---------- */
+@media (max-width: 720px) {
+  .tz-body,
+  .al-body {
+    padding: 12px 14px 72px;
+  }
+
+  .tz-title {
+    margin: 2px 0 12px;
+    font-size: 22px;
+  }
+
+  .tz-group {
+    margin: 16px 0 6px;
+    letter-spacing: 0.08em;
+  }
+
+  /* 分组变成白卡 */
+  .tz-list {
+    margin: 0 0 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .tz-row {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tz-list li:last-child .tz-row {
+    border-bottom: 0;
+  }
+
+  .tz-name {
+    font-size: 15px;
+  }
+
+  .tz-check {
+    width: 40px;
+    height: 40px;
+    margin-left: -6px;
+  }
+
+  .tz-check span {
+    width: 20px;
+    height: 20px;
+  }
+
+  .al-body {
+    padding-top: 8px;
+  }
+
+  .al-card {
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  /* 入场：逐条淡入，最多 8 条 */
+  .tz-list li,
+  .al-card {
+    animation: m-up 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .tz-list li:nth-child(2),
+  .al-card:nth-of-type(2) { animation-delay: 0.03s }
+  .tz-list li:nth-child(3),
+  .al-card:nth-of-type(3) { animation-delay: 0.06s }
+  .tz-list li:nth-child(4),
+  .al-card:nth-of-type(4) { animation-delay: 0.09s }
+  .tz-list li:nth-child(5),
+  .al-card:nth-of-type(5) { animation-delay: 0.12s }
+  .tz-list li:nth-child(6),
+  .al-card:nth-of-type(6) { animation-delay: 0.15s }
+  .tz-list li:nth-child(n + 7),
+  .al-card:nth-of-type(n + 7) { animation: none }
+
+  @keyframes m-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tz-list li,
+  .al-card {
+    animation: none;
+  }
+}
