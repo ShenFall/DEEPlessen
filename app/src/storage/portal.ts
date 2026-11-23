@@ -30,8 +30,9 @@ html{background:var(--bg)}
 body{margin:0;min-height:100dvh;color:var(--ink);
   background:radial-gradient(120% 50% at 82% -6%,rgba(140,90,32,.05),transparent 60%),var(--bg);
   font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27300%27%3E%3Cg fill=%27none%27 stroke=%27%23c9b894%27 stroke-width=%271%27%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%27112%27 stroke-dasharray=%272 9%27 opacity=%27.45%27/%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%2774%27 opacity=%27.5%27/%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%2738%27 opacity=%27.35%27/%3E%3C/g%3E%3Cg fill=%27%23c9a05c%27 opacity=%27.45%27%3E%3Ccircle cx=%27242.0%27 cy=%27150.0%27 r=%271.5%27/%3E%3Ccircle cx=%27229.7%27 cy=%27196.0%27 r=%271.5%27/%3E%3Ccircle cx=%27196.0%27 cy=%27229.7%27 r=%271.5%27/%3E%3Ccircle cx=%27150.0%27 cy=%27242.0%27 r=%271.5%27/%3E%3Ccircle cx=%27104.0%27 cy=%27229.7%27 r=%271.5%27/%3E%3Ccircle cx=%2770.3%27 cy=%27196.0%27 r=%271.5%27/%3E%3Ccircle cx=%2758.0%27 cy=%27150.0%27 r=%271.5%27/%3E%3Ccircle cx=%2770.3%27 cy=%27104.0%27 r=%271.5%27/%3E%3Ccircle cx=%27104.0%27 cy=%2770.3%27 r=%271.5%27/%3E%3Ccircle cx=%27150.0%27 cy=%2758.0%27 r=%271.5%27/%3E%3Ccircle cx=%27196.0%27 cy=%2770.3%27 r=%271.5%27/%3E%3Ccircle cx=%27229.7%27 cy=%27104.0%27 r=%271.5%27/%3E%3C/g%3E%3C/svg%3E");background-size:300px 300px;background-position:center top}
+.bgline{position:fixed;right:-12%;bottom:-4%;height:110vh;width:auto;max-width:none;
+  opacity:.12;mix-blend-mode:multiply;pointer-events:none;user-select:none;z-index:0}
+@media(max-width:520px){.bgline{right:-26%;height:96vh;opacity:.1}}
 
 /* 顶部：初始占大半个屏，滚动或输入后收缩吸顶 */
 .topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;
@@ -94,6 +95,7 @@ footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body>
+<img class="bgline" src="brand/lines.png" alt="" aria-hidden="true" onerror="this.remove()" />
 <header class="topbar" id="topbar">
   <div class="inner">
     <h1>课程资料</h1>
@@ -261,7 +263,10 @@ export async function exportPortal(
   }
 
   const brandDir = await portal.getDirectoryHandle('brand', { create: true })
-  for (const [name, from] of [['avatar.png', '/brand/avatar.png']]) {
+  for (const [name, from] of [
+    ['avatar.png', '/brand/avatar.png'],
+    ['lines.png', '/brand/lines.png'],
+  ]) {
     try {
       const res = await fetch(from)
       if (!res.ok) continue
