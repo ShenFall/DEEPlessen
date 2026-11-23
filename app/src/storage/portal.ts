@@ -43,8 +43,10 @@ body{margin:0;min-height:100dvh;color:var(--ink);
 .rule--b{right:calc(24% + 8px);height:26vh;opacity:.6}
 
 /* 顶部 */
-.topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;
-  min-height:100dvh;transition:min-height .32s var(--ease),background .2s linear}
+.topbar{position:fixed;left:0;right:0;top:50dvh;transform:translateY(-50%);z-index:6;
+  display:flex;align-items:center;justify-content:center;
+  transition:top .32s var(--ease),transform .32s var(--ease),background .2s linear}
+.space{height:100dvh}
 .topbar .inner{width:100%;max-width:600px;margin:0 auto;padding:0 16px;
   display:flex;flex-direction:column;gap:10px;transition:gap .3s var(--ease)}
 .who{display:flex;align-items:center;gap:8px;font-family:Georgia,"Times New Roman","Songti SC",serif;
@@ -68,7 +70,8 @@ h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2
 .kinds button[data-on='true']{border-color:var(--gold);color:var(--gold);background:rgba(140,90,32,.06)}
 .topbar:not(.stuck) .kinds{max-height:0;opacity:0}
 
-.topbar.stuck{min-height:0;background:rgba(247,244,238,.95);border-bottom:1px solid var(--line)}
+.topbar.stuck{top:0;transform:none;background:rgba(247,244,238,.96);
+  border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(140,90,32,.04)}
 .topbar.stuck .inner{gap:8px;padding-top:8px;padding-bottom:8px}
 .topbar.stuck h1{font-size:15px;font-weight:500}
 .topbar.stuck .who{max-height:0;opacity:0}
@@ -119,6 +122,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
     <div class="kinds" id="kinds"></div>
   </div>
 </header>
+<div class="space" aria-hidden="true"></div>
 
 <div class="wrap">
   <div id="list" aria-live="polite"></div>
