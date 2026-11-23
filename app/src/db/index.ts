@@ -280,6 +280,23 @@ export async function listTodos(): Promise<Todo[]> {
     })
 }
 
+/** 全部待办：未完成在前（按截止），已完成在后（按完成时间倒序） */
+export async function listAllTodos(): Promise<Todo[]> {
+  const all = await db.todos.toArray()
+  const active = all
+    .filter((t) => !t.done)
+    .sort((a, b) => {
+      const da = a.due ?? ''
+      const db_ = b.due ?? ''
+      if (da !== db_) return da.localeCompare(db_)
+      return b.createdAt.localeCompare(a.createdAt)
+    })
+  const done = all
+    .filter((t) => t.done)
+    .sort((a, b) => (b.doneAt ?? '').localeCompare(a.doneAt ?? ''))
+  return [...active, ...done]
+}
+
 export async function createTodo(title: string, due?: string) {
   const text = title.trim()
   if (!text) return

@@ -9,6 +9,7 @@ type Props = {
   onOpen: (id: string) => void
   onAll: () => void
   onLibrary: () => void
+  onTodos: () => void
   onAddTodo: (title: string, due?: string) => void
   onToggleTodo: (id: string, done: boolean) => void
   onDeleteTodo: (id: string) => void
@@ -82,6 +83,7 @@ export default function DashboardScreen({
   onOpen,
   onAll,
   onLibrary,
+  onTodos,
   onAddTodo,
   onToggleTodo,
   onDeleteTodo,
@@ -146,6 +148,9 @@ export default function DashboardScreen({
         <button type="button" className="db-rail-item" data-on="true">
           看板
         </button>
+        <button type="button" className="db-rail-item" onClick={onTodos}>
+          待办
+        </button>
         <button type="button" className="db-rail-item" onClick={onAll}>
           作业
         </button>
@@ -175,7 +180,9 @@ export default function DashboardScreen({
           <section className="db-panel db-panel--now">
             <div className="db-panel-head">
               <p className="db-panel-title">现在要做</p>
-              <span className="db-panel-meta">{total} 项</span>
+              <button type="button" className="db-link" onClick={onTodos}>
+                全部 {total}
+              </button>
             </div>
 
             <form

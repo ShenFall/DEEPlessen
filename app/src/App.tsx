@@ -7,6 +7,7 @@ import {
   deleteTodo,
   ensureSeed,
   listAssignments,
+  listAllTodos,
   loadDashboard,
   loadWorkspace,
   paidCounts,
@@ -17,6 +18,7 @@ import {
   updateAssignment,
   type Assignment,
   type DashboardData,
+  type Todo,
   type Workspace,
 } from './db'
 import AssignmentListScreen from './features/assignments/AssignmentListScreen'
@@ -24,14 +26,16 @@ import DashboardScreen from './features/dashboard/DashboardScreen'
 import ImportScreen from './features/import/ImportScreen'
 import LibraryScreen from './features/library/LibraryScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
+import TodosScreen from './features/todos/TodosScreen'
 
-type View = 'dashboard' | 'reconcile' | 'list' | 'import' | 'library'
+type View = 'dashboard' | 'todos' | 'reconcile' | 'list' | 'import' | 'library'
 
 export default function App() {
   const [ws, setWs] = useState<Workspace | null>(null)
   const [list, setList] = useState<Assignment[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [dash, setDash] = useState<DashboardData | null>(null)
+  const [todosAll, setTodosAll] = useState<Todo[]>([])
   const [view, setView] = useState<View>('dashboard')
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,16 +47,18 @@ export default function App() {
   const bootstrap = useCallback(async (id?: string) => {
     await ensureSeed()
     await syncAssignmentTotals()
-    const [workspace, assignments, paid, dashboard] = await Promise.all([
+    const [workspace, assignments, paid, dashboard, todos] = await Promise.all([
       loadWorkspace(id),
       listAssignments(),
       paidCounts(),
       loadDashboard(),
+      listAllTodos(),
     ])
     setWs(workspace)
     setList(assignments)
     setCounts(paid)
     setDash(dashboard)
+    setTodosAll(todos)
     setReady(true)
     return workspace
   }, [])
@@ -158,6 +164,18 @@ export default function App() {
     return <LibraryScreen onBack={() => setView('dashboard')} />
   }
 
+  if (view === 'todos') {
+    return (
+      <TodosScreen
+        todos={todosAll}
+        onBack={() => setView('dashboard')}
+        onToggle={(id, done) => void toggleTodo(id, done)}
+        onDelete={(id) => void removeTodo(id)}
+        onSetDue={(id, due) => void setTodoDate(id, due)}
+      />
+    )
+  }
+
   if (view === 'dashboard' && dash) {
     return (
       <DashboardScreen
@@ -166,6 +184,7 @@ export default function App() {
         onOpen={(id) => void open(id)}
         onAll={() => setView('list')}
         onLibrary={() => setView('library')}
+        onTodos={() => setView('todos')}
         onAddTodo={(title, due) => void addTodo(title, due)}
         onToggleTodo={(id, done) => void toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
