@@ -8,21 +8,7 @@ type Props = {
   onNav: (key: ShellNav) => void
   onToggle: (id: string, done: boolean) => void
   onDelete: (id: string) => void
-  onSetDue: (id: string, due?: string) => void
-}
-
-function toDateValue(iso?: string) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
-
-function fromDateValue(value: string): string | undefined {
-  if (!value) return undefined
-  const d = new Date(`${value}T23:59:00`)
-  return Number.isNaN(d.getTime()) ? undefined : d.toISOString()
+  onOpenTodo: (todo: Todo) => void
 }
 
 function doneText(iso?: string) {
@@ -37,7 +23,7 @@ export default function TodosScreen({
   onNav,
   onToggle,
   onDelete,
-  onSetDue,
+  onOpenTodo,
 }: Props) {
   const active = todos.filter((t) => !t.done)
   const done = todos.filter((t) => t.done)
@@ -68,30 +54,17 @@ export default function TodosScreen({
                   >
                     <span />
                   </button>
-                  <span className="tz-main">
+                  <button
+                    type="button"
+                    className="tz-main tz-main--open"
+                    onClick={() => onOpenTodo(t)}
+                  >
                     <span className="tz-name">{t.title}</span>
                     <span className="tz-sub">
-                      <label
-                        className="tz-due"
-                        title="设置日期"
-                        onClick={(e) => {
-                          const el = e.currentTarget.querySelector('input')
-                          el?.showPicker?.()
-                        }}
-                      >
-                        <input
-                          type="date"
-                          value={toDateValue(t.due)}
-                          onChange={(e) =>
-                            onSetDue(t.id, fromDateValue(e.target.value))
-                          }
-                        />
-                        <span data-none={!t.due}>
-                          {t.due ? dueLabel(t.due).text : '设日期'}
-                        </span>
-                      </label>
+                      {t.due ? dueLabel(t.due).text : '无日期'}
+                      {t.note ? ' · 有备注' : ''}
                     </span>
-                  </span>
+                  </button>
                   <button
                     type="button"
                     className="tz-del"
@@ -124,10 +97,14 @@ export default function TodosScreen({
                   >
                     <span />
                   </button>
-                  <span className="tz-main">
+                  <button
+                    type="button"
+                    className="tz-main tz-main--open"
+                    onClick={() => onOpenTodo(t)}
+                  >
                     <span className="tz-name">{t.title}</span>
                     <span className="tz-sub">{doneText(t.doneAt)}</span>
-                  </span>
+                  </button>
                   <button
                     type="button"
                     className="tz-del"

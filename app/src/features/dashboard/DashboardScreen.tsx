@@ -15,7 +15,7 @@ type Props = {
   onAddTodo: (title: string, due?: string) => void
   onToggleTodo: (id: string, done: boolean) => void
   onDeleteTodo: (id: string) => void
-  onSetTodoDue: (id: string, due?: string) => void
+  onOpenTodo: (todo: Todo) => void
 }
 
 type Bucket = 'overdue' | 'today' | 'later' | 'none'
@@ -54,14 +54,6 @@ function dueFor(when: When): string | undefined {
   return d.toISOString()
 }
 
-function toDateValue(iso?: string) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
-
 function fromDateValue(value: string): string | undefined {
   if (!value) return undefined
   const d = new Date(`${value}T23:59:00`)
@@ -90,7 +82,7 @@ export default function DashboardScreen({
   onAddTodo,
   onToggleTodo,
   onDeleteTodo,
-  onSetTodoDue,
+  onOpenTodo,
 }: Props) {
   const [draft, setDraft] = useState('')
   const [preset, setPreset] = useState<When>('none')
@@ -248,37 +240,18 @@ export default function DashboardScreen({
                             >
                               <span />
                             </button>
-                            <span className="db-row-main">
+                            <button
+                              type="button"
+                              className="db-row-main db-row-open"
+                              onClick={() => onOpenTodo(r.todo)}
+                            >
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">
                                 <span className="db-tag db-tag--todo">待办</span>
-                                <label
-                                  className="db-due"
-                                  title="设置日期"
-                                  onClick={(e) => {
-                                    const el = e.currentTarget.querySelector('input')
-                                    el?.showPicker?.()
-                                  }}
-                                >
-                                  <input
-                                    type="date"
-                                    value={toDateValue(r.todo.due)}
-                                    onChange={(e) =>
-                                      onSetTodoDue(
-                                        r.todo.id,
-                                        fromDateValue(e.target.value),
-                                      )
-                                    }
-                                  />
-                                  <span data-none={!r.todo.due}>
-                                    {r.todo.due
-                                      ? dueLabel(r.todo.due).text
-                                      : '设日期'}
-                                  </span>
-                                </label>
+                                {r.todo.note ? <span>有备注</span> : null}
                                 {r.done && <span>已完成</span>}
                               </span>
-                            </span>
+                            </button>
                             <button
                               type="button"
                               className="db-del"

@@ -13,9 +13,9 @@ import {
   paidCounts,
   setAssignmentStatus,
   setTodoDone,
-  setTodoDue,
   syncAssignmentTotals,
   updateAssignment,
+  updateTodo,
   type Assignment,
   type DashboardData,
   type Todo,
@@ -27,6 +27,7 @@ import ImportScreen from './features/import/ImportScreen'
 import LibraryScreen from './features/library/LibraryScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
 import TodosScreen from './features/todos/TodosScreen'
+import TodoSheet from './components/TodoSheet'
 
 type View = 'dashboard' | 'todos' | 'reconcile' | 'list' | 'import' | 'library'
 
@@ -36,6 +37,7 @@ export default function App() {
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [dash, setDash] = useState<DashboardData | null>(null)
   const [todosAll, setTodosAll] = useState<Todo[]>([])
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
   const [view, setView] = useState<View>('dashboard')
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -106,8 +108,11 @@ export default function App() {
     await bootstrap()
   }
 
-  async function setTodoDate(id: string, due?: string) {
-    await setTodoDue(id, due)
+  async function saveTodo(
+    id: string,
+    patch: { title: string; note: string; due?: string },
+  ) {
+    await updateTodo(id, patch)
     await bootstrap()
   }
 
@@ -166,19 +171,31 @@ export default function App() {
 
   if (view === 'todos') {
     return (
-      <TodosScreen
-        todos={todosAll}
-        onNav={(k) => setView(k)}
-        onToggle={(id, done) => void toggleTodo(id, done)}
-        onDelete={(id) => void removeTodo(id)}
-        onSetDue={(id, due) => void setTodoDate(id, due)}
-      />
+      <>
+        <TodosScreen
+          todos={todosAll}
+          onNav={(k) => setView(k)}
+          onToggle={(id, done) => void toggleTodo(id, done)}
+          onDelete={(id) => void removeTodo(id)}
+          onOpenTodo={setEditingTodo}
+        />
+        {editingTodo && (
+          <TodoSheet
+            todo={editingTodo}
+            onClose={() => setEditingTodo(null)}
+            onSave={(id, patch) => void saveTodo(id, patch)}
+            onToggle={(id, done) => void toggleTodo(id, done)}
+            onDelete={(id) => void removeTodo(id)}
+          />
+        )}
+      </>
     )
   }
 
   if (view === 'dashboard' && dash) {
     return (
-      <DashboardScreen
+      <>
+        <DashboardScreen
         data={dash}
         paidCounts={counts}
         onNav={(k) => setView(k)}
@@ -189,8 +206,18 @@ export default function App() {
         onAddTodo={(title, due) => void addTodo(title, due)}
         onToggleTodo={(id, done) => void toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
-        onSetTodoDue={(id, due) => void setTodoDate(id, due)}
+        onOpenTodo={setEditingTodo}
       />
+        {editingTodo && (
+          <TodoSheet
+            todo={editingTodo}
+            onClose={() => setEditingTodo(null)}
+            onSave={(id, patch) => void saveTodo(id, patch)}
+            onToggle={(id, done) => void toggleTodo(id, done)}
+            onDelete={(id) => void removeTodo(id)}
+          />
+        )}
+      </>
     )
   }
 

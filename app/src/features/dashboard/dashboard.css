@@ -370,6 +370,11 @@
   gap: 5px;
 }
 
+.db-row-open {
+  text-align: left;
+  cursor: pointer;
+}
+
 .db-row-title {
   font-size: 14px;
   font-weight: 500;

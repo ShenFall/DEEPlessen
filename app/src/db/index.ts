@@ -40,6 +40,7 @@ export type PublishItem = { name: string; size: number; file: string }
 export type Todo = {
   id: string
   title: string
+  note?: string
   done: boolean
   due?: string
   createdAt: string
@@ -322,6 +323,13 @@ export async function deleteTodo(id: string) {
 
 export async function setTodoDue(id: string, due?: string) {
   await db.todos.update(id, { due })
+}
+
+export async function updateTodo(
+  id: string,
+  patch: { title?: string; note?: string; due?: string },
+) {
+  await db.todos.update(id, patch)
 }
 
 export async function savePublish(p: Publish) {
