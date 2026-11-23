@@ -29,9 +29,10 @@ const PORTAL_HTML = `<!doctype html>
 html{background:var(--bg)}
 body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rgba(140,90,32,.045),transparent 58%),var(--bg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 .wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
-.bp{position:absolute;top:-18px;left:-28px;width:calc(100% + 56px);height:220px;pointer-events:none;opacity:.5}
-.bp .ln{stroke:#d5c5a4}
-.bp .cn{stroke:#c9b894}
+.motif{position:absolute;top:-26px;right:-56px;width:250px;height:250px;pointer-events:none;opacity:.55}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(#8c5a20 1px,transparent 1px);
+  background-size:18px 18px;opacity:.055}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
 .meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
 .search{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(var(--bg) 76%,transparent)}
@@ -60,7 +61,6 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){.g{animation:none}}
-footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 .sign{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;
   font-family:Georgia,"Times New Roman","Songti SC",serif;font-style:italic;
   font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.75}
@@ -69,27 +69,16 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 </head>
 <body>
 <div class="wrap">
-  <svg class="bp" viewBox="0 0 600 220" fill="none" aria-hidden="true">
-    <defs>
-      <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <line x1="0" y1="0" x2="0" y2="6" stroke="#c9b894" stroke-width="1"/>
-      </pattern>
-    </defs>
-    <g class="ln" stroke-width="1">
-      <line x1="0" y1="120" x2="600" y2="120" stroke-dasharray="7 11"/>
-      <line x1="486" y1="0" x2="430" y2="220" stroke-dasharray="2 7" opacity=".7"/>
-      <line x1="196" y1="0" x2="262" y2="220" stroke-dasharray="2 7" opacity=".45"/>
+  <svg class="motif" viewBox="0 0 240 240" fill="none" aria-hidden="true">
+    <g stroke="#c9b894" stroke-width="1">
+      <circle cx="120" cy="120" r="112" stroke-dasharray="2 7" opacity=".55"/>
+      <circle cx="120" cy="120" r="78" opacity=".8"/>
+      <g opacity=".55"><circle cx="150.0" cy="120.0" r="30"/><circle cx="135.0" cy="146.0" r="30"/><circle cx="105.0" cy="146.0" r="30"/><circle cx="90.0" cy="120.0" r="30"/><circle cx="105.0" cy="94.0" r="30"/><circle cx="135.0" cy="94.0" r="30"/></g>
+      <line x1="120" y1="4" x2="120" y2="236" stroke-dasharray="1 9" opacity=".35"/>
+      <line x1="4" y1="120" x2="236" y2="120" stroke-dasharray="1 9" opacity=".35"/>
     </g>
-    <g class="cn" stroke-width="1">
-      <circle cx="104" cy="120" r="60" stroke-dasharray="3 7"/>
-      <circle cx="192" cy="120" r="42" stroke-dasharray="2 8"/>
-      <circle cx="392" cy="120" r="70" stroke-dasharray="3 7"/>
-      <circle cx="466" cy="120" r="34" stroke-dasharray="2 8"/>
-    </g>
-    <path d="M228 114 C316 114 332 114 356 102 C372 94 382 90 392 90
-             C380 98 374 108 374 120 C374 132 380 142 392 150
-             C382 150 372 146 356 138 C332 126 316 126 228 126 Z"
-          stroke="#c9b894" stroke-width="1" fill="url(#hatch)" fill-opacity=".4"/>
+    <g fill="#c9a05c" opacity=".8"><circle cx="216.0" cy="120.0" r="1.6"/><circle cx="212.7" cy="144.8" r="1.6"/><circle cx="203.1" cy="168.0" r="1.6"/><circle cx="187.9" cy="187.9" r="1.6"/><circle cx="168.0" cy="203.1" r="1.6"/><circle cx="144.8" cy="212.7" r="1.6"/><circle cx="120.0" cy="216.0" r="1.6"/><circle cx="95.2" cy="212.7" r="1.6"/><circle cx="72.0" cy="203.1" r="1.6"/><circle cx="52.1" cy="187.9" r="1.6"/><circle cx="36.9" cy="168.0" r="1.6"/><circle cx="27.3" cy="144.8" r="1.6"/><circle cx="24.0" cy="120.0" r="1.6"/><circle cx="27.3" cy="95.2" r="1.6"/><circle cx="36.9" cy="72.0" r="1.6"/><circle cx="52.1" cy="52.1" r="1.6"/><circle cx="72.0" cy="36.9" r="1.6"/><circle cx="95.2" cy="27.3" r="1.6"/><circle cx="120.0" cy="24.0" r="1.6"/><circle cx="144.8" cy="27.3" r="1.6"/><circle cx="168.0" cy="36.9" r="1.6"/><circle cx="187.9" cy="52.1" r="1.6"/><circle cx="203.1" cy="72.0" r="1.6"/><circle cx="212.7" cy="95.2" r="1.6"/></g>
+    <circle cx="120" cy="120" r="3" fill="#c9a05c"/>
   </svg>
   <h1>课程资料</h1>
   <p class="meta" id="meta" aria-live="polite">加载中…</p>
