@@ -19,46 +19,55 @@ const PORTAL_HTML = `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#f7f4ee" />
 <title>课程资料</title>
 <style>
-  :root{--bg:#f7f4ee;--card:#fff;--line:#e2dcd1;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20}
-  *{box-sizing:border-box}
+  :root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20;--chip:#f0ebe1}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--bg);color:var(--ink);
-    font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  .wrap{max-width:560px;margin:0 auto;padding:24px 16px 48px}
-  h1{font-size:22px;font-weight:600;margin:0 0 4px}
-  .sub{color:var(--dim);font-size:13px;margin:0 0 18px}
-  input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;
-    background:var(--card);font-size:14px;color:var(--ink);margin-bottom:20px}
-  input:focus{outline:none;border-color:#c9bda6}
-  h2{font-size:13px;font-weight:600;color:var(--dim);margin:22px 0 8px;letter-spacing:.04em}
-  ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:600px;margin:0 auto;padding:28px 16px 56px}
+  h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
+  .meta{margin:6px 0 16px;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .search{position:sticky;top:0;z-index:5;padding:8px 0 12px;background:linear-gradient(var(--bg) 70%,transparent)}
+  input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card);font-size:14px;color:var(--ink)}
+  input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
+  h2{display:flex;align-items:baseline;gap:8px;margin:24px 0 8px;font-size:14px;font-weight:600}
+  h2 span{font-size:12px;font-weight:400;color:var(--dim)}
+  ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
   li+li{border-top:1px solid var(--line)}
-  a{display:flex;align-items:center;gap:10px;padding:14px 14px;text-decoration:none;color:var(--ink)}
-  a:active{background:#f1ece2}
-  .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .s{flex:none;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+  a{display:flex;align-items:center;gap:12px;padding:13px 14px;text-decoration:none;color:inherit;transition:background .12s}
+  a:hover{background:#faf7f1}
+  a:active{background:#f3eee4}
+  .ext{flex:none;width:38px;height:38px;border-radius:9px;background:var(--chip);display:flex;
+    align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold)}
+  .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .n b{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .n i{font-style:normal;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
   .dl{flex:none;font-size:12px;color:var(--gold)}
-  .empty{color:var(--dim);font-size:13px;padding:28px 0;text-align:center}
-  footer{margin-top:28px;color:var(--dim);font-size:12px;text-align:center}
+  .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0}
+  footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>课程资料</h1>
-  <p class="sub" id="sub">加载中…</p>
-  <input id="q" placeholder="搜索文件名或课程" />
+  <p class="meta" id="meta">加载中…</p>
+  <div class="search"><input id="q" placeholder="搜索文件名或课程" /></div>
   <div id="list"></div>
-  <footer>点击文件名直接下载</footer>
+  <footer id="foot"></footer>
 </div>
 <script>
 (function(){
   var data = null;
   function size(n){ if(n<1024) return n+' B'; if(n<1048576) return Math.round(n/1024)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+  function ext(n){ var i=n.lastIndexOf('.'); return i<0 ? 'FILE' : n.slice(i+1).toUpperCase().slice(0,4); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function render(q){
     var box = document.getElementById('list');
-    if(!data){ box.innerHTML='<p class="empty">没有资料</p>'; return; }
+    if(!data){ box.innerHTML = '<p class="empty">没有资料</p>'; return; }
     var key = (q||'').trim().toLowerCase();
     var html = '';
     data.courses.forEach(function(c){
@@ -66,10 +75,12 @@ const PORTAL_HTML = `<!doctype html>
         return !key || i.name.toLowerCase().indexOf(key) >= 0 || c.name.toLowerCase().indexOf(key) >= 0;
       });
       if(!items.length) return;
-      html += '<h2>'+c.name+' · '+items.length+'</h2><ul>';
+      html += '<h2>' + esc(c.name) + '<span>' + items.length + ' 个文件</span></h2><ul>';
       items.forEach(function(i){
-        html += '<li><a href="'+i.url+'" download><span class="n">'+i.name+'</span>'
-             +  '<span class="s">'+size(i.size)+'</span><span class="dl">下载</span></a></li>';
+        html += '<li><a href="' + i.url + '" download>'
+             +  '<span class="ext">' + ext(i.name) + '</span>'
+             +  '<span class="n"><b>' + esc(i.name) + '</b><i>' + size(i.size) + '</i></span>'
+             +  '<span class="dl">下载</span></a></li>';
       });
       html += '</ul>';
     });
@@ -78,10 +89,13 @@ const PORTAL_HTML = `<!doctype html>
   fetch('manifest.json').then(function(r){ return r.json(); }).then(function(d){
     data = d;
     var n = d.courses.reduce(function(a,c){ return a + c.items.length; }, 0);
-    document.getElementById('sub').textContent = n + ' 个文件 · ' + d.courses.length + ' 门课';
+    document.getElementById('meta').textContent = n + ' 个文件 · ' + d.courses.length + ' 门课';
+    var d2 = new Date(d.generatedAt);
+    document.getElementById('foot').textContent = isNaN(d2.getTime()) ? '点击文件名直接下载'
+      : '更新于 ' + (d2.getMonth()+1) + ' 月 ' + d2.getDate() + ' 日';
     render('');
   }).catch(function(){
-    document.getElementById('sub').textContent = '清单读不出来，请刷新';
+    document.getElementById('meta').textContent = '清单读不出来，请刷新页面';
   });
   document.getElementById('q').addEventListener('input', function(e){ render(e.target.value); });
 })();

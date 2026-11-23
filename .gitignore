@@ -28,3 +28,6 @@ fixtures/real/
 exports/
 *.private.xlsx
 *.private.json
+
+# 本地门户预览（demo 数据，可随时重建）
+preview/
