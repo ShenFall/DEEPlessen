@@ -70,8 +70,13 @@ h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2
 .kinds button[data-on='true']{border-color:var(--gold);color:var(--gold);background:rgba(140,90,32,.06)}
 .topbar:not(.stuck) .kinds{max-height:0;opacity:0}
 
-.topbar.stuck{top:0;transform:none;background:rgba(247,244,238,.96);
-  border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(140,90,32,.04)}
+.topbar.stuck{top:0;transform:none;background:rgba(247,244,238,.62);
+  -webkit-backdrop-filter:blur(12px) saturate(1.05);
+  backdrop-filter:blur(12px) saturate(1.05)}
+.topbar.stuck::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(140,90,32,.12) 16%,rgba(140,90,32,.12) 84%,transparent)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .topbar.stuck{background:rgba(247,244,238,.94)}}
 .topbar.stuck .inner{gap:8px;padding-top:8px;padding-bottom:8px}
 .topbar.stuck h1{font-size:15px;font-weight:500}
 .topbar.stuck .who{max-height:0;opacity:0}
