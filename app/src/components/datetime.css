@@ -111,12 +111,21 @@
   cursor: pointer;
 }
 
-.dtp-step b {
-  min-width: 26px;
+.dtp-step input {
+  width: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   text-align: center;
   font-family: var(--font-mono);
   font-size: var(--fs-13);
-  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dtp-step input:focus {
+  outline: none;
+  color: var(--amber);
 }
 
 .dtp-actions {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './datetime.css'
 
 const WEEK = ['一', '二', '三', '四', '五', '六', '日']
@@ -17,23 +17,55 @@ function sameDay(a: Date, b: Date) {
 
 type StepperProps = {
   value: number
-  max: number
+  cycle: number
   step?: number
   onChange: (v: number) => void
 }
 
-function Stepper({ value, max, step = 1, onChange }: StepperProps) {
-  const cycle = max + step
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** 可点 +/-，也可直接键入 */
+function Stepper({ value, cycle, step = 1, onChange }: StepperProps) {
+  const [draft, setDraft] = useState(pad(value))
+
+  useEffect(() => {
+    setDraft(pad(value))
+  }, [value])
+
+  function commit() {
+    const n = Number(draft.replace(/\D/g, ''))
+    if (draft.trim() === '' || Number.isNaN(n)) {
+      setDraft(pad(value))
+      return
+    }
+    const clamped = Math.min(cycle - 1, Math.max(0, n))
+    onChange(clamped)
+    setDraft(pad(clamped))
+  }
+
   return (
     <span className="dtp-step">
       <button
         type="button"
-        onClick={() => onChange((value - step + cycle * 2) % cycle)}
+        onClick={() => onChange((value - step + cycle) % cycle)}
         aria-label="减少"
       >
         −
       </button>
-      <b>{String(value).padStart(2, '0')}</b>
+      <input
+        value={draft}
+        inputMode="numeric"
+        maxLength={2}
+        aria-label="直接输入"
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            commit()
+          }
+        }}
+      />
       <button
         type="button"
         onClick={() => onChange((value + step) % cycle)}
@@ -151,9 +183,9 @@ export default function DateTimePicker({ value, onPick, onCancel }: Props) {
 
       <div className="dtp-time">
         <span className="dtp-label">时间</span>
-        <Stepper value={hour} max={23} onChange={setHour} />
+        <Stepper value={hour} cycle={24} onChange={setHour} />
         <span className="dtp-colon">:</span>
-        <Stepper value={minute} max={55} step={5} onChange={setMinute} />
+        <Stepper value={minute} cycle={60} step={5} onChange={setMinute} />
       </div>
 
       <div className="dtp-actions">
