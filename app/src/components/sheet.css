@@ -104,6 +104,21 @@
   color: var(--mute);
 }
 
+.sheet-time {
+  flex: 1;
+  padding: 2px 0;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sheet-time[data-empty='true'] {
+  font-family: var(--font-sans);
+  color: var(--mute);
+}
+
 .sheet-error {
   margin: 8px 0 0 52px;
   font-size: var(--fs-11);

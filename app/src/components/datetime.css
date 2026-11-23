@@ -1,0 +1,160 @@
+.dtp {
+  margin-top: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+.dtp-quick {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.dtp-quick button {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.dtp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: var(--fs-12);
+  color: var(--text);
+}
+
+.dtp-head button {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-md);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.dtp-week,
+.dtp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.dtp-week span {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 10px;
+  color: var(--mute);
+}
+
+.dtp-grid button,
+.dtp-grid span {
+  height: 32px;
+  border-radius: var(--r-md);
+  font-size: var(--fs-12);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.dtp-grid button[data-today='true'] {
+  color: var(--amber);
+}
+
+.dtp-grid button[data-on='true'] {
+  background: var(--amber);
+  color: #1a1206;
+  font-weight: 500;
+}
+
+[data-theme='paper'] .dtp-grid button[data-on='true'] {
+  color: #fffdf9;
+}
+
+.dtp-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+
+.dtp-label {
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.dtp-colon {
+  color: var(--mute);
+}
+
+.dtp-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.dtp-step button {
+  width: 28px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.dtp-step b {
+  min-width: 26px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  font-weight: 500;
+}
+
+.dtp-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dtp-clear {
+  padding: 0 12px;
+  min-height: 36px;
+  font-size: var(--fs-11);
+  color: var(--red);
+  cursor: pointer;
+}
+
+.dtp-cancel {
+  margin-left: auto;
+  padding: 0 14px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.dtp-ok {
+  padding: 0 18px;
+  min-height: 36px;
+  border-radius: var(--r-md);
+  background: var(--amber);
+  color: #1a1206;
+  font-size: var(--fs-11);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+[data-theme='paper'] .dtp-ok {
+  color: #fffdf9;
+}
