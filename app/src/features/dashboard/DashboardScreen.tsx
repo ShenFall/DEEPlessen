@@ -272,7 +272,7 @@ export default function DashboardScreen({
             )}
           </section>
 
-          <section className="db-panel">
+          <section className="db-panel db-panel--lib">
             <div className="db-panel-head">
               <p className="db-panel-title">资料</p>
             </div>

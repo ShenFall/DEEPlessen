@@ -274,3 +274,10 @@
 .al-muted {
   color: var(--mute);
 }
+
+/* 手机上底部有 tab，容器要矮 66px，否则「新建清点」被盖住 */
+@media (max-width: 720px) {
+  .al {
+    min-height: calc(100dvh - 66px);
+  }
+}

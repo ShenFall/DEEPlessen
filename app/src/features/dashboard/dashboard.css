@@ -519,3 +519,10 @@
   font-size: 12px;
   color: var(--ink);
 }
+
+/* 手机上不展示资料卡：资料只在电脑端整理 */
+@media (max-width: 720px) {
+  .db-panel--lib {
+    display: none;
+  }
+}

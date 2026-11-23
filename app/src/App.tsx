@@ -212,6 +212,7 @@ export default function App() {
             onDelete={(id) => void removeTodo(id)}
           />
         )}
+        <MobileTabs active="todos" onNav={(k) => setView(k)} />
       </>
     )
   }

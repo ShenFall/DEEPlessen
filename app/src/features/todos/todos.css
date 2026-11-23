@@ -178,3 +178,10 @@
 .tz-done {
   opacity: 0.72;
 }
+
+/* 底部 tab 占位 */
+@media (max-width: 720px) {
+  .tz {
+    min-height: calc(100dvh - 66px);
+  }
+}
