@@ -44,6 +44,24 @@
   color: var(--dim);
 }
 
+.sh-motto {
+  flex: none;
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--mute);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .sh-motto {
+    display: none;
+  }
+}
+
 .sh-nav {
   display: flex;
   gap: 2px;
