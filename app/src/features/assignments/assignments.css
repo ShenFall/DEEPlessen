@@ -211,6 +211,21 @@
   outline: none;
 }
 
+.al-time {
+  flex: 1;
+  padding: 10px 0;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.al-time[data-empty='true'] {
+  font-family: var(--font-sans);
+  color: var(--mute);
+}
+
 .al-submit {
   width: 100%;
   min-height: 44px;

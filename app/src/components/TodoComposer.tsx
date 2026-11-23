@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DateTimePicker from './DateTimePicker'
 import './todo-composer.css'
 
 type When = 'none' | 'today' | 'tomorrow'
@@ -17,10 +18,13 @@ function dueFor(when: When): string | undefined {
   return d.toISOString()
 }
 
-function fromDateValue(value: string): string | undefined {
-  if (!value) return undefined
-  const d = new Date(`${value}T23:59:00`)
-  return Number.isNaN(d.getTime()) ? undefined : d.toISOString()
+function shortText(iso: string) {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '选日期'
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(
+    d.getMinutes(),
+  )}`
 }
 
 type Props = {
@@ -35,15 +39,17 @@ export default function TodoComposer({
 }: Props) {
   const [draft, setDraft] = useState('')
   const [preset, setPreset] = useState<When>('none')
-  const [customDate, setCustomDate] = useState('')
+  const [customDue, setCustomDue] = useState<string | undefined>(undefined)
+  const [picking, setPicking] = useState(false)
 
   function submit() {
     const text = draft.trim()
     if (!text) return
-    onAdd(text, customDate ? fromDateValue(customDate) : dueFor(preset))
+    onAdd(text, customDue ?? dueFor(preset))
     setDraft('')
     setPreset('none')
-    setCustomDate('')
+    setCustomDue(undefined)
+    setPicking(false)
   }
 
   return (
@@ -73,31 +79,37 @@ export default function TodoComposer({
           <button
             key={w.key}
             type="button"
-            data-on={!customDate && preset === w.key}
+            data-on={!customDue && preset === w.key}
             onClick={() => {
               setPreset(w.key)
-              setCustomDate('')
+              setCustomDue(undefined)
+              setPicking(false)
             }}
           >
             {w.label}
           </button>
         ))}
-        <label
+        <button
+          type="button"
           className="tc-date"
-          data-on={!!customDate}
-          onClick={(e) => {
-            const el = e.currentTarget.querySelector('input')
-            el?.showPicker?.()
-          }}
+          data-on={!!customDue}
+          onClick={() => setPicking((v) => !v)}
         >
-          <input
-            type="date"
-            value={customDate}
-            onChange={(e) => setCustomDate(e.target.value)}
-          />
-          <span>{customDate ? customDate.slice(5).replace('-', '/') : '选日期'}</span>
-        </label>
+          {customDue ? shortText(customDue) : '选日期'}
+        </button>
       </div>
+
+      {picking && (
+        <DateTimePicker
+          value={customDue}
+          onPick={(iso) => {
+            setCustomDue(iso)
+            setPreset('none')
+            setPicking(false)
+          }}
+          onCancel={() => setPicking(false)}
+        />
+      )}
     </form>
   )
 }

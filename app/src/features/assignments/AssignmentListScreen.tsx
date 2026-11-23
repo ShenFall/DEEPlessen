@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
+import DateTimePicker from '../../components/DateTimePicker'
 import type { Assignment } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './assignments.css'
@@ -27,9 +28,11 @@ const STATUS_LABEL: Record<string, string> = {
 
 const LONG_PRESS = 550
 
-function toInputValue(d: Date) {
+function timeText(iso: string) {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '选择时间'
   const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(
     d.getHours(),
   )}:${p(d.getMinutes())}`
 }
@@ -54,6 +57,7 @@ export default function AssignmentListScreen({
   const [form, setForm] = useState<Form | null>(null)
   const [menuFor, setMenuFor] = useState<Assignment | null>(null)
   const [deleteArmed, setDeleteArmed] = useState(false)
+  const [picking, setPicking] = useState(false)
 
   const pressTimer = useRef<number | undefined>(undefined)
   const longFired = useRef(false)
@@ -64,16 +68,13 @@ export default function AssignmentListScreen({
   function openCreate() {
     const d = new Date()
     d.setHours(23, 59, 0, 0)
-    setForm({ course: '', title: '', due: toInputValue(d) })
+    setPicking(false)
+    setForm({ course: '', title: '', due: d.toISOString() })
   }
 
   function openEdit(a: Assignment) {
-    setForm({
-      id: a.id,
-      course: a.course,
-      title: a.title,
-      due: toInputValue(new Date(a.due)),
-    })
+    setPicking(false)
+    setForm({ id: a.id, course: a.course, title: a.title, due: a.due })
   }
 
   function submit() {
@@ -81,7 +82,7 @@ export default function AssignmentListScreen({
     const payload: FormInput = {
       course: form.course.trim(),
       title: form.title.trim(),
-      due: new Date(form.due).toISOString(),
+      due: form.due,
     }
     if (form.id) onUpdate(form.id, payload)
     else onCreate(payload)
@@ -258,14 +259,28 @@ export default function AssignmentListScreen({
               />
             </label>
 
-            <label className="al-field">
+            <div className="al-field">
               <span>截止</span>
-              <input
-                type="datetime-local"
+              <button
+                type="button"
+                className="al-time"
+                data-empty={!form.due}
+                onClick={() => setPicking((v) => !v)}
+              >
+                {form.due ? timeText(form.due) : '选择时间'}
+              </button>
+            </div>
+
+            {picking && (
+              <DateTimePicker
                 value={form.due}
-                onChange={(e) => setForm({ ...form, due: e.target.value })}
+                onPick={(iso) => {
+                  setForm({ ...form, due: iso ?? '' })
+                  setPicking(false)
+                }}
+                onCancel={() => setPicking(false)}
               />
-            </label>
+            )}
 
             <button
               type="button"
