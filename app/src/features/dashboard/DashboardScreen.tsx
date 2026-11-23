@@ -134,7 +134,6 @@ export default function DashboardScreen({
         <button type="button" className="db-rail-item" onClick={onLibrary}>
           资料
         </button>
-        <span className="db-rail-soon">日程</span>
       </nav>
 
       <div className="db-main">
@@ -168,11 +167,16 @@ export default function DashboardScreen({
                 submit()
               }}
             >
-              <input
-                value={draft}
-                placeholder="记一件要做的事，回车保存"
-                onChange={(e) => setDraft(e.target.value)}
-              />
+              <div className="db-add-box">
+                <span className="db-add-plus" aria-hidden="true">
+                  ＋
+                </span>
+                <input
+                  value={draft}
+                  placeholder="记一件要做的事"
+                  onChange={(e) => setDraft(e.target.value)}
+                />
+              </div>
               <div className="db-when">
                 {WHENS.map((w) => (
                   <button
@@ -187,7 +191,11 @@ export default function DashboardScreen({
               </div>
             </form>
 
-            {total === 0 && <p className="db-quiet">没有待处理的事</p>}
+            {total === 0 && (
+              <p className="db-quiet">
+                还没有待办。在上面那行写一句，回车就记下。
+              </p>
+            )}
 
             {BUCKETS.map(({ key, label }) => {
               const group = rows.filter((r) => r.bucket === key)
@@ -302,6 +310,9 @@ export default function DashboardScreen({
                 <span>已收</span>
               </div>
             </div>
+            {data.openCount === 0 && (
+              <p className="db-quiet">没有进行中的清点</p>
+            )}
           </section>
 
           <section className="db-panel">

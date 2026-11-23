@@ -201,24 +201,45 @@
   margin: 2px 0 4px;
 }
 
-.db-add input {
-  width: 100%;
-  padding: 10px 0;
+.db-add-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.db-add-box:focus-within {
+  border-color: rgba(233, 163, 65, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.db-add-plus {
+  flex: none;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--gold);
+}
+
+.db-add-box input {
+  flex: 1;
+  min-width: 0;
   border: 0;
-  border-bottom: 1px solid var(--hair);
   background: transparent;
   color: var(--ink);
   font-size: 13px;
   font-family: var(--font-sans);
 }
 
-.db-add input::placeholder {
-  color: rgba(154, 166, 184, 0.7);
+.db-add-box input::placeholder {
+  color: rgba(154, 166, 184, 0.75);
 }
 
-.db-add input:focus {
+.db-add-box input:focus {
   outline: none;
-  border-bottom-color: rgba(233, 163, 65, 0.6);
 }
 
 .db-when {
