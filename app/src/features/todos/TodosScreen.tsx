@@ -1,10 +1,11 @@
+import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import type { Todo } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './todos.css'
 
 type Props = {
   todos: Todo[]
-  onBack: () => void
+  onNav: (key: ShellNav) => void
   onToggle: (id: string, done: boolean) => void
   onDelete: (id: string) => void
   onSetDue: (id: string, due?: string) => void
@@ -33,7 +34,7 @@ function doneText(iso?: string) {
 
 export default function TodosScreen({
   todos,
-  onBack,
+  onNav,
   onToggle,
   onDelete,
   onSetDue,
@@ -43,12 +44,7 @@ export default function TodosScreen({
 
   return (
     <main className="tz">
-      <header className="tz-top">
-        <button type="button" className="tz-back" onClick={onBack}>
-          <span aria-hidden="true">←</span>
-          看板
-        </button>
-      </header>
+      <AppShellHeader active="todos" onNav={onNav} />
 
       <div className="tz-body">
         <h1 className="tz-title">待办</h1>
@@ -69,7 +65,9 @@ export default function TodosScreen({
                     className="tz-check"
                     aria-label="完成"
                     onClick={() => onToggle(t.id, true)}
-                  />
+                  >
+                    <span />
+                  </button>
                   <span className="tz-main">
                     <span className="tz-name">{t.title}</span>
                     <span className="tz-sub">
@@ -123,7 +121,9 @@ export default function TodosScreen({
                     data-on="true"
                     aria-label="恢复"
                     onClick={() => onToggle(t.id, false)}
-                  />
+                  >
+                    <span />
+                  </button>
                   <span className="tz-main">
                     <span className="tz-name">{t.title}</span>
                     <span className="tz-sub">{doneText(t.doneAt)}</span>

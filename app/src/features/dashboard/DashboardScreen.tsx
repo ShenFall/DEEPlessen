@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import type { Assignment, DashboardData, Todo } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './dashboard.css'
@@ -6,6 +7,7 @@ import './dashboard.css'
 type Props = {
   data: DashboardData
   paidCounts: Record<string, number>
+  onNav: (key: ShellNav) => void
   onOpen: (id: string) => void
   onAll: () => void
   onLibrary: () => void
@@ -80,6 +82,7 @@ type Row =
 export default function DashboardScreen({
   data,
   paidCounts,
+  onNav,
   onOpen,
   onAll,
   onLibrary,
@@ -141,6 +144,8 @@ export default function DashboardScreen({
 
   return (
     <main className="db">
+      <AppShellHeader active="dashboard" onNav={onNav} />
+
       <div className="db-main">
         <header className="db-head">
           <div>
@@ -155,20 +160,6 @@ export default function DashboardScreen({
               {total > 0 ? `还有 ${total} 件事` : '今天清空了'}
             </h1>
           </div>
-          <nav className="db-nav" aria-label="主导航">
-            <button type="button" data-on="true">
-              看板
-            </button>
-            <button type="button" onClick={onTodos}>
-              待办
-            </button>
-            <button type="button" onClick={onAll}>
-              作业
-            </button>
-            <button type="button" onClick={onLibrary}>
-              资料
-            </button>
-          </nav>
         </header>
 
         <div className="db-grid">
@@ -254,7 +245,9 @@ export default function DashboardScreen({
                               data-on={r.done}
                               aria-label={r.done ? '恢复' : '完成'}
                               onClick={() => toggle(r.todo, !r.done)}
-                            />
+                            >
+                              <span />
+                            </button>
                             <span className="db-row-main">
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">

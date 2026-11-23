@@ -85,14 +85,25 @@
 
 .tz-check {
   flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: -8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tz-check span {
   width: 18px;
   height: 18px;
   border: 1px solid var(--cell-edge);
   border-radius: 50%;
-  background: transparent;
 }
 
-.tz-check[data-on='true'] {
+.tz-check[data-on='true'] span {
   border-color: var(--amber);
   background:
     radial-gradient(circle at 50% 50%, var(--amber) 0 45%, transparent 46%);

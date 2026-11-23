@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import {
   listPublishes,
   loadHandle,
@@ -62,7 +63,7 @@ function kindOf(name: string): Kind {
   return 'other'
 }
 
-export default function LibraryScreen({ onBack }: { onBack: () => void }) {
+export default function LibraryScreen({ onNav }: { onNav: (key: ShellNav) => void }) {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null)
   const [granted, setGranted] = useState(false)
   const [entries, setEntries] = useState<LibraryEntry[]>([])
@@ -248,12 +249,7 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <main className="lb">
-      <header className="lb-top">
-        <button type="button" className="lb-back" onClick={onBack}>
-          <span aria-hidden="true">←</span>
-          看板
-        </button>
-      </header>
+      <AppShellHeader active="library" onNav={onNav} />
 
       <div className="lb-body">
         <p className="lb-title">资料库</p>

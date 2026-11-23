@@ -303,18 +303,37 @@
   border-top: 0;
 }
 
+/* 34px 命中区，内部 18px 圆点：格子小但点得中 */
 .db-check {
   flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: -8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 120ms ease-out;
+}
+
+.db-check span {
   width: 18px;
   height: 18px;
   border: 1px solid rgba(242, 237, 228, 0.35);
   border-radius: 50%;
-  background: transparent;
-  transition: transform 120ms ease-out;
+  transition: border-color 120ms ease;
 }
 
 .db-check:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
+}
+
+.db-check[data-on='true'] span {
+  border-color: var(--gold);
+  background:
+    radial-gradient(circle at 50% 50%, var(--gold) 0 45%, transparent 46%);
 }
 
 /* 作业行没有勾选框，用同尺寸的空心点占位，让标题与待办对齐 */
@@ -322,14 +341,9 @@
   flex: none;
   width: 18px;
   height: 18px;
+  margin-left: 8px;
   border: 1px dashed rgba(154, 166, 184, 0.35);
   border-radius: 50%;
-}
-
-.db-check[data-on='true'] {
-  border-color: var(--gold);
-  background:
-    radial-gradient(circle at 50% 50%, var(--gold) 0 45%, transparent 46%);
 }
 
 .db-row[data-done='true'] .db-row-title {

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import type { Assignment } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './assignments.css'
@@ -13,7 +14,7 @@ type Props = {
   onUpdate: (id: string, input: FormInput) => void
   onDelete: (id: string) => void
   onImportRoster: () => void
-  onToday: () => void
+  onNav: (key: ShellNav) => void
 }
 
 type Form = FormInput & { id?: string }
@@ -48,7 +49,7 @@ export default function AssignmentListScreen({
   onUpdate,
   onDelete,
   onImportRoster,
-  onToday,
+  onNav,
 }: Props) {
   const [form, setForm] = useState<Form | null>(null)
   const [menuFor, setMenuFor] = useState<Assignment | null>(null)
@@ -153,17 +154,15 @@ export default function AssignmentListScreen({
 
   return (
     <main className="al">
-      <header className="al-top">
-        <span className="al-brand">拾课</span>
-        <span className="al-actions">
-          <button type="button" className="al-import" onClick={onToday}>
-            看板
-          </button>
-          <button type="button" className="al-import" onClick={onImportRoster}>
+      <AppShellHeader
+        active="list"
+        onNav={onNav}
+        right={
+          <button type="button" onClick={onImportRoster}>
             名单
           </button>
-        </span>
-      </header>
+        }
+      />
 
       <div className="al-body">
         <p className="al-eyebrow">进行中 · {running.length}</p>

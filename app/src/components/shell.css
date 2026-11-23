@@ -1,0 +1,109 @@
+.sh-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.sh-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 10px var(--pad-x);
+}
+
+.sh-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  cursor: pointer;
+}
+
+.sh-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.sh-name {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
+.sh-nav {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.sh-nav button {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.sh-nav button:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.sh-nav button[data-on='true'] {
+  color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+}
+
+.sh-right {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+.sh-right button {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+}
+
+/* 深色看板页里，顶栏底色跟随深空 */
+.db .sh-bar {
+  background: transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.db .sh-name {
+  color: #9aa6b8;
+}
+
+.db .sh-nav button {
+  color: #9aa6b8;
+}
+
+.db .sh-nav button:hover {
+  color: #f2ede4;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.db .sh-nav button[data-on='true'] {
+  color: #d38a43;
+  background: rgba(211, 138, 67, 0.12);
+}

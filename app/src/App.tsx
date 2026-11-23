@@ -161,14 +161,14 @@ export default function App() {
   }
 
   if (view === 'library') {
-    return <LibraryScreen onBack={() => setView('dashboard')} />
+    return <LibraryScreen onNav={(k) => setView(k)} />
   }
 
   if (view === 'todos') {
     return (
       <TodosScreen
         todos={todosAll}
-        onBack={() => setView('dashboard')}
+        onNav={(k) => setView(k)}
         onToggle={(id, done) => void toggleTodo(id, done)}
         onDelete={(id) => void removeTodo(id)}
         onSetDue={(id, due) => void setTodoDate(id, due)}
@@ -181,6 +181,7 @@ export default function App() {
       <DashboardScreen
         data={dash}
         paidCounts={counts}
+        onNav={(k) => setView(k)}
         onOpen={(id) => void open(id)}
         onAll={() => setView('list')}
         onLibrary={() => setView('library')}
@@ -203,7 +204,7 @@ export default function App() {
         onUpdate={(id, input) => void update(id, input)}
         onDelete={(id) => void remove(id)}
         onImportRoster={() => openImport('list')}
-        onToday={() => setView('dashboard')}
+        onNav={(k) => setView(k)}
       />
     )
   }
