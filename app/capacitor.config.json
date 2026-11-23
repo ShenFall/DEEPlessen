@@ -1,0 +1,11 @@
+{
+  "appId": "com.shenfall.deeptime",
+  "appName": "深时",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#F7F4EE"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
