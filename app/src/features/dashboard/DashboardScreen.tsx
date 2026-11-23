@@ -9,7 +9,7 @@ type Props = {
   onOpen: (id: string) => void
   onAll: () => void
   onLibrary: () => void
-  onAddTodo: (title: string) => void
+  onAddTodo: (title: string, due?: string) => void
   onToggleTodo: (id: string, done: boolean) => void
   onDeleteTodo: (id: string) => void
 }
@@ -31,6 +31,23 @@ function bucketOf(due?: string): Bucket {
   if (d.getTime() < now.getTime()) return 'overdue'
   if (d.toDateString() === now.toDateString()) return 'today'
   return 'later'
+}
+
+type When = 'none' | 'today' | 'tomorrow'
+
+const WHENS: { key: When; label: string }[] = [
+  { key: 'none', label: '无时间' },
+  { key: 'today', label: '今天' },
+  { key: 'tomorrow', label: '明天' },
+]
+
+/** 只给日期不给钟点：这些事不精确到分钟 */
+function dueFor(when: When): string | undefined {
+  if (when === 'none') return undefined
+  const d = new Date()
+  if (when === 'tomorrow') d.setDate(d.getDate() + 1)
+  d.setHours(23, 59, 0, 0)
+  return d.toISOString()
 }
 
 type Row =
@@ -55,6 +72,7 @@ export default function DashboardScreen({
   onDeleteTodo,
 }: Props) {
   const [draft, setDraft] = useState('')
+  const [when, setWhen] = useState<When>('none')
   /** 刚勾掉的先留在原地变灰，刷新后才归入已完成 */
   const [justDone, setJustDone] = useState<Todo[]>([])
 
@@ -90,8 +108,9 @@ export default function DashboardScreen({
   function submit() {
     const text = draft.trim()
     if (!text) return
-    onAddTodo(text)
+    onAddTodo(text, dueFor(when))
     setDraft('')
+    setWhen('none')
   }
 
   function toggle(t: Todo, done: boolean) {
@@ -154,6 +173,18 @@ export default function DashboardScreen({
                 placeholder="记一件要做的事，回车保存"
                 onChange={(e) => setDraft(e.target.value)}
               />
+              <div className="db-when">
+                {WHENS.map((w) => (
+                  <button
+                    key={w.key}
+                    type="button"
+                    data-on={when === w.key}
+                    onClick={() => setWhen(w.key)}
+                  >
+                    {w.label}
+                  </button>
+                ))}
+              </div>
             </form>
 
             {total === 0 && <p className="db-quiet">没有待处理的事</p>}
@@ -180,6 +211,9 @@ export default function DashboardScreen({
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">
                                 <span className="db-tag db-tag--todo">待办</span>
+                                {r.todo.due && (
+                                  <span>{dueLabel(r.todo.due).text}</span>
+                                )}
                                 {r.done && <span>已完成</span>}
                               </span>
                             </span>

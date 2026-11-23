@@ -84,8 +84,8 @@ export default function App() {
     await bootstrap()
   }
 
-  async function addTodo(title: string) {
-    await createTodo(title)
+  async function addTodo(title: string, due?: string) {
+    await createTodo(title, due)
     await bootstrap()
   }
 
@@ -160,7 +160,7 @@ export default function App() {
         onOpen={(id) => void open(id)}
         onAll={() => setView('list')}
         onLibrary={() => setView('library')}
-        onAddTodo={(title) => void addTodo(title)}
+        onAddTodo={(title, due) => void addTodo(title, due)}
         onToggleTodo={(id, done) => void toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
       />

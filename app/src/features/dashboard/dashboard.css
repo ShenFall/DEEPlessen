@@ -221,6 +221,25 @@
   border-bottom-color: rgba(233, 163, 65, 0.6);
 }
 
+.db-when {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 2px;
+}
+
+.db-when button {
+  padding: 3px 9px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.db-when button[data-on='true'] {
+  border-color: rgba(211, 138, 67, 0.5);
+  color: var(--gold);
+}
+
 .db-group {
   margin-top: 14px;
 }
