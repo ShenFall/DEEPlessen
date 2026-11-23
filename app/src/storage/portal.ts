@@ -27,20 +27,28 @@ const PORTAL_HTML = `<!doctype html>
 :root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20;--chip:#f0ebe1;--r-card:12px;--r-input:10px;--r-chip:9px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
-body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rgba(140,90,32,.045),transparent 58%),var(--bg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
-.motif{position:absolute;top:-26px;right:-56px;width:250px;height:250px;pointer-events:none;opacity:.55}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(#8c5a20 1px,transparent 1px);
-  background-size:18px 18px;opacity:.055}
-h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
-.meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
-.search{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(var(--bg) 76%,transparent)}
-input{display:block;width:100%;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:var(--r-input);background:var(--card);font:inherit;font-size:14px;color:var(--ink);appearance:none}
+body{margin:0;min-height:100dvh;color:var(--ink);
+  background:radial-gradient(120% 50% at 82% -6%,rgba(140,90,32,.05),transparent 60%),var(--bg);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27300%27%3E%3Cg fill=%27none%27 stroke=%27%23c9b894%27 stroke-width=%271%27%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%27112%27 stroke-dasharray=%272 9%27 opacity=%27.45%27/%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%2774%27 opacity=%27.5%27/%3E%3Ccircle cx=%27150%27 cy=%27150%27 r=%2738%27 opacity=%27.35%27/%3E%3C/g%3E%3Cg fill=%27%23c9a05c%27 opacity=%27.45%27%3E%3Ccircle cx=%27242.0%27 cy=%27150.0%27 r=%271.5%27/%3E%3Ccircle cx=%27229.7%27 cy=%27196.0%27 r=%271.5%27/%3E%3Ccircle cx=%27196.0%27 cy=%27229.7%27 r=%271.5%27/%3E%3Ccircle cx=%27150.0%27 cy=%27242.0%27 r=%271.5%27/%3E%3Ccircle cx=%27104.0%27 cy=%27229.7%27 r=%271.5%27/%3E%3Ccircle cx=%2770.3%27 cy=%27196.0%27 r=%271.5%27/%3E%3Ccircle cx=%2758.0%27 cy=%27150.0%27 r=%271.5%27/%3E%3Ccircle cx=%2770.3%27 cy=%27104.0%27 r=%271.5%27/%3E%3Ccircle cx=%27104.0%27 cy=%2770.3%27 r=%271.5%27/%3E%3Ccircle cx=%27150.0%27 cy=%2758.0%27 r=%271.5%27/%3E%3Ccircle cx=%27196.0%27 cy=%2770.3%27 r=%271.5%27/%3E%3Ccircle cx=%27229.7%27 cy=%27104.0%27 r=%271.5%27/%3E%3C/g%3E%3C/svg%3E");
+  background-size:300px 300px;background-position:center top}
+.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:24px 16px 48px}
+h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.meta{margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.bar{position:sticky;top:0;z-index:5;margin:14px -16px 0;padding:10px 16px;
+  background:linear-gradient(var(--bg) 84%,transparent)}
+input{display:block;width:100%;height:44px;padding:0 14px;border:1px solid var(--line);
+  border-radius:var(--r-input);background:var(--card);font:inherit;font-size:14px;color:var(--ink);appearance:none}
 input::placeholder{color:var(--dim)}
 input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
 input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.g{margin:20px 0 0;animation:up .2s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*24ms)}
+.kinds{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.kinds::-webkit-scrollbar{display:none}
+.kinds button{flex:none;height:28px;padding:0 11px;border:1px solid var(--line);border-radius:999px;
+  background:transparent;font:inherit;font-size:12px;color:var(--dim);cursor:pointer}
+.kinds button[data-on='true']{border-color:var(--gold);color:var(--gold);background:rgba(140,90,32,.06)}
+.g{margin:18px 0 0;animation:up .2s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*24ms)}
 .g.s{animation:none}
 .g:nth-of-type(n+9){animation:none}
 .g h2{display:flex;align-items:baseline;gap:8px;margin:0 0 8px;font-size:14px;font-weight:600}
@@ -51,59 +59,74 @@ li+li{border-top:1px solid var(--line)}
 a{display:flex;align-items:center;gap:12px;min-height:62px;padding:11px 14px;text-decoration:none;color:inherit;transition:background .12s ease}
 a:active{background:#f3eee4}
 a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-.ext{flex:none;width:38px;height:38px;border-radius:var(--r-chip);background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold)}
+.ext{flex:none;width:38px;height:38px;border-radius:var(--r-chip);background:var(--chip);display:flex;
+  align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold)}
 .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .n b{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .n i{font-style:normal;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
 .dl{flex:none;font-size:12px;color:var(--gold)}
 .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
-footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
-@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media(hover:hover){a:hover{background:#faf7f1}}
-@media(prefers-reduced-motion:reduce){.g{animation:none}}
+footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
 .sign{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;
   font-family:Georgia,"Times New Roman","Songti SC",serif;font-style:italic;
   font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.75}
 .ava{width:22px;height:22px;border-radius:50%;object-fit:cover;filter:saturate(.85)}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(hover:hover){a:hover{background:#faf7f1}}
+@media(prefers-reduced-motion:reduce){.g{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <svg class="motif" viewBox="0 0 240 240" fill="none" aria-hidden="true">
-    <g stroke="#c9b894" stroke-width="1">
-      <circle cx="120" cy="120" r="112" stroke-dasharray="2 7" opacity=".55"/>
-      <circle cx="120" cy="120" r="78" opacity=".8"/>
-      <g opacity=".55"><circle cx="150.0" cy="120.0" r="30"/><circle cx="135.0" cy="146.0" r="30"/><circle cx="105.0" cy="146.0" r="30"/><circle cx="90.0" cy="120.0" r="30"/><circle cx="105.0" cy="94.0" r="30"/><circle cx="135.0" cy="94.0" r="30"/></g>
-      <line x1="120" y1="4" x2="120" y2="236" stroke-dasharray="1 9" opacity=".35"/>
-      <line x1="4" y1="120" x2="236" y2="120" stroke-dasharray="1 9" opacity=".35"/>
-    </g>
-    <g fill="#c9a05c" opacity=".8"><circle cx="216.0" cy="120.0" r="1.6"/><circle cx="212.7" cy="144.8" r="1.6"/><circle cx="203.1" cy="168.0" r="1.6"/><circle cx="187.9" cy="187.9" r="1.6"/><circle cx="168.0" cy="203.1" r="1.6"/><circle cx="144.8" cy="212.7" r="1.6"/><circle cx="120.0" cy="216.0" r="1.6"/><circle cx="95.2" cy="212.7" r="1.6"/><circle cx="72.0" cy="203.1" r="1.6"/><circle cx="52.1" cy="187.9" r="1.6"/><circle cx="36.9" cy="168.0" r="1.6"/><circle cx="27.3" cy="144.8" r="1.6"/><circle cx="24.0" cy="120.0" r="1.6"/><circle cx="27.3" cy="95.2" r="1.6"/><circle cx="36.9" cy="72.0" r="1.6"/><circle cx="52.1" cy="52.1" r="1.6"/><circle cx="72.0" cy="36.9" r="1.6"/><circle cx="95.2" cy="27.3" r="1.6"/><circle cx="120.0" cy="24.0" r="1.6"/><circle cx="144.8" cy="27.3" r="1.6"/><circle cx="168.0" cy="36.9" r="1.6"/><circle cx="187.9" cy="52.1" r="1.6"/><circle cx="203.1" cy="72.0" r="1.6"/><circle cx="212.7" cy="95.2" r="1.6"/></g>
-    <circle cx="120" cy="120" r="3" fill="#c9a05c"/>
-  </svg>
   <h1>课程资料</h1>
   <p class="meta" id="meta" aria-live="polite">加载中…</p>
-  <div class="search"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
+
+  <div class="bar">
+    <input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" />
+    <div class="kinds" id="kinds"></div>
+  </div>
+
   <div id="list" aria-live="polite"></div>
   <footer id="foot"></footer>
   <p class="sign"><img class="ava" src="brand/avatar.png" alt="" onerror="this.remove()" />ShenFall</p>
 </div>
 <script>
 (function(){
-  var data=null,total=0;
+  var data=null,total=0,kind='all',key='';
+  var MAP={pdf:'文档',doc:'文档',docx:'文档',dot:'文档',txt:'文档',md:'文档',
+           xls:'表格',xlsx:'表格',csv:'表格',tsv:'表格',
+           ppt:'幻灯片',pptx:'幻灯片',
+           png:'图片',jpg:'图片',jpeg:'图片',gif:'图片',webp:'图片',svg:'图片',
+           zip:'压缩',rar:'压缩','7z':'压缩'};
   function size(n){ if(n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
   function ext(n){ var i=n.lastIndexOf('.'); return i<0 ? 'FILE' : n.slice(i+1).toUpperCase().slice(0,4); }
+  function kindOf(n){ var i=n.lastIndexOf('.'); var e=i<0?'':n.slice(i+1).toLowerCase(); return MAP[e]||'其他'; }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
-  function render(q,animate){
+
+  function buildKinds(){
+    var seen={},order=['文档','表格','幻灯片','图片','压缩','其他'],box=document.getElementById('kinds');
+    data.courses.forEach(function(c){ c.items.forEach(function(i){ var k=kindOf(i.name); seen[k]=(seen[k]||0)+1; }); });
+    var html='<button type="button" data-k="all" data-on="'+(kind==='all')+'">全部 '+total+'</button>';
+    order.forEach(function(k){ if(seen[k]) html+='<button type="button" data-k="'+k+'" data-on="'+(kind===k)+'">'+k+' '+seen[k]+'</button>'; });
+    box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll('button'),function(b){
+      b.addEventListener('click',function(){ kind=b.getAttribute('data-k'); buildKinds(); render(true); });
+    });
+  }
+
+  function render(animate){
     var box=document.getElementById('list');
     if(!data){ box.innerHTML=''; return; }
-    var key=(q||'').trim().toLowerCase(),html='',n=0;
+    var html='',n=0;
     data.courses.forEach(function(c){
       var items=c.items.filter(function(i){
-        return !key || i.name.toLowerCase().indexOf(key)>=0 || c.name.toLowerCase().indexOf(key)>=0;
+        var okq=!key||i.name.toLowerCase().indexOf(key)>=0||c.name.toLowerCase().indexOf(key)>=0;
+        return okq && (kind==='all'||kindOf(i.name)===kind);
       });
       if(!items.length) return;
-      var i=Math.min(n,7),cls=animate?'g':'g s';
-      html+='<section class="'+cls+'" style="--i:'+i+'"><h2><span class="c">'+esc(c.name)+'</span><span class="k">'+items.length+' 个文件</span></h2><ul>';
+      var idx=Math.min(n,7),cls=animate?'g':'g s';
+      html+='<section class="'+cls+'" style="--i:'+idx+'"><h2><span class="c">'+esc(c.name)+'</span>'
+          +'<span class="k">'+items.length+' 个文件</span></h2><ul>';
       items.forEach(function(f){
         html+='<li><a href="'+esc(f.url)+'" download="'+esc(f.name)+'" aria-label="下载 '+esc(f.name)+'">'
           +'<span class="ext">'+esc(ext(f.name))+'</span>'
@@ -114,20 +137,25 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
     });
     box.innerHTML=html || (total ? '<p class="empty">没有匹配的资料</p>' : '<p class="empty">还没有资料</p>');
   }
+
   fetch('manifest.json').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
     data=d;data.courses=Array.isArray(d.courses)?d.courses:[];
     total=data.courses.reduce(function(a,c){ return a+c.items.length; },0);
     document.getElementById('meta').textContent=total+' 个文件 · '+data.courses.length+' 门课';
     var dt=new Date(d.generatedAt);
     document.getElementById('foot').textContent=isNaN(dt.getTime())?'点击文件名直接下载':'更新于 '+(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日';
-    render('',true);
+    buildKinds(); render(true);
   }).catch(function(){
     data=null;total=0;
     document.getElementById('meta').textContent='清单读不出来，请刷新页面';
     document.getElementById('list').innerHTML='';
+    document.getElementById('kinds').innerHTML='';
     document.getElementById('foot').textContent='';
   });
-  document.getElementById('q').addEventListener('input',function(e){ render(e.target.value,false); });
+
+  document.getElementById('q').addEventListener('input',function(e){
+    key=(e.target.value||'').trim().toLowerCase(); render(false);
+  });
 })();
 </script>
 </body>
