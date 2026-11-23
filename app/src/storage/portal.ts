@@ -28,8 +28,12 @@ const PORTAL_HTML = `<!doctype html>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rgba(140,90,32,.045),transparent 58%),var(--bg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
+.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%238c5a20' fill-opacity='0.13'/%3E%3C/svg%3E");
+  background-size:24px 24px}
 .orbit{position:absolute;top:-70px;right:-60px;width:260px;height:260px;pointer-events:none;opacity:.5}
+.orbit--bl{top:auto;right:auto;bottom:-96px;left:-84px;width:300px;height:300px;opacity:.32;transform:rotate(160deg)}
 .rings{stroke:var(--line)}.stars{fill:var(--gold)}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
 .meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
@@ -73,6 +77,17 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
       <circle cx="130" cy="16" r="2.5"/>
       <circle cx="212" cy="176" r="1.8"/>
       <circle cx="70" cy="205" r="1.4"/>
+    </g>
+  </svg>
+  <svg class="orbit orbit--bl" viewBox="0 0 260 260" fill="none" aria-hidden="true">
+    <g class="rings" stroke-width="1">
+      <circle cx="130" cy="130" r="120" stroke-dasharray="1 8"/>
+      <circle cx="130" cy="130" r="78" stroke-dasharray="2 5"/>
+      <circle cx="130" cy="130" r="40"/>
+    </g>
+    <g class="stars">
+      <circle cx="130" cy="10" r="1.6"/>
+      <circle cx="52" cy="176" r="1.2"/>
     </g>
   </svg>
   <h1>课程资料</h1>
