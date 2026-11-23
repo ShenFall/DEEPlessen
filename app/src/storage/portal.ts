@@ -38,6 +38,8 @@ body{margin:0;min-height:100dvh;color:var(--ink);
   clip-path:polygon(26% 0,100% 0,100% 100%,0 100%)}
 .frag--b{left:-14%;bottom:-18%;height:64vh;opacity:.09;transform:rotate(180deg);
   clip-path:polygon(0 0,100% 0,74% 100%,0 100%)}
+.frag--c{left:-18%;top:-22%;height:54vh;opacity:.07;
+  clip-path:polygon(0 0,100% 0,86% 100%,0 100%)}
 .rule{position:absolute;top:0;width:1px;background:linear-gradient(var(--line),transparent)}
 .rule--a{right:24%;height:42vh}
 .rule--b{right:calc(24% + 8px);height:26vh;opacity:.6}
@@ -70,11 +72,9 @@ h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2
 .kinds button[data-on='true']{border-color:var(--gold);color:var(--gold);background:rgba(140,90,32,.06)}
 .topbar:not(.stuck) .kinds{max-height:0;opacity:0}
 
-.topbar.stuck{top:0;transform:none;background:rgba(247,244,238,.62);
-  -webkit-backdrop-filter:blur(12px) saturate(1.05);
-  backdrop-filter:blur(12px) saturate(1.05)}
-.topbar.stuck::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(140,90,32,.12) 16%,rgba(140,90,32,.12) 84%,transparent)}
+.topbar.stuck{top:0;transform:none;background:rgba(247,244,238,.3);
+  -webkit-backdrop-filter:blur(10px) saturate(1.05);
+  backdrop-filter:blur(10px) saturate(1.05)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .topbar.stuck{background:rgba(247,244,238,.94)}}
 .topbar.stuck .inner{gap:8px;padding-top:8px;padding-bottom:8px}
@@ -115,6 +115,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 <div class="art" aria-hidden="true">
   <img class="frag frag--a" src="brand/lines.png" alt="" onerror="this.remove()" />
   <img class="frag frag--b" src="brand/lines.png" alt="" onerror="this.remove()" />
+  <img class="frag frag--c" src="brand/lines.png" alt="" onerror="this.remove()" />
   <i class="rule rule--a"></i><i class="rule rule--b"></i>
 </div>
 
