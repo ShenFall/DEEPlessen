@@ -1,66 +1,73 @@
-# 拾课 / DEEP
+# 深时 / DEEP
 
-> ShenFall 的学委工作台：收作业对账、通知拆解、资料取件、个人日程。
+> 一个人的学委工作台：手机上点名、电脑里整资料、同学扫码取件。
+> 由 ShenFall 自用并持续整理，2026 秋。
 
-**当前状态：v0.7 —— 设计定稿，M0 代码基本完成（差真机验收）。**
-进度与明天从哪继续，看 [docs/13-status.md](docs/13-status.md)。
+![深时图标](app/public/icon-512.png)
 
-<img src="assets/avatar-shenfall.jpg" width="120" alt="ShenFall 头像">
+[![构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml/badge.svg)](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml)
 
 ---
 
-## 一句话
+## 它解决什么
 
-给一个人的作战台。后台是深夜终端，前台是白天取件柜。
+收作业这件事，难的不是"收齐"，是**第一个人交的时候就立刻能用、还能离线、不能因为少一个人就重排格子**。深时把这件事做成一个人的行动看板，再把资料整理成同学三步能拿到的取件柜。
 
-- **学委端**：信息密度高、键盘优先、深空暗色
-- **学生端**：不注册、不登录、像取快递一样三步拿到文件
+- **不注册、不登录、不联网也能用**：数据在浏览器 IndexedDB 和本地目录，不上传
+- **点名位置恒定**：谁交了只降权不消失，勾一个人下面不会重排
+- **零服务器成本**：学生门户是静态网页，资料靠手动导出发布
 
-## 目录
+## 三端
 
-| 文件 | 内容 |
+| 端 | 形态 | 能做什么 | 怎么用 |
+|---|---|---|---|
+| 📱 手机 | 安卓 APK | 待办、点名（含名单导入），纸白主题、离线可用 | 见下方[下载](#下载) |
+| 💻 电脑 | 浏览器（Edge） | 看板、待办、作业清点、资料库、发布学生门户 | `cd app && npm install && npm run dev` |
+| 🔗 同学 | 静态网页 | 搜索、按类型筛选、下载课件 | 由学委在资料页导出并部署，不提供公共演示站 |
+
+三端数据**各自独立**：手机自己导名单，电脑管资料，靠导出 / 导入 JSON 备份搬运。这是刻意的取舍——不引入账号和服务器。
+
+## 下载
+
+- **安卓 APK（Debug）**：直接去 [Releases](https://github.com/ShenFall/DEEPlessen/releases) 下载 `shenshi-latest` 里的 APK，公开后无需登录。每次 `app/` 有改动，CI 会自动重建并更新这个 Release。
+- **想看构建日志**：[Actions · 构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml)；登录用户也可从成功运行的 **Artifacts** 取包。
+- 首次使用需先跑一次 CI：在 Actions 页面点 **Run workflow** 手动触发；成功后 Release 才出现。
+
+> Debug 包可直接安装，更新时需卸载重装。若要自己编译：本机需 JDK 17 + Android SDK，或直接用上面的云端 Actions。
+
+## 快速开始
+
+```bash
+git clone https://github.com/ShenFall/DEEPlessen.git
+cd DEEPlessen/app
+npm install          # .npmrc 已配国内镜像
+npm run dev          # http://127.0.0.1:5178
+npm run build        # tsc --noEmit + 生产构建
+```
+
+学生门户的导出与部署见 [docs/25-publish-guide.md](docs/25-publish-guide.md)。
+
+## 设计基线
+
+- 品牌：深空蓝 `#0F1620` 与归位金 `#D38A43`，双星轨道为图形语言；头像中央书法「深」字是个人印记
+- 工作台（点名 / 导入）守细线、≤8px 圆角、克制动效；看板与个人空间可用更细腻的材质
+- 视觉概念稿 14 件收在 `deep-visual-assets.miora`，素材与分析见 [docs/16](docs/16-assets-generation.md)、[docs/18](docs/18-reference-materials.md)
+
+## 文档
+
+设计、数据与协作文档按编号放在 `docs/`，从 [docs/01](docs/01-vision.md) 到 [docs/26](docs/26-lineart-collage.md)。常看的几份：
+
+| 文档 | 内容 |
 |---|---|
-| [docs/01-vision.md](docs/01-vision.md) | 定位、用户、五个痛点与四条主线、设计原则、明确不做的事 |
-| [docs/02-brand.md](docs/02-brand.md) | 视觉识别：从头像提取的双星体系、色板、字体、图形语言、动效 |
-| [docs/03-information-architecture.md](docs/03-information-architecture.md) | 信息架构、路由表、两套前台的边界 |
-| [docs/04-data-model.md](docs/04-data-model.md) | 班级/学生/课程/作业/资料的数据模型、花名册导入规范、姓名匹配算法 |
-| [docs/05-flows.md](docs/05-flows.md) | 五条核心流程：建档、对账点名、通知拆解、发布资料、换班级 |
-| [docs/06-screens.md](docs/06-screens.md) | 界面清单与规格、状态设计、文案表 |
-| [docs/07-tech.md](docs/07-tech.md) | 技术选型、存储与成本、隐私边界 |
-| [docs/08-roadmap.md](docs/08-roadmap.md) | 分期计划与待决问题（讨论入口） |
-| [docs/09-appearance.md](docs/09-appearance.md) | 外观层：壁纸、预设主题、密度；动效三层模型与「华丽」清单 |
-| [docs/10-tasks.md](docs/10-tasks.md) | 任务拆解：M0–M5 纵向切片、依赖、出口标准、节奏 |
-| [docs/11-mobile.md](docs/11-mobile.md) | 手机端规格（主场景）：课堂现场、4 列网格、离线、强光 |
-| [docs/12-m0-plan.md](docs/12-m0-plan.md) | M0 细分任务表（0.1–0.12）与真机暴露的问题 |
-| [docs/13-status.md](docs/13-status.md) | **当前进度**：今天做到哪、明天从哪继续 |
-| [docs/14-ui-system.md](docs/14-ui-system.md) | UI 组件层、对账台、响应式、微交互与无障碍核验 |
-| [docs/15-m3-plan.md](docs/15-m3-plan.md) | M3 细分任务表与路线取舍 |
-| [docs/16-assets-generation.md](docs/16-assets-generation.md) | 视觉素材生成对接单：需求队列、生成规格与验收记录（当前暂停派生） |
-| [docs/17-dashboard-ui.md](docs/17-dashboard-ui.md) | UI v2 视觉气质与动效：双端看板、个人空间、Orbit Plotter 加载动画 |
-| [docs/18-reference-materials.md](docs/18-reference-materials.md) | 参考素材库说明：6 张风格参考的提取边界与禁用项 |
-| [docs/19-ui-execution-brief.md](docs/19-ui-execution-brief.md) | **UI 执行规格（内容优先）**：待办 / 时间 / 作业 / 资料 / 通知；点名为二级功能 |
-| [docs/20-handoff.md](docs/20-handoff.md) | **双智能体分工与接口契约**：谁改什么、props 不许动、提交纪律 |
-| [docs/decisions/](docs/decisions/) | 架构决策记录（ADR），改主意就新开一条，不删旧的 |
+| [docs/13-status.md](docs/13-status.md) | **当前进度**：做到哪、下一步 |
+| [docs/22-spec-v3.md](docs/22-spec-v3.md) | **主规格书 v3**（唯一真相源） |
+| [docs/20-handoff.md](docs/20-handoff.md) | 双智能体分工与接口契约 |
+| [docs/25-publish-guide.md](docs/25-publish-guide.md) | 学生门户发布三步 |
+| [docs/decisions/](docs/decisions/) | 架构决策 ADR，改主意新开一条不删旧的 |
 
-## 已定决策
+## 怎么讨论
 
-| 编号 | 决策 | 一句话理由 |
-|---|---|---|
-| [0001](docs/decisions/0001-single-operator.md) | 单人后台 + 公开取件页，不做双角色系统 | 同学不会为了拿一份资料注册账号 |
-| [0002](docs/decisions/0002-names-never-disappear.md) | 名字永不消失，只降权；位置恒定位 | 勾一个少一个会重排，手指立刻失去记忆 |
-| [0003](docs/decisions/0003-cohort-as-source-of-truth.md) | 花名册是一等公民，班级与课程解耦 | 换班、跨学期、一门课带两个班都要能活 |
-| [0004](docs/decisions/0004-streaming-roll-call.md) | 收作业是流式 REPL，不是批量差集 | 第一个人交的时候就得能用，不能等名单齐全 |
-| [0005](docs/decisions/0005-motion-layers.md) | 动效分三层，功能层不许华丽 | 23:57 数人头的时候不能有粒子在眼前飞 |
-| [0006](docs/decisions/0006-mobile-first.md) | 手机优先：课堂是现场，桌面是后台 | 一只手拿作业、另一只手点手机，还得离线能用 |
-| [0007](docs/decisions/0007-no-qr-checkin-for-now.md) | 扫码签到搁置，两位学号改作搜索 | 29 人算下来扫码更慢，还多三个失败模式 |
-| [0008](docs/decisions/0008-local-library-tauri.md) | 本地库 + Tauri 壳，分发只走对象存储 | 微信目录里混着私人文件，不能给自动化开门 |
-| [0009](docs/decisions/0009-no-sequential-guide.md) | 不做顺序引导，做常驻撤销 | 学生是随机走上来的，"下一个"不在你面前 |
-| [0010](docs/decisions/0010-edge-only-and-student-lite.md) | 学委桌面 Edge Only；学生端独立轻量构建 | 两端兼容性与体积目标完全不同 |
-| [0011](docs/decisions/0011-dashboard-first-and-precision-visuals.md) | 仪表盘优先；看板升级精密视觉，点名保持工具化 | 首页要总览全局，高级感不靠霓虹堆叠 |
-
-## 怎么一起讨论
-
-1. 每个决定落到 `docs/decisions/NNNN-*.md`，编号递增。改主意不删旧文件，新开一条并注明 `Supersedes`。
-2. 改界面规格时，连「为什么」一起改，别只改结果。
-3. 还没想清楚的问题统一堆在 `docs/08-roadmap.md` 的「待决问题」里，一次讨论一批。
-4. 这个仓库可以直接推 GitHub；`.workbuddy/` 已忽略。
+1. 每个决定落到 `docs/decisions/NNNN-*.md`，编号递增；改主意不删旧文件，新开一条注明 `Supersedes`。
+2. 改界面规格时连「为什么」一起改，不只改结果。
+3. 没想清楚的问题堆到 `docs/08-roadmap.md` 的「待决问题」，一次讨论一批。
+4. 本仓库可直接推 GitHub；`.workbuddy/` 已忽略。

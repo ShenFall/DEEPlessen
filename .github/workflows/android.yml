@@ -8,6 +8,10 @@ on:
       - 'app/**'
       - '.github/workflows/android.yml'
 
+# 允许在构建成功后创建 Release 并附加 APK
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -63,7 +67,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: 上传产物
+      - name: 上传构建产物（登录 GitHub 可下）
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -73,3 +77,20 @@ jobs:
             app/android/app/build/outputs/logs/**
           if-no-files-found: warn
           retention-days: 30
+
+      # 构建成功时同步发布到 Releases，公开仓库访客无需登录即可下载
+      - name: 发布 APK 到 Releases
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: shenshi-latest
+          name: 深时 · 安卓最新版（自动构建）
+          body: |
+            由 GitHub Actions 从 `main` 自动构建的 Debug APK。
+            更新时重新下载安装即可（Debug 包需卸载旧版）。
+
+            构建时间：${{ github.event.repository.updated_at }}
+            提交：${{ github.sha }}
+          files: app/android/app/build/outputs/apk/debug/app-debug.apk
+          prerelease: true
+          fail_on_unmatched_files: true
