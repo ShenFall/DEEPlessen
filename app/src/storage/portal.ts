@@ -139,6 +139,7 @@ export async function exportPortal(
 
   const courses = new Map<string, { name: string; size: number; url: string }[]>()
   const skipped: { course: string; name: string; size: number }[] = []
+  const seen = new Set<string>()
   let count = 0
 
   for (const m of manifests) {
@@ -149,6 +150,11 @@ export async function exportPortal(
     })) as DirHandle
 
     for (const item of m.items) {
+      // 同一课程重复发布会产生同名文件，只保留最新那次（manifests 已按时间倒序）
+      const key = `${m.course}::${item.name}`
+      if (seen.has(key)) continue
+      seen.add(key)
+
       if (item.size > MAX_FILE) {
         skipped.push({ course: m.course, name: item.name, size: item.size })
         continue
