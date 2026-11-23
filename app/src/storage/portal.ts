@@ -32,10 +32,7 @@ body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rg
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%238c5a20' fill-opacity='0.13'/%3E%3C/svg%3E");
   background-size:24px 24px}
-.emblem{position:absolute;right:-60px;bottom:-30px;width:240px;height:240px;z-index:-1;
-  pointer-events:none;opacity:.1;mix-blend-mode:multiply}
-@media(max-width:430px){.emblem{width:190px;right:-48px;bottom:-18px;opacity:.09}}
-.bp{position:absolute;top:-8px;left:-24px;width:calc(100% + 48px);height:230px;pointer-events:none;opacity:.55}
+@media(max-width:430px){.bp{position:absolute;top:-8px;left:-24px;width:calc(100% + 48px);height:230px;pointer-events:none;opacity:.55}
 .bp .ln{stroke:#d5c5a4}.bp .cn{stroke:#c9b894}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
 .meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
@@ -73,7 +70,6 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 </head>
 <body>
 <div class="wrap">
-  <img class="emblem" src="brand/emblem.png" alt="" aria-hidden="true" onerror="this.remove()" />
   <svg class="bp" viewBox="0 0 600 230" fill="none" aria-hidden="true">
     <defs>
       <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -228,10 +224,7 @@ export async function exportPortal(
   }
 
   const brandDir = await portal.getDirectoryHandle('brand', { create: true })
-  for (const [name, from] of [
-    ['emblem.png', '/brand/emblem-line.png'],
-    ['avatar.png', '/brand/avatar.png'],
-  ]) {
+  for (const [name, from] of [['avatar.png', '/brand/avatar.png']]) {
     try {
       const res = await fetch(from)
       if (!res.ok) continue
