@@ -119,6 +119,24 @@ button {
   body {
     padding-bottom: 66px;
   }
+
+  /* 页面底色透明，露出拼贴底纹 */
+  .tz,
+  .al,
+  .db {
+    background: transparent;
+  }
+
+  /* 顶栏保持不透明，滚动时不与内容混在一起 */
+  .sh-bar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* 看板底部再多留一点，避免数字卡被 tab 压住 */
+  .db-main {
+    padding-bottom: 96px;
+  }
 }
 
 /* 手机端拼贴底纹：只在 ≤720px 显示 */

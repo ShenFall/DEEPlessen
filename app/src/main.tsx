@@ -21,6 +21,16 @@ applyTheme()
 lightQuery.addEventListener('change', applyTheme)
 narrowQuery.addEventListener('change', applyTheme)
 
+/**
+ * 开发环境不保留 Service Worker：
+ * 旧缓存 + 热更新会让页面反复自动刷新，看起来"闪烁"。
+ */
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  void navigator.serviceWorker
+    .getRegistrations()
+    .then((list) => list.forEach((r) => void r.unregister()))
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Boundary>
