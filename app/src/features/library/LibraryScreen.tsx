@@ -12,6 +12,7 @@ import {
   type Publish,
 } from '../../db'
 import { publishCourseLocal, unpublishLocal } from '../../storage/local'
+import { fuzzyBest } from '../../lib/fuzzy'
 import { exportPortal } from '../../storage/portal'
 import { collectPortal, createZip } from '../../storage/zip'
 import {
@@ -99,14 +100,15 @@ export default function LibraryScreen({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const hit = entries.filter(
-      (e) =>
-        (kind === 'all' || kindOf(e.name) === kind) &&
-        (!q ||
-          e.name.toLowerCase().includes(q) ||
-          courseOf(e.path).toLowerCase().includes(q)),
-    )
+    const q = query.trim()
+    const scored = entries
+      .filter((e) => kind === 'all' || kindOf(e.name) === kind)
+      .map((e) => ({
+        e,
+        score: q ? fuzzyBest([e.name, courseOf(e.path)], q) : 1,
+      }))
+      .filter((x) => x.score > 0)
+    const hit = scored.map((x) => x.e)
     const map = new Map<string, LibraryEntry[]>()
     for (const e of hit) {
       const course = courseOf(e.path)
@@ -123,6 +125,26 @@ export default function LibraryScreen({
     }
     return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh'))
   }, [entries, query, kind, sort])
+
+  /** 有搜索词时，命中程度高的排在前面 */
+  const ranked = useMemo(() => {
+    const q = query.trim()
+    if (!q) return groups
+    return [...groups]
+      .map(([course, list]) => {
+        const sorted = [...list].sort(
+          (a, b) =>
+            fuzzyBest([b.name], q) - fuzzyBest([a.name], q) ||
+            a.name.localeCompare(b.name, 'zh'),
+        )
+        return [course, sorted] as [string, LibraryEntry[]]
+      })
+      .sort(
+        (a, b) =>
+          Math.max(...b[1].map((x) => fuzzyBest([x.name], q))) -
+          Math.max(...a[1].map((x) => fuzzyBest([x.name], q))),
+      )
+  }, [groups, query])
 
   const kindCounts = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -512,7 +534,7 @@ export default function LibraryScreen({
               <p className="lb-empty">没有匹配的文件</p>
             )}
 
-            {groups.map(([course, list]) => (
+            {ranked.map(([course, list]) => (
               <section className="lb-group" key={course}>
                 <div className="lb-group-head">
                   <p className="lb-group-title">

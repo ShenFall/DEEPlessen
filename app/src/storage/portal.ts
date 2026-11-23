@@ -141,6 +141,33 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
   function ext(n){ var i=n.lastIndexOf('.'); return i<0 ? 'FILE' : n.slice(i+1).toUpperCase().slice(0,4); }
   function kindOf(n){ var i=n.lastIndexOf('.'); var e=i<0?'':n.slice(i+1).toLowerCase(); return MAP[e]||'其他'; }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function fscore(text,q){
+    var t=String(text).toLowerCase();q=String(q).toLowerCase().trim();
+    if(!q) return 1;
+    var i=t.indexOf(q); if(i>=0) return 1000-Math.min(i,300);
+    var cur=0,last=-1,hit=0,gaps=0;
+    for(var k=0;k<q.length;k++){
+      var ch=q.charAt(k); if(ch===' ') continue;
+      var f=t.indexOf(ch,cur); if(f<0) return 0;
+      if(last>=0) gaps+=f-last-1;
+      hit++; last=f; cur=f+1;
+    }
+    return Math.max(1,200-gaps*4-(t.length-hit));
+  }
+  function fbest(fields,q){
+    q=String(q).trim(); if(!q) return 1;
+    var tokens=q.toLowerCase().split(/\s+/),best=0;
+    fields.forEach(function(f){
+      var sum=0;
+      for(var i=0;i<tokens.length;i++){
+        var sc=fscore(f,tokens[i]);
+        if(sc===0){ sum=0; break; }
+        sum+=sc;
+      }
+      if(sum>best) best=sum;
+    });
+    return best;
+  }
 
   function sync(){
     bar.classList.toggle('stuck', window.scrollY>40 || key.length>0 || document.activeElement===q);
@@ -162,15 +189,15 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
     if(!data){ box.innerHTML=''; return; }
     var html='',n=0;
     data.courses.forEach(function(c){
-      var items=c.items.filter(function(i){
-        var okq=!key||i.name.toLowerCase().indexOf(key)>=0||c.name.toLowerCase().indexOf(key)>=0;
-        return okq && (kind==='all'||kindOf(i.name)===kind);
-      });
+      var items=c.items.map(function(i){ return {i:i,s:key?fbest([i.name,c.name],key):1}; })
+        .filter(function(x){ return x.s>0 && (kind==='all'||kindOf(x.i.name)===kind); });
       if(!items.length) return;
+      if(key) items.sort(function(a,b){ return b.s-a.s; });
       var idx=Math.min(n,7),cls=animate?'g':'g s';
       html+='<section class="'+cls+'" style="--i:'+idx+'"><h2><span class="c">'+esc(c.name)+'</span>'
           +'<span class="k">'+items.length+' 个文件</span></h2><ul>';
-      items.forEach(function(f){
+      items.forEach(function(x){
+        var f=x.i;
         html+='<li><a href="'+esc(f.url)+'" download="'+esc(f.name)+'" aria-label="下载 '+esc(f.name)+'">'
           +'<span class="ext">'+esc(ext(f.name))+'</span>'
           +'<span class="n"><b>'+esc(f.name)+'</b><i>'+size(f.size)+'</i></span>'
