@@ -60,6 +60,13 @@
   font-size: 11px;
   color: var(--dim);
   letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.db-rail-item:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .db-rail-item[data-on='true'] {
@@ -140,6 +147,8 @@
   .db-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 16px;
+    /* 面板按内容高度排列，不被同行最高的一张拉长 */
+    align-items: start;
   }
 
   .db-panel--now {
@@ -335,6 +344,15 @@
 
 .db-check:active {
   transform: scale(0.92);
+}
+
+/* 作业行没有勾选框，用同尺寸的空心点占位，让标题与待办对齐 */
+.db-mark-dot {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1px dashed rgba(154, 166, 184, 0.35);
+  border-radius: 50%;
 }
 
 .db-check[data-on='true'] {

@@ -294,6 +294,7 @@ export default function DashboardScreen({
                             className="db-row db-row--link"
                             onClick={() => onOpen(r.assignment.id)}
                           >
+                            <span className="db-mark-dot" aria-hidden="true" />
                             <span className="db-row-main">
                               <span className="db-row-title">
                                 {r.assignment.course} · {r.assignment.title}
