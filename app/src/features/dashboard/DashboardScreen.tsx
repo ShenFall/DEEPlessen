@@ -141,24 +141,6 @@ export default function DashboardScreen({
 
   return (
     <main className="db">
-      <nav className="db-rail" aria-label="主导航">
-        <span className="db-rail-logo" title="ShenFall" aria-label="深 ShenFall">
-          深
-        </span>
-        <button type="button" className="db-rail-item" data-on="true">
-          看板
-        </button>
-        <button type="button" className="db-rail-item" onClick={onTodos}>
-          待办
-        </button>
-        <button type="button" className="db-rail-item" onClick={onAll}>
-          作业
-        </button>
-        <button type="button" className="db-rail-item" onClick={onLibrary}>
-          资料
-        </button>
-      </nav>
-
       <div className="db-main">
         <header className="db-head">
           <div>
@@ -173,7 +155,20 @@ export default function DashboardScreen({
               {total > 0 ? `还有 ${total} 件事` : '今天清空了'}
             </h1>
           </div>
-          <span className="db-mark">拾课</span>
+          <nav className="db-nav" aria-label="主导航">
+            <button type="button" data-on="true">
+              看板
+            </button>
+            <button type="button" onClick={onTodos}>
+              待办
+            </button>
+            <button type="button" onClick={onAll}>
+              作业
+            </button>
+            <button type="button" onClick={onLibrary}>
+              资料
+            </button>
+          </nav>
         </header>
 
         <div className="db-grid">
@@ -216,7 +211,14 @@ export default function DashboardScreen({
                     {w.label}
                   </button>
                 ))}
-                <label className="db-when-date" data-on={!!customDate}>
+                <label
+                  className="db-when-date"
+                  data-on={!!customDate}
+                  onClick={(e) => {
+                    const el = e.currentTarget.querySelector('input')
+                    el?.showPicker?.()
+                  }}
+                >
                   <input
                     type="date"
                     value={customDate}
@@ -257,7 +259,14 @@ export default function DashboardScreen({
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">
                                 <span className="db-tag db-tag--todo">待办</span>
-                                <label className="db-due" title="设置日期">
+                                <label
+                                  className="db-due"
+                                  title="设置日期"
+                                  onClick={(e) => {
+                                    const el = e.currentTarget.querySelector('input')
+                                    el?.showPicker?.()
+                                  }}
+                                >
                                   <input
                                     type="date"
                                     value={toDateValue(r.todo.due)}
@@ -371,9 +380,6 @@ export default function DashboardScreen({
           <section className="db-panel">
             <div className="db-panel-head">
               <p className="db-panel-title">资料</p>
-              <button type="button" className="db-link" onClick={onLibrary}>
-                打开
-              </button>
             </div>
             <p className="db-quiet">
               {data.publishCount > 0

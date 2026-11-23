@@ -8,10 +8,8 @@
 
 @media (min-width: 720px) {
   .lb {
-    max-width: 560px;
+    max-width: 980px;
     margin: 0 auto;
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
   }
 }
 

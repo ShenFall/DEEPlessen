@@ -251,7 +251,7 @@ export default function LibraryScreen({ onBack }: { onBack: () => void }) {
       <header className="lb-top">
         <button type="button" className="lb-back" onClick={onBack}>
           <span aria-hidden="true">←</span>
-          今日
+          看板
         </button>
       </header>
 

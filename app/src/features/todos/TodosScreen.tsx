@@ -73,7 +73,14 @@ export default function TodosScreen({
                   <span className="tz-main">
                     <span className="tz-name">{t.title}</span>
                     <span className="tz-sub">
-                      <label className="tz-due" title="设置日期">
+                      <label
+                        className="tz-due"
+                        title="设置日期"
+                        onClick={(e) => {
+                          const el = e.currentTarget.querySelector('input')
+                          el?.showPicker?.()
+                        }}
+                      >
                         <input
                           type="date"
                           value={toDateValue(t.due)}

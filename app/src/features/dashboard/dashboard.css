@@ -10,8 +10,8 @@
   --gold: #d38a43;
   --hair: rgba(255, 255, 255, 0.08);
 
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
   color: var(--ink);
   background:
@@ -19,81 +19,44 @@
     var(--void);
 }
 
-/* 左侧导航：桌面才出现 */
-.db-rail {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .db {
-    grid-template-columns: 64px 1fr;
-  }
-
-  .db-rail {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 16px 0;
-    border-right: 1px solid var(--hair);
-  }
-}
-
-.db-rail-logo {
+/* 主导航改成顶栏胶囊，不再用左侧竖栏 */
+.db-nav {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  margin-bottom: 14px;
-  border: 1px solid var(--gold);
-  border-radius: 11px;
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: 14px;
-  color: var(--gold);
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: 2px;
 }
 
-.db-rail-item {
-  width: 44px;
-  padding: 10px 0;
-  border-radius: 10px;
-  font-size: 11px;
+.db-nav button {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
   color: var(--dim);
-  letter-spacing: 0.02em;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease;
 }
 
-.db-rail-item:hover {
+.db-nav button:hover {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.05);
 }
 
-.db-rail-item[data-on='true'] {
-  color: var(--ink);
-  background: rgba(76, 123, 224, 0.16);
-}
-
-.db-rail-soon {
-  width: 44px;
-  padding: 10px 0;
-  border-radius: 10px;
-  font-size: 11px;
-  color: rgba(154, 166, 184, 0.4);
-  cursor: default;
+.db-nav button[data-on='true'] {
+  color: var(--gold);
+  background: rgba(211, 138, 67, 0.12);
 }
 
 /* 主体 */
 .db-main {
   width: 100%;
-  max-width: 1180px;
+  max-width: 980px;
   margin: 0 auto;
   padding: 20px var(--pad-x) calc(28px + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 1024px) {
   .db-main {
-    padding: 32px 40px 40px;
+    padding: 32px 40px 48px;
   }
 }
 
@@ -151,17 +114,25 @@
     align-items: start;
   }
 
+  /* 左 8 列只放「现在要做」，右 4 列自上而下排「接下来 / 作业 / 资料」 */
   .db-panel--now {
-    grid-column: span 8;
+    grid-column: 1 / 9;
+    grid-row: 1 / span 3;
   }
 
   .db-panel--next {
-    grid-column: span 4;
+    grid-column: 9 / 13;
+    grid-row: 1;
   }
 
-  .db-panel:nth-of-type(3),
+  .db-panel:nth-of-type(3) {
+    grid-column: 9 / 13;
+    grid-row: 2;
+  }
+
   .db-panel:nth-of-type(4) {
-    grid-column: span 6;
+    grid-column: 9 / 13;
+    grid-row: 3;
   }
 }
 
