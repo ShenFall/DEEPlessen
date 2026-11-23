@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import {
+  exportAll,
+  importAll,
   listPublishes,
   loadHandle,
   saveHandle,
   savePublish,
+  type Backup,
   type Publish,
 } from '../../db'
 import { publishCourseLocal, unpublishLocal } from '../../storage/local'
@@ -63,7 +66,13 @@ function kindOf(name: string): Kind {
   return 'other'
 }
 
-export default function LibraryScreen({ onNav }: { onNav: (key: ShellNav) => void }) {
+export default function LibraryScreen({
+  onNav,
+  onRestored,
+}: {
+  onNav: (key: ShellNav) => void
+  onRestored: () => void
+}) {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null)
   const [granted, setGranted] = useState(false)
   const [entries, setEntries] = useState<LibraryEntry[]>([])
@@ -76,6 +85,7 @@ export default function LibraryScreen({ onNav }: { onNav: (key: ShellNav) => voi
   const [sort, setSort] = useState<'recent' | 'name'>('recent')
   const [publishes, setPublishes] = useState<Publish[]>([])
   const [offarm, setOffarm] = useState<string | null>(null)
+  const [pending, setPending] = useState<Backup | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
@@ -224,6 +234,53 @@ export default function LibraryScreen({ onNav }: { onNav: (key: ShellNav) => voi
       setNotice('已复制 slug')
     } catch {
       setNotice(slug)
+    }
+  }
+
+  async function exportBackup() {
+    try {
+      const data = await exportAll()
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const d = new Date()
+      const p = (n: number) => String(n).padStart(2, '0')
+      a.href = url
+      a.download = `deep-backup-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      setNotice('已导出备份')
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '导出失败')
+    }
+  }
+
+  async function readBackup(file: File | undefined) {
+    if (!file) return
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text) as Backup
+      if (data.app !== 'deep' || !Array.isArray(data.students)) {
+        setNotice('这不是拾课的备份文件')
+        return
+      }
+      setPending(data)
+    } catch {
+      setNotice('文件读不出来，可能不是 JSON')
+    }
+  }
+
+  async function applyBackup() {
+    if (!pending) return
+    try {
+      await importAll(pending)
+      setPending(null)
+      setNotice('已恢复备份')
+      onRestored()
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '恢复失败')
     }
   }
 
@@ -442,6 +499,56 @@ export default function LibraryScreen({ onNav }: { onNav: (key: ShellNav) => voi
             )}
           </>
         )}
+
+        <section className="lb-backup">
+          <p className="lb-backup-title">数据备份</p>
+          <p className="lb-backup-note">
+            名单、清点、待办都存在这台电脑的浏览器里。换网址或清缓存会丢，建议定期导出。
+          </p>
+
+          {pending ? (
+            <div className="lb-backup-confirm">
+              <p className="lb-backup-warn">
+                将用备份覆盖现有数据（{pending.assignments.length} 个清点 ·{' '}
+                {pending.todos.length} 条待办）
+              </p>
+              <div className="lb-backup-row">
+                <button
+                  type="button"
+                  className="lb-primary"
+                  onClick={() => void applyBackup()}
+                >
+                  确认覆盖
+                </button>
+                <button
+                  type="button"
+                  className="lb-link"
+                  onClick={() => setPending(null)}
+                >
+                  取消
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="lb-backup-row">
+              <button
+                type="button"
+                className="lb-primary"
+                onClick={() => void exportBackup()}
+              >
+                导出备份
+              </button>
+              <label className="lb-backup-input">
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={(e) => void readBackup(e.target.files?.[0])}
+                />
+                <span>导入备份</span>
+              </label>
+            </div>
+          )}
+        </section>
 
         {notice && <p className="lb-notice">{notice}</p>}
       </div>

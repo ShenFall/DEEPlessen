@@ -332,6 +332,65 @@ export async function updateTodo(
   await db.todos.update(id, patch)
 }
 
+/* ---------- 备份 ---------- */
+
+export type Backup = {
+  app: 'deep'
+  version: number
+  exportedAt: string
+  students: Student[]
+  assignments: Assignment[]
+  submissions: Submission[]
+  publishes: Publish[]
+  todos: Todo[]
+}
+
+export async function exportAll(): Promise<Backup> {
+  const [students, assignments, submissions, publishes, todos] =
+    await Promise.all([
+      db.students.toArray(),
+      db.assignments.toArray(),
+      db.submissions.toArray(),
+      db.publishes.toArray(),
+      db.todos.toArray(),
+    ])
+  return {
+    app: 'deep',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    students,
+    assignments,
+    submissions,
+    publishes,
+    todos,
+  }
+}
+
+/** 覆盖式恢复。调用方必须先让用户确认。 */
+export async function importAll(data: Backup): Promise<void> {
+  if (data.app !== 'deep' || !Array.isArray(data.students)) {
+    throw new Error('不是拾课的备份文件')
+  }
+  await db.transaction(
+    'rw',
+    [db.students, db.assignments, db.submissions, db.publishes, db.todos],
+    async () => {
+      await Promise.all([
+        db.students.clear(),
+        db.assignments.clear(),
+        db.submissions.clear(),
+        db.publishes.clear(),
+        db.todos.clear(),
+      ])
+      await db.students.bulkPut(data.students ?? [])
+      await db.assignments.bulkPut(data.assignments ?? [])
+      await db.submissions.bulkPut(data.submissions ?? [])
+      await db.publishes.bulkPut(data.publishes ?? [])
+      await db.todos.bulkPut(data.todos ?? [])
+    },
+  )
+}
+
 export async function savePublish(p: Publish) {
   await db.publishes.put(p)
 }

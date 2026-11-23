@@ -166,7 +166,12 @@ export default function App() {
   }
 
   if (view === 'library') {
-    return <LibraryScreen onNav={(k) => setView(k)} />
+    return (
+      <LibraryScreen
+        onNav={(k) => setView(k)}
+        onRestored={() => void bootstrap()}
+      />
+    )
   }
 
   if (view === 'todos') {
