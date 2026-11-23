@@ -1,4 +1,5 @@
 import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
+import TodoComposer from '../../components/TodoComposer'
 import type { Todo } from '../../db'
 import { dueLabel } from '../../lib/due'
 import './todos.css'
@@ -9,6 +10,7 @@ type Props = {
   onToggle: (id: string, done: boolean) => void
   onDelete: (id: string) => void
   onOpenTodo: (todo: Todo) => void
+  onAdd: (title: string, due?: string) => void
 }
 
 function doneText(iso?: string) {
@@ -24,6 +26,7 @@ export default function TodosScreen({
   onToggle,
   onDelete,
   onOpenTodo,
+  onAdd,
 }: Props) {
   const active = todos.filter((t) => !t.done)
   const done = todos.filter((t) => t.done)
@@ -34,6 +37,8 @@ export default function TodosScreen({
 
       <div className="tz-body">
         <h1 className="tz-title">待办</h1>
+
+        <TodoComposer onAdd={onAdd} />
 
         <section>
           <p className="tz-group">

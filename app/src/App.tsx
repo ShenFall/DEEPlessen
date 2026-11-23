@@ -178,6 +178,7 @@ export default function App() {
           onToggle={(id, done) => void toggleTodo(id, done)}
           onDelete={(id) => void removeTodo(id)}
           onOpenTodo={setEditingTodo}
+          onAdd={(title, due) => void addTodo(title, due)}
         />
         {editingTodo && (
           <TodoSheet

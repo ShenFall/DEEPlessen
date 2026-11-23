@@ -10,6 +10,13 @@
   --gold: #d38a43;
   --hair: rgba(255, 255, 255, 0.08);
 
+  /* 深空页里给共用录入条覆盖颜色 */
+  --tc-line: rgba(255, 255, 255, 0.08);
+  --tc-bg: rgba(255, 255, 255, 0.03);
+  --tc-text: #f2ede4;
+  --tc-dim: #9aa6b8;
+  --tc-accent: #d38a43;
+
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
