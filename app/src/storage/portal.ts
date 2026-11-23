@@ -154,13 +154,37 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
     }
     return Math.max(1,200-gaps*4-(t.length-hit));
   }
+  var ANCH=['阿','八','擦','搭','蛾','发','噶','哈','击','喀','拉','妈','拿','哦','啪','期','然','撒','塌','挖','昔','压','匝'];
+  var LET='abcdefghjklmnopqrstwxyz'.split('');
+  var COL=window.Intl?new Intl.Collator('zh-Hans-CN'):null;
+  var IC={};
+  function initials(text){
+    var key=String(text); if(IC[key]!==undefined) return IC[key];
+    var out='';
+    var arr=Array.from(key);
+    for(var k=0;k<arr.length;k++){
+      var ch=arr[k], code=ch.codePointAt(0);
+      if(code<128){ if(/[a-z0-9]/i.test(ch)) out+=ch.toLowerCase(); continue; }
+      var idx=0;
+      if(COL){ for(var j=0;j<ANCH.length;j++){ if(COL.compare(ch,ANCH[j])>=0) idx=j; } }
+      out+=LET[idx];
+    }
+    IC[key]=out; return out;
+  }
+  function scoreField(f,token){
+    var direct=fscore(f,token);
+    if(direct>0) return direct;
+    if(!/^[a-z0-9]+$/.test(token)) return 0;
+    var at=initials(f).indexOf(token);
+    return at<0?0:800-Math.min(at*2,200);
+  }
   function fbest(fields,q){
     q=String(q).trim(); if(!q) return 1;
     var tokens=q.toLowerCase().split(/\s+/),best=0;
     fields.forEach(function(f){
       var sum=0;
       for(var i=0;i<tokens.length;i++){
-        var sc=fscore(f,tokens[i]);
+        var sc=scoreField(f,tokens[i]);
         if(sc===0){ sum=0; break; }
         sum+=sc;
       }
