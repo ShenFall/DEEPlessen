@@ -244,11 +244,13 @@
 
 .db-when {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin: 8px 0 2px;
 }
 
-.db-when button {
+.db-when button,
+.db-when-date {
   padding: 3px 9px;
   border: 1px solid var(--hair);
   border-radius: 999px;
@@ -256,9 +258,37 @@
   color: var(--dim);
 }
 
-.db-when button[data-on='true'] {
+.db-when button[data-on='true'],
+.db-when-date[data-on='true'] {
   border-color: rgba(211, 138, 67, 0.5);
   color: var(--gold);
+}
+
+/* 原生的日期输入藏起来，只露一个胶囊 */
+.db-when-date,
+.db-due {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.db-when-date input,
+.db-due input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.db-due span {
+  border-bottom: 1px dashed rgba(154, 166, 184, 0.4);
+}
+
+.db-due span[data-none='true'] {
+  color: rgba(154, 166, 184, 0.65);
 }
 
 .db-group {

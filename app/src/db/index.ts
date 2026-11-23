@@ -303,6 +303,10 @@ export async function deleteTodo(id: string) {
   await db.todos.delete(id)
 }
 
+export async function setTodoDue(id: string, due?: string) {
+  await db.todos.update(id, { due })
+}
+
 export async function savePublish(p: Publish) {
   await db.publishes.put(p)
 }

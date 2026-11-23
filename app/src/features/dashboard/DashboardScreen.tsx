@@ -12,6 +12,7 @@ type Props = {
   onAddTodo: (title: string, due?: string) => void
   onToggleTodo: (id: string, done: boolean) => void
   onDeleteTodo: (id: string) => void
+  onSetTodoDue: (id: string, due?: string) => void
 }
 
 type Bucket = 'overdue' | 'today' | 'later' | 'none'
@@ -50,6 +51,20 @@ function dueFor(when: When): string | undefined {
   return d.toISOString()
 }
 
+function toDateValue(iso?: string) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+function fromDateValue(value: string): string | undefined {
+  if (!value) return undefined
+  const d = new Date(`${value}T23:59:00`)
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString()
+}
+
 type Row =
   | { kind: 'todo'; todo: Todo; bucket: Bucket; done: boolean }
   | {
@@ -70,9 +85,11 @@ export default function DashboardScreen({
   onAddTodo,
   onToggleTodo,
   onDeleteTodo,
+  onSetTodoDue,
 }: Props) {
   const [draft, setDraft] = useState('')
-  const [when, setWhen] = useState<When>('none')
+  const [preset, setPreset] = useState<When>('none')
+  const [customDate, setCustomDate] = useState('')
   /** 刚勾掉的先留在原地变灰，刷新后才归入已完成 */
   const [justDone, setJustDone] = useState<Todo[]>([])
 
@@ -108,9 +125,10 @@ export default function DashboardScreen({
   function submit() {
     const text = draft.trim()
     if (!text) return
-    onAddTodo(text, dueFor(when))
+    onAddTodo(text, customDate ? fromDateValue(customDate) : dueFor(preset))
     setDraft('')
-    setWhen('none')
+    setPreset('none')
+    setCustomDate('')
   }
 
   function toggle(t: Todo, done: boolean) {
@@ -182,12 +200,25 @@ export default function DashboardScreen({
                   <button
                     key={w.key}
                     type="button"
-                    data-on={when === w.key}
-                    onClick={() => setWhen(w.key)}
+                    data-on={!customDate && preset === w.key}
+                    onClick={() => {
+                      setPreset(w.key)
+                      setCustomDate('')
+                    }}
                   >
                     {w.label}
                   </button>
                 ))}
+                <label className="db-when-date" data-on={!!customDate}>
+                  <input
+                    type="date"
+                    value={customDate}
+                    onChange={(e) => setCustomDate(e.target.value)}
+                  />
+                  <span>
+                    {customDate ? customDate.slice(5).replace('-', '/') : '选日期'}
+                  </span>
+                </label>
               </div>
             </form>
 
@@ -219,9 +250,23 @@ export default function DashboardScreen({
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">
                                 <span className="db-tag db-tag--todo">待办</span>
-                                {r.todo.due && (
-                                  <span>{dueLabel(r.todo.due).text}</span>
-                                )}
+                                <label className="db-due" title="设置日期">
+                                  <input
+                                    type="date"
+                                    value={toDateValue(r.todo.due)}
+                                    onChange={(e) =>
+                                      onSetTodoDue(
+                                        r.todo.id,
+                                        fromDateValue(e.target.value),
+                                      )
+                                    }
+                                  />
+                                  <span data-none={!r.todo.due}>
+                                    {r.todo.due
+                                      ? dueLabel(r.todo.due).text
+                                      : '设日期'}
+                                  </span>
+                                </label>
                                 {r.done && <span>已完成</span>}
                               </span>
                             </span>

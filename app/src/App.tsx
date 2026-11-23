@@ -12,6 +12,7 @@ import {
   paidCounts,
   setAssignmentStatus,
   setTodoDone,
+  setTodoDue,
   syncAssignmentTotals,
   updateAssignment,
   type Assignment,
@@ -99,6 +100,11 @@ export default function App() {
     await bootstrap()
   }
 
+  async function setTodoDate(id: string, due?: string) {
+    await setTodoDue(id, due)
+    await bootstrap()
+  }
+
   async function toggleStatus() {
     if (!ws) return
     const next = ws.assignment.status === 'closed' ? 'reconciling' : 'closed'
@@ -163,6 +169,7 @@ export default function App() {
         onAddTodo={(title, due) => void addTodo(title, due)}
         onToggleTodo={(id, done) => void toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
+        onSetTodoDue={(id, due) => void setTodoDate(id, due)}
       />
     )
   }
