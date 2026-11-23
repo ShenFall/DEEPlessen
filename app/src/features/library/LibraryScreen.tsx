@@ -13,6 +13,7 @@ import {
 } from '../../db'
 import { publishCourseLocal, unpublishLocal } from '../../storage/local'
 import { exportPortal } from '../../storage/portal'
+import { collectPortal, createZip } from '../../storage/zip'
 import {
   copyIntoLibrary,
   removeMaterial,
@@ -283,6 +284,38 @@ export default function LibraryScreen({
       )
     } catch (e) {
       setNotice(e instanceof Error ? e.message : '导出失败')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function packAndGo() {
+    if (!root || busy) return
+    setBusy(true)
+    try {
+      const entries = await collectPortal(root)
+      if (!entries.some((e) => e.path === 'index.html')) {
+        setNotice('portal 里没有 index.html，先点一次「导出学生门户」')
+        return
+      }
+      const blob = createZip(entries)
+      const d = new Date()
+      const p = (n: number) => String(n).padStart(2, '0')
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `deep-portal-${d.getFullYear()}${p(d.getMonth() + 1)}${p(
+        d.getDate(),
+      )}.zip`
+      a.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 4000)
+      setNotice(`已打包 ${entries.length} 个文件，下载完成后拖进 Cloudflare`)
+      window.open(
+        'https://dash.cloudflare.com/?to=/:account/workers-and-pages',
+        '_blank',
+      )
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '打包失败')
     } finally {
       setBusy(false)
     }
@@ -599,13 +632,23 @@ export default function LibraryScreen({
         <section className="lb-help">
           <div className="lb-group-head">
             <p className="lb-group-title">发布到公网</p>
-            <button
-              type="button"
-              className="lb-link"
-              onClick={() => setShowHelp((v) => !v)}
-            >
-              {showHelp ? '收起' : '怎么做'}
-            </button>
+            <span className="lb-help-acts">
+              <button
+                type="button"
+                className="lb-link"
+                onClick={() => setShowHelp((v) => !v)}
+              >
+                {showHelp ? '收起' : '怎么做'}
+              </button>
+              <button
+                type="button"
+                className="lb-publish"
+                disabled={busy}
+                onClick={() => void packAndGo()}
+              >
+                {busy ? '打包中…' : '打包并去上传'}
+              </button>
+            </span>
           </div>
           {showHelp && (
             <ol className="lb-steps">

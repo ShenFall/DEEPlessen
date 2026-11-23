@@ -456,3 +456,9 @@
   line-height: 1.8;
   color: var(--mute);
 }
+
+.lb-help-acts {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
