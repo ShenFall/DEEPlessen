@@ -28,12 +28,10 @@ const PORTAL_HTML = `<!doctype html>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rgba(140,90,32,.045),transparent 58%),var(--bg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%238c5a20' fill-opacity='0.13'/%3E%3C/svg%3E");
-  background-size:24px 24px}
-@media(max-width:430px){.bp{position:absolute;top:-8px;left:-24px;width:calc(100% + 48px);height:230px;pointer-events:none;opacity:.55}
-.bp .ln{stroke:#d5c5a4}.bp .cn{stroke:#c9b894}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
+.bp{position:absolute;top:-18px;left:-28px;width:calc(100% + 56px);height:220px;pointer-events:none;opacity:.5}
+.bp .ln{stroke:#d5c5a4}
+.bp .cn{stroke:#c9b894}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
 .meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
 .search{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(var(--bg) 76%,transparent)}
@@ -59,42 +57,39 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .dl{flex:none;font-size:12px;color:var(--gold)}
 .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
 footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(hover:hover){a:hover{background:#faf7f1}}
+@media(prefers-reduced-motion:reduce){.g{animation:none}}
+footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 .sign{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;
   font-family:Georgia,"Times New Roman","Songti SC",serif;font-style:italic;
   font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.75}
 .ava{width:22px;height:22px;border-radius:50%;object-fit:cover;filter:saturate(.85)}
-@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media(hover:hover){a:hover{background:#faf7f1}}
-@media(prefers-reduced-motion:reduce){.g{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <svg class="bp" viewBox="0 0 600 230" fill="none" aria-hidden="true">
+  <svg class="bp" viewBox="0 0 600 220" fill="none" aria-hidden="true">
     <defs>
       <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <line x1="0" y1="0" x2="0" y2="6" stroke="#c9b894" stroke-width="1"/>
       </pattern>
     </defs>
     <g class="ln" stroke-width="1">
-      <line x1="0" y1="126" x2="600" y2="126" stroke-dasharray="7 11"/>
-      <line x1="486" y1="0" x2="430" y2="230" stroke-dasharray="2 7" opacity=".75"/>
-      <line x1="196" y1="0" x2="262" y2="230" stroke-dasharray="2 7" opacity=".45"/>
+      <line x1="0" y1="120" x2="600" y2="120" stroke-dasharray="7 11"/>
+      <line x1="486" y1="0" x2="430" y2="220" stroke-dasharray="2 7" opacity=".7"/>
+      <line x1="196" y1="0" x2="262" y2="220" stroke-dasharray="2 7" opacity=".45"/>
     </g>
     <g class="cn" stroke-width="1">
-      <circle cx="104" cy="126" r="64" stroke-dasharray="3 7"/>
-      <circle cx="196" cy="126" r="44" stroke-dasharray="2 8"/>
-      <circle cx="392" cy="126" r="74" stroke-dasharray="3 7"/>
-      <circle cx="470" cy="126" r="36" stroke-dasharray="2 8"/>
+      <circle cx="104" cy="120" r="60" stroke-dasharray="3 7"/>
+      <circle cx="192" cy="120" r="42" stroke-dasharray="2 8"/>
+      <circle cx="392" cy="120" r="70" stroke-dasharray="3 7"/>
+      <circle cx="466" cy="120" r="34" stroke-dasharray="2 8"/>
     </g>
-    <path d="M232 120 C320 120 336 120 360 108 C376 100 386 96 396 96
-             C384 104 378 114 378 126 C378 138 384 148 396 156
-             C386 156 376 152 360 144 C336 132 320 132 232 132 Z"
-          stroke="#c9b894" stroke-width="1" fill="url(#hatch)" fill-opacity=".45"/>
-    <g class="cn" stroke-width="1" stroke-dasharray="1 5" opacity=".7">
-      <line x1="232" y1="126" x2="222" y2="126"/>
-      <line x1="396" y1="96" x2="404" y2="88"/>
-    </g>
+    <path d="M228 114 C316 114 332 114 356 102 C372 94 382 90 392 90
+             C380 98 374 108 374 120 C374 132 380 142 392 150
+             C382 150 372 146 356 138 C332 126 316 126 228 126 Z"
+          stroke="#c9b894" stroke-width="1" fill="url(#hatch)" fill-opacity=".4"/>
   </svg>
   <h1>课程资料</h1>
   <p class="meta" id="meta" aria-live="polite">加载中…</p>
