@@ -44,7 +44,7 @@ body{margin:0;min-height:100dvh;color:var(--ink);
 
 /* 顶部 */
 .topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;
-  min-height:56vh;transition:min-height .3s var(--ease),background .2s linear}
+  min-height:100dvh;transition:min-height .32s var(--ease),background .2s linear}
 .topbar .inner{width:100%;max-width:600px;margin:0 auto;padding:0 16px;
   display:flex;flex-direction:column;gap:10px;transition:gap .3s var(--ease)}
 .who{display:flex;align-items:center;gap:8px;font-family:Georgia,"Times New Roman","Songti SC",serif;
@@ -59,8 +59,7 @@ h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2
   border-radius:12px;background:var(--card);font:inherit;font-size:15px;color:var(--ink);appearance:none;
   transition:height .3s var(--ease),border-radius .3s var(--ease)}
 .field input::placeholder{color:var(--dim)}
-.field input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
-.field input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.field input:focus,.field input:focus-visible{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.10)}
 .kinds{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
   max-height:34px;opacity:1;transition:max-height .25s var(--ease),opacity .2s linear}
 .kinds::-webkit-scrollbar{display:none}
