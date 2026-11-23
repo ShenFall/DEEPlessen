@@ -146,6 +146,16 @@ export default function LibraryScreen({
       )
   }, [groups, query])
 
+  /** 哪些文件已经在「未下架」的发布里 */
+  const publishedSet = useMemo(() => {
+    const set = new Set<string>()
+    for (const p of publishes) {
+      if (p.state === 'offline') continue
+      for (const item of p.items) set.add(`${p.course}::${item.name}`)
+    }
+    return set
+  }, [publishes])
+
   const kindCounts = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const e of entries) {
@@ -540,6 +550,15 @@ export default function LibraryScreen({
                   <p className="lb-group-title">
                     {course}
                     <span>{list.length}</span>
+                    <em className="lb-group-pub">
+                      已发布{' '}
+                      {
+                        list.filter((e) =>
+                          publishedSet.has(`${course}::${e.name}`),
+                        ).length
+                      }
+                      /{list.length}
+                    </em>
                   </p>
                   <button
                     type="button"
@@ -552,6 +571,19 @@ export default function LibraryScreen({
                 <ul className="lb-list">
                   {list.map((e) => (
                     <li key={e.path}>
+                      <i
+                        className="lb-dot"
+                        data-on={
+                          publishedSet.has(`${course}::${e.name}`)
+                            ? 'true'
+                            : 'false'
+                        }
+                        title={
+                          publishedSet.has(`${course}::${e.name}`)
+                            ? '已发布'
+                            : '未发布'
+                        }
+                      />
                       <span className="lb-name">{e.name}</span>
                       <span className="lb-meta">{sizeText(e.size)}</span>
                       <button
@@ -588,6 +620,12 @@ export default function LibraryScreen({
                     <li key={p.id} className="lb-pub-row">
                       <span className="lb-pub-main">
                         <span className="lb-name">
+                          <em
+                            className="lb-pub-state"
+                            data-off={p.state === 'offline' ? 'true' : 'false'}
+                          >
+                            {p.state === 'offline' ? '已下架' : '发布中'}
+                          </em>
                           {p.course} · {p.items.length} 个文件
                         </span>
                         <span className="lb-pub-slug">
@@ -635,10 +673,10 @@ export default function LibraryScreen({
                             </span>
                             <button
                               type="button"
-                              className="lb-pub-act"
+                              className="lb-pub-act lb-pub-act--danger"
                               onClick={() => void dropRecord(p.id)}
                             >
-                              删除记录
+                              删除
                             </button>
                           </li>
                         ))}

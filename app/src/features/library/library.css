@@ -462,3 +462,48 @@
   align-items: center;
   gap: 10px;
 }
+
+/* 资料行状态点：金=已发布，灰=未发布 */
+.lb-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--mute);
+  opacity: 0.45;
+}
+
+.lb-dot[data-on='true'] {
+  background: var(--amber);
+  opacity: 1;
+}
+
+.lb-group-pub {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.lb-pub-act--danger {
+  color: var(--red);
+}
+
+.lb-pub-state {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--amber);
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 10px;
+  color: var(--amber);
+}
+
+.lb-pub-state[data-off='true'] {
+  border-color: var(--line);
+  color: var(--mute);
+}
