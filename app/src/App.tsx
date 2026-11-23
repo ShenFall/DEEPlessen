@@ -28,6 +28,7 @@ import LibraryScreen from './features/library/LibraryScreen'
 import ReconcileScreen from './features/reconcile/ReconcileScreen'
 import TodosScreen from './features/todos/TodosScreen'
 import TodoSheet from './components/TodoSheet'
+import AssignmentSheet from './components/AssignmentSheet'
 
 type View = 'dashboard' | 'todos' | 'reconcile' | 'list' | 'import' | 'library'
 
@@ -38,6 +39,7 @@ export default function App() {
   const [dash, setDash] = useState<DashboardData | null>(null)
   const [todosAll, setTodosAll] = useState<Todo[]>([])
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
+  const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
   const [view, setView] = useState<View>('dashboard')
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -94,8 +96,23 @@ export default function App() {
   }
 
   async function addTodo(title: string, due?: string) {
-    await createTodo(title, due)
+    const created = await createTodo(title, due)
     await bootstrap()
+    // 新建完直接开详情，省一次点击才能写备注
+    if (created) setEditingTodo(created)
+  }
+
+  async function setStatus(id: string, closed: boolean) {
+    await setAssignmentStatus(id, closed ? 'closed' : 'reconciling')
+    await bootstrap()
+  }
+
+  async function cloneOne(id: string) {
+    const newId = await cloneAssignment(id)
+    if (!newId) return
+    await bootstrap(newId)
+    setEditingAssignment(null)
+    setView('reconcile')
   }
 
   async function toggleTodo(id: string, done: boolean) {
@@ -213,6 +230,7 @@ export default function App() {
         onToggleTodo={(id, done) => void toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
         onOpenTodo={setEditingTodo}
+        onOpenAssignment={setEditingAssignment}
       />
         {editingTodo && (
           <TodoSheet
@@ -220,7 +238,24 @@ export default function App() {
             onClose={() => setEditingTodo(null)}
             onSave={(id, patch) => void saveTodo(id, patch)}
             onToggle={(id, done) => void toggleTodo(id, done)}
-            onDelete={(id) => void removeTodo(id)}
+            onDelete={(id) => {
+              void removeTodo(id)
+              setEditingTodo(null)
+            }}
+          />
+        )}
+        {editingAssignment && (
+          <AssignmentSheet
+            assignment={editingAssignment}
+            paid={counts[editingAssignment.id] ?? 0}
+            onClose={() => setEditingAssignment(null)}
+            onGo={(id) => void open(id)}
+            onToggleStatus={(id, closed) => void setStatus(id, closed)}
+            onClone={(id) => void cloneOne(id)}
+            onDelete={(id) => {
+              void remove(id)
+              setEditingAssignment(null)
+            }}
           />
         )}
       </>

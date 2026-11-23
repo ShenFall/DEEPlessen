@@ -4,7 +4,6 @@ export type ShellNav = 'dashboard' | 'todos' | 'list' | 'library'
 
 const NAV: { key: ShellNav; label: string }[] = [
   { key: 'dashboard', label: '看板' },
-  { key: 'todos', label: '待办' },
   { key: 'list', label: '作业' },
   { key: 'library', label: '资料' },
 ]

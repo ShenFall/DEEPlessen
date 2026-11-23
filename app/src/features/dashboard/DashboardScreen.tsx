@@ -17,6 +17,7 @@ type Props = {
   onToggleTodo: (id: string, done: boolean) => void
   onDeleteTodo: (id: string) => void
   onOpenTodo: (todo: Todo) => void
+  onOpenAssignment: (assignment: Assignment) => void
 }
 
 type Bucket = 'overdue' | 'today' | 'later' | 'none'
@@ -61,6 +62,7 @@ export default function DashboardScreen({
   onToggleTodo,
   onDeleteTodo,
   onOpenTodo,
+  onOpenAssignment,
 }: Props) {
   /** 刚勾掉的先留在原地变灰，刷新后才归入已完成 */
   const [justDone, setJustDone] = useState<Todo[]>([])
@@ -165,6 +167,11 @@ export default function DashboardScreen({
                               <span className="db-row-title">{r.todo.title}</span>
                               <span className="db-row-sub">
                                 <span className="db-tag db-tag--todo">待办</span>
+                                {r.todo.due && (
+                                  <span data-overdue={bucketOf(r.todo.due) === 'overdue'}>
+                                    {dueLabel(r.todo.due).text}
+                                  </span>
+                                )}
                                 {r.todo.note ? <span>有备注</span> : null}
                                 {r.done && <span>已完成</span>}
                               </span>
@@ -181,13 +188,12 @@ export default function DashboardScreen({
                         </li>
                       ) : (
                         <li key={r.assignment.id}>
-                          <button
-                            type="button"
-                            className="db-row db-row--link"
-                            onClick={() => onOpen(r.assignment.id)}
-                          >
-                            <span className="db-mark-dot" aria-hidden="true" />
-                            <span className="db-row-main">
+                          <div className="db-row">
+                            <button
+                              type="button"
+                              className="db-row-main db-row-open"
+                              onClick={() => onOpenAssignment(r.assignment)}
+                            >
                               <span className="db-row-title">
                                 {r.assignment.course} · {r.assignment.title}
                               </span>
@@ -196,9 +202,15 @@ export default function DashboardScreen({
                                 <span data-overdue={r.overdue}>{r.time}</span>
                                 <span>剩 {r.left}</span>
                               </span>
-                            </span>
-                            <span className="db-row-go">去点名</span>
-                          </button>
+                            </button>
+                            <button
+                              type="button"
+                              className="db-row-go"
+                              onClick={() => onOpen(r.assignment.id)}
+                            >
+                              去点名
+                            </button>
+                          </div>
                         </li>
                       ),
                     )}

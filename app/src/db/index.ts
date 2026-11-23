@@ -298,16 +298,18 @@ export async function listAllTodos(): Promise<Todo[]> {
   return [...active, ...done]
 }
 
-export async function createTodo(title: string, due?: string) {
+export async function createTodo(title: string, due?: string): Promise<Todo | null> {
   const text = title.trim()
-  if (!text) return
-  await db.todos.put({
+  if (!text) return null
+  const todo: Todo = {
     id: `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
     title: text,
     done: false,
     due,
     createdAt: new Date().toISOString(),
-  })
+  }
+  await db.todos.put(todo)
+  return todo
 }
 
 export async function setTodoDone(id: string, done: boolean) {

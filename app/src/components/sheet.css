@@ -81,7 +81,21 @@
 .sheet-actions {
   display: flex;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 12px;
+}
+
+.sheet-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 4px 0 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--dim);
+}
+
+.sheet-facts [data-overdue='true'] {
+  color: var(--red);
 }
 
 .sheet-main {
