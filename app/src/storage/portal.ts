@@ -32,9 +32,8 @@ body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rg
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%238c5a20' fill-opacity='0.13'/%3E%3C/svg%3E");
   background-size:24px 24px}
-.orbit{position:absolute;top:-70px;right:-60px;width:260px;height:260px;pointer-events:none;opacity:.5}
-.orbit--bl{top:auto;right:auto;bottom:-96px;left:-84px;width:300px;height:300px;opacity:.32;transform:rotate(160deg)}
-.rings{stroke:var(--line)}.stars{fill:var(--gold)}
+.bp{position:absolute;top:-8px;left:-24px;width:calc(100% + 48px);height:230px;pointer-events:none;opacity:.55}
+.bp .ln{stroke:#d5c5a4}.bp .cn{stroke:#c9b894}
 h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
 .meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
 .search{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(var(--bg) 76%,transparent)}
@@ -60,6 +59,8 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .dl{flex:none;font-size:12px;color:var(--gold)}
 .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
 footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
+.sign{margin:8px 0 0;text-align:center;font-family:Georgia,"Times New Roman","Songti SC",serif;
+  font-style:italic;font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.7}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){.g{animation:none}}
@@ -67,27 +68,30 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
 </head>
 <body>
 <div class="wrap">
-  <svg class="orbit" viewBox="0 0 260 260" fill="none" aria-hidden="true">
-    <g class="rings" stroke-width="1">
-      <circle cx="130" cy="130" r="118" stroke-dasharray="2 6"/>
-      <circle cx="130" cy="130" r="86" stroke-dasharray="1 7"/>
-      <circle cx="130" cy="130" r="54"/>
+  <svg class="bp" viewBox="0 0 600 230" fill="none" aria-hidden="true">
+    <defs>
+      <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#c9b894" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <g class="ln" stroke-width="1">
+      <line x1="0" y1="126" x2="600" y2="126" stroke-dasharray="7 11"/>
+      <line x1="486" y1="0" x2="430" y2="230" stroke-dasharray="2 7" opacity=".75"/>
+      <line x1="196" y1="0" x2="262" y2="230" stroke-dasharray="2 7" opacity=".45"/>
     </g>
-    <g class="stars">
-      <circle cx="130" cy="16" r="2.5"/>
-      <circle cx="212" cy="176" r="1.8"/>
-      <circle cx="70" cy="205" r="1.4"/>
+    <g class="cn" stroke-width="1">
+      <circle cx="104" cy="126" r="64" stroke-dasharray="3 7"/>
+      <circle cx="196" cy="126" r="44" stroke-dasharray="2 8"/>
+      <circle cx="392" cy="126" r="74" stroke-dasharray="3 7"/>
+      <circle cx="470" cy="126" r="36" stroke-dasharray="2 8"/>
     </g>
-  </svg>
-  <svg class="orbit orbit--bl" viewBox="0 0 260 260" fill="none" aria-hidden="true">
-    <g class="rings" stroke-width="1">
-      <circle cx="130" cy="130" r="120" stroke-dasharray="1 8"/>
-      <circle cx="130" cy="130" r="78" stroke-dasharray="2 5"/>
-      <circle cx="130" cy="130" r="40"/>
-    </g>
-    <g class="stars">
-      <circle cx="130" cy="10" r="1.6"/>
-      <circle cx="52" cy="176" r="1.2"/>
+    <path d="M232 120 C320 120 336 120 360 108 C376 100 386 96 396 96
+             C384 104 378 114 378 126 C378 138 384 148 396 156
+             C386 156 376 152 360 144 C336 132 320 132 232 132 Z"
+          stroke="#c9b894" stroke-width="1" fill="url(#hatch)" fill-opacity=".45"/>
+    <g class="cn" stroke-width="1" stroke-dasharray="1 5" opacity=".7">
+      <line x1="232" y1="126" x2="222" y2="126"/>
+      <line x1="396" y1="96" x2="404" y2="88"/>
     </g>
   </svg>
   <h1>课程资料</h1>
@@ -95,6 +99,7 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
   <div class="search"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
   <div id="list" aria-live="polite"></div>
   <footer id="foot"></footer>
+  <p class="sign">ShenFall</p>
 </div>
 <script>
 (function(){
