@@ -21,24 +21,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: app/package-lock.json
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
+      - name: 环境信息
+        run: |
+          node -v
+          npm -v
+          java -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME" 2>/dev/null || true
 
       - name: 安装依赖
-        run: npm ci
+        run: |
+          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
       - name: 构建 Web 资源
         run: npm run build
 
       - name: 安装 Capacitor
-        run: npm i -D @capacitor/cli@6 @capacitor/core@6 @capacitor/android@6
+        run: npm i -D @capacitor/cli@6.2.0 @capacitor/core@6.2.0 @capacitor/android@6.2.0 --no-audit --no-fund
 
       - name: 生成安卓工程
         run: |
@@ -47,17 +52,24 @@ jobs:
 
       - name: 生成应用图标与启动图
         continue-on-error: true
-        run: npx @capacitor/assets generate --android --iconBackgroundColor '#F7F4EE' --splashBackgroundColor '#F7F4EE'
+        run: |
+          npx --yes @capacitor/assets generate --android \
+            --iconBackgroundColor '#F7F4EE' \
+            --splashBackgroundColor '#F7F4EE'
 
       - name: 编译 Debug APK
         working-directory: app/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: 上传产物
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: shenshi-debug-apk
-          path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            app/android/app/build/outputs/apk/debug/app-debug.apk
+            app/android/app/build/outputs/logs/**
+          if-no-files-found: warn
           retention-days: 30
