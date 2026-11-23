@@ -28,44 +28,55 @@ const PORTAL_HTML = `<!doctype html>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{margin:0;min-height:100dvh;color:var(--ink);
-  background:radial-gradient(120% 50% at 82% -6%,rgba(140,90,32,.05),transparent 60%),var(--bg);
+  background:radial-gradient(110% 46% at 84% -8%,rgba(140,90,32,.06),transparent 62%),var(--bg);
   font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.bgline{position:fixed;right:-12%;bottom:-4%;height:110vh;width:auto;max-width:none;
-  opacity:.12;mix-blend-mode:multiply;pointer-events:none;user-select:none;z-index:0}
-@media(max-width:520px){.bgline{right:-26%;height:96vh;opacity:.1}}
 
-/* 顶部：初始占大半个屏，滚动或输入后收缩吸顶 */
+/* 构成主义拼贴：两块斜切 + 两根细线 */
+.art{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.frag{position:absolute;mix-blend-mode:multiply;will-change:transform}
+.frag--a{right:-5%;top:-14%;height:120vh;opacity:.15;
+  clip-path:polygon(26% 0,100% 0,100% 100%,0 100%)}
+.frag--b{left:-14%;bottom:-18%;height:64vh;opacity:.09;transform:rotate(180deg);
+  clip-path:polygon(0 0,100% 0,74% 100%,0 100%)}
+.rule{position:absolute;top:0;width:1px;background:linear-gradient(var(--line),transparent)}
+.rule--a{right:24%;height:42vh}
+.rule--b{right:calc(24% + 8px);height:26vh;opacity:.6}
+
+/* 顶部 */
 .topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;
-  min-height:58vh;transition:min-height .3s var(--ease),background .2s linear}
+  min-height:56vh;transition:min-height .3s var(--ease),background .2s linear}
 .topbar .inner{width:100%;max-width:600px;margin:0 auto;padding:0 16px;
-  display:flex;flex-direction:column;gap:12px;transition:gap .3s var(--ease)}
-.topbar h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2;
+  display:flex;flex-direction:column;gap:10px;transition:gap .3s var(--ease)}
+.who{display:flex;align-items:center;gap:8px;font-family:Georgia,"Times New Roman","Songti SC",serif;
+  font-style:italic;font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.85;
+  transition:opacity .2s linear,max-height .3s var(--ease);max-height:28px;overflow:hidden}
+.ava{width:24px;height:24px;border-radius:50%;object-fit:cover;filter:saturate(.85)}
+h1{margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2;
   transition:font-size .3s var(--ease)}
-.topbar .meta{margin:0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;
-  transition:opacity .2s linear,max-height .3s var(--ease);overflow:hidden;max-height:24px}
+.meta{margin:0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;
+  transition:opacity .2s linear,max-height .3s var(--ease);max-height:24px;overflow:hidden}
 .field input{display:block;width:100%;height:46px;padding:0 14px;border:1px solid var(--line);
   border-radius:12px;background:var(--card);font:inherit;font-size:15px;color:var(--ink);appearance:none;
   transition:height .3s var(--ease),border-radius .3s var(--ease)}
 .field input::placeholder{color:var(--dim)}
 .field input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
 .field input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-
 .kinds{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
-  max-height:34px;opacity:1;transition:max-height .25s var(--ease),opacity .2s linear,margin .25s}
+  max-height:34px;opacity:1;transition:max-height .25s var(--ease),opacity .2s linear}
 .kinds::-webkit-scrollbar{display:none}
-.topbar:not(.stuck) .kinds{max-height:0;opacity:0;margin:0}
 .kinds button{flex:none;height:28px;padding:0 11px;border:1px solid var(--line);border-radius:999px;
   background:transparent;font:inherit;font-size:12px;color:var(--dim);cursor:pointer}
 .kinds button[data-on='true']{border-color:var(--gold);color:var(--gold);background:rgba(140,90,32,.06)}
+.topbar:not(.stuck) .kinds{max-height:0;opacity:0}
 
-/* 收缩态 */
-.topbar.stuck{min-height:0;background:rgba(247,244,238,.94);border-bottom:1px solid var(--line)}
-.topbar.stuck .inner{gap:8px;padding-top:9px;padding-bottom:9px}
+.topbar.stuck{min-height:0;background:rgba(247,244,238,.95);border-bottom:1px solid var(--line)}
+.topbar.stuck .inner{gap:8px;padding-top:8px;padding-bottom:8px}
 .topbar.stuck h1{font-size:15px;font-weight:500}
+.topbar.stuck .who{max-height:0;opacity:0}
 .topbar.stuck .meta{max-height:0;opacity:0}
 .topbar.stuck .field input{height:38px;border-radius:10px;font-size:14px}
 
-.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:8px 16px 48px}
+.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:10px 16px 40px}
 .g{margin:16px 0 0;animation:up .2s var(--ease) both;animation-delay:calc(var(--i)*24ms)}
 .g.s{animation:none}
 .g:nth-of-type(n+9){animation:none}
@@ -84,20 +95,25 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .n i{font-style:normal;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
 .dl{flex:none;font-size:12px;color:var(--gold)}
 .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
-footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
-.sign{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;
-  font-family:Georgia,"Times New Roman","Songti SC",serif;font-style:italic;
-  font-size:13px;letter-spacing:.14em;color:var(--gold);opacity:.75}
-.ava{width:22px;height:22px;border-radius:50%;object-fit:cover;filter:saturate(.85)}
+.motto{margin:34px 0 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;
+  font-family:Georgia,"Songti SC",serif;font-size:13px;letter-spacing:.22em;color:var(--gold);opacity:.72}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(hover:hover){a:hover{background:#faf7f1}}
-@media(prefers-reduced-motion:reduce){.topbar,.topbar .inner,.topbar h1,.topbar .meta,.field input,.kinds{transition:none}.g{animation:none}}
+@media(prefers-reduced-motion:reduce){
+  .topbar,.topbar .inner,.topbar h1,.who,.meta,.field input,.kinds{transition:none}
+  .g{animation:none}}
 </style>
 </head>
 <body>
-<img class="bgline" src="brand/lines.png" alt="" aria-hidden="true" onerror="this.remove()" />
+<div class="art" aria-hidden="true">
+  <img class="frag frag--a" src="brand/lines.png" alt="" onerror="this.remove()" />
+  <img class="frag frag--b" src="brand/lines.png" alt="" onerror="this.remove()" />
+  <i class="rule rule--a"></i><i class="rule rule--b"></i>
+</div>
+
 <header class="topbar" id="topbar">
   <div class="inner">
+    <div class="who"><img class="ava" src="brand/avatar.png" alt="" onerror="this.remove()" />ShenFall</div>
     <h1>课程资料</h1>
     <p class="meta" id="meta" aria-live="polite">加载中…</p>
     <div class="field"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
@@ -107,8 +123,7 @@ footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
 
 <div class="wrap">
   <div id="list" aria-live="polite"></div>
-  <footer id="foot"></footer>
-  <p class="sign"><img class="ava" src="brand/avatar.png" alt="" onerror="this.remove()" />ShenFall</p>
+  <p class="motto">十年饮冰　难凉热血</p>
 </div>
 <script>
 (function(){
@@ -125,8 +140,7 @@ footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
 
   function sync(){
-    var stuck = window.scrollY>40 || key.length>0 || document.activeElement===q;
-    bar.classList.toggle('stuck', stuck);
+    bar.classList.toggle('stuck', window.scrollY>40 || key.length>0 || document.activeElement===q);
   }
 
   function buildKinds(){
@@ -136,7 +150,7 @@ footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
     order.forEach(function(k){ if(seen[k]) html+='<button type="button" data-k="'+k+'" data-on="'+(kind===k)+'">'+k+' '+seen[k]+'</button>'; });
     box.innerHTML=html;
     Array.prototype.forEach.call(box.querySelectorAll('button'),function(b){
-      b.addEventListener('click',function(){ kind=b.getAttribute('data-k'); buildKinds(); render(true); sync(); });
+      b.addEventListener('click',function(){ kind=b.getAttribute('data-k'); buildKinds(); render(true); });
     });
   }
 
@@ -167,16 +181,15 @@ footer{margin-top:26px;text-align:center;font-size:12px;color:var(--dim)}
   fetch('manifest.json').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
     data=d;data.courses=Array.isArray(d.courses)?d.courses:[];
     total=data.courses.reduce(function(a,c){ return a+c.items.length; },0);
-    document.getElementById('meta').textContent=total+' 个文件 · '+data.courses.length+' 门课';
     var dt=new Date(d.generatedAt);
-    document.getElementById('foot').textContent=isNaN(dt.getTime())?'点击文件名直接下载':'更新于 '+(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日';
+    var stamp=isNaN(dt.getTime())?'':(' · 更新于 '+(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日');
+    document.getElementById('meta').textContent=total+' 个文件 · '+data.courses.length+' 门课'+stamp;
     buildKinds(); render(true); sync();
   }).catch(function(){
     data=null;total=0;
     document.getElementById('meta').textContent='清单读不出来，请刷新页面';
     document.getElementById('list').innerHTML='';
     document.getElementById('kinds').innerHTML='';
-    document.getElementById('foot').textContent='';
   });
 
   q.addEventListener('input',function(e){ key=(e.target.value||'').trim().toLowerCase(); render(false); sync(); });
