@@ -430,3 +430,29 @@
   margin-top: 8px;
   opacity: 0.65;
 }
+
+/* 发布指引 */
+.lb-help {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.lb-steps {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: var(--fs-11);
+  line-height: 2;
+  color: var(--dim);
+}
+
+.lb-steps li::marker {
+  color: var(--mute);
+}
+
+.lb-help-note {
+  margin: 10px 0 0;
+  font-size: var(--fs-11);
+  line-height: 1.8;
+  color: var(--mute);
+}

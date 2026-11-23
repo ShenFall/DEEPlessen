@@ -94,6 +94,7 @@ export default function LibraryScreen({
   const [pending, setPending] = useState<Backup | null>(null)
   const [showGone, setShowGone] = useState(false)
   const [killArm, setKillArm] = useState<string | null>(null)
+  const [showHelp, setShowHelp] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
@@ -594,6 +595,34 @@ export default function LibraryScreen({
             )}
           </>
         )}
+
+        <section className="lb-help">
+          <div className="lb-group-head">
+            <p className="lb-group-title">发布到公网</p>
+            <button
+              type="button"
+              className="lb-link"
+              onClick={() => setShowHelp((v) => !v)}
+            >
+              {showHelp ? '收起' : '怎么做'}
+            </button>
+          </div>
+          {showHelp && (
+            <ol className="lb-steps">
+              <li>点「已发布」右侧的「导出学生门户」，生成 portal 目录</li>
+              <li>把 portal 里的内容压成 zip（不会压就找总工打包）</li>
+              <li>浏览器打开 Cloudflare，进项目 deep-portal</li>
+              <li>点 Create new deployment，环境选 Production</li>
+              <li>把 zip 拖进去，点 Save and deploy，等 20 秒</li>
+            </ol>
+          )}
+          {showHelp && (
+            <p className="lb-help-note">
+              网址不变：deep-portal.pages.dev。别新建项目，新建会换地址。
+              单文件超过 25MB 不会打包，见 portal/large-files.md。
+            </p>
+          )}
+        </section>
 
         <section className="lb-backup">
           <p className="lb-backup-title">数据备份</p>

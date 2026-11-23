@@ -20,93 +20,108 @@ const PORTAL_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
 <meta name="theme-color" content="#f7f4ee" />
 <title>课程资料</title>
 <style>
-  :root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20;--chip:#f0ebe1}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,#fdfaf3 0%,var(--bg) 58%);
-    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  .wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
-  .orbit{position:absolute;top:-70px;right:-60px;width:260px;height:260px;pointer-events:none;opacity:.5}
-  h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
-  .meta{margin:6px 0 16px;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
-  .search{position:sticky;top:0;z-index:5;padding:8px 0 12px;background:linear-gradient(var(--bg) 70%,transparent)}
-  input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
-    background:var(--card);font-size:14px;color:var(--ink)}
-  input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
-  h2{display:flex;align-items:baseline;gap:8px;margin:24px 0 8px;font-size:14px;font-weight:600}
-  h2 span{font-size:12px;font-weight:400;color:var(--dim)}
-  ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  li+li{border-top:1px solid var(--line)}
-  a{display:flex;align-items:center;gap:12px;padding:13px 14px;text-decoration:none;color:inherit;transition:background .12s}
-  a:hover{background:#faf7f1}
-  a:active{background:#f3eee4}
-  .ext{flex:none;width:38px;height:38px;border-radius:9px;background:var(--chip);display:flex;
-    align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold)}
-  .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-  .n b{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .n i{font-style:normal;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
-  .dl{flex:none;font-size:12px;color:var(--gold)}
-  .empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0}
-  footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
+:root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20;--chip:#f0ebe1;--r-card:12px;--r-input:10px;--r-chip:9px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,rgba(140,90,32,.045),transparent 58%),var(--bg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
+.orbit{position:absolute;top:-70px;right:-60px;width:260px;height:260px;pointer-events:none;opacity:.5}
+.rings{stroke:var(--line)}.stars{fill:var(--gold)}
+h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.meta{position:relative;margin:6px 0 0;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.search{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(var(--bg) 76%,transparent)}
+input{display:block;width:100%;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:var(--r-input);background:var(--card);font:inherit;font-size:14px;color:var(--ink);appearance:none}
+input::placeholder{color:var(--dim)}
+input:focus{outline:none;border-color:#cdbfa4;box-shadow:0 0 0 3px rgba(140,90,32,.08)}
+input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.g{margin:20px 0 0;animation:up .2s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*24ms)}
+.g.s{animation:none}
+.g:nth-of-type(n+9){animation:none}
+.g h2{display:flex;align-items:baseline;gap:8px;margin:0 0 8px;font-size:14px;font-weight:600}
+.g h2 .c{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g h2 .k{margin-left:auto;flex:none;font-size:12px;font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+li+li{border-top:1px solid var(--line)}
+a{display:flex;align-items:center;gap:12px;min-height:62px;padding:11px 14px;text-decoration:none;color:inherit;transition:background .12s ease}
+a:active{background:#f3eee4}
+a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.ext{flex:none;width:38px;height:38px;border-radius:var(--r-chip);background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold)}
+.n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.n b{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n i{font-style:normal;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.dl{flex:none;font-size:12px;color:var(--gold)}
+.empty{color:var(--dim);font-size:13px;text-align:center;padding:36px 0;margin:0}
+footer{margin-top:28px;text-align:center;font-size:12px;color:var(--dim)}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(hover:hover){a:hover{background:#faf7f1}}
+@media(prefers-reduced-motion:reduce){.g{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <svg class="orbit" viewBox="0 0 260 260" fill="none" aria-hidden="true">
-    <circle cx="130" cy="130" r="118" stroke="#d9c9a8" stroke-width="1" stroke-dasharray="2 6"/>
-    <circle cx="130" cy="130" r="86" stroke="#d9c9a8" stroke-width="1" stroke-dasharray="1 7"/>
-    <circle cx="130" cy="130" r="54" stroke="#cdb894" stroke-width="1"/>
-    <circle cx="130" cy="16" r="2.5" fill="#c39a5c"/>
-    <circle cx="212" cy="176" r="1.8" fill="#c39a5c"/>
-    <circle cx="70" cy="205" r="1.4" fill="#d9c9a8"/>
+    <g class="rings" stroke-width="1">
+      <circle cx="130" cy="130" r="118" stroke-dasharray="2 6"/>
+      <circle cx="130" cy="130" r="86" stroke-dasharray="1 7"/>
+      <circle cx="130" cy="130" r="54"/>
+    </g>
+    <g class="stars">
+      <circle cx="130" cy="16" r="2.5"/>
+      <circle cx="212" cy="176" r="1.8"/>
+      <circle cx="70" cy="205" r="1.4"/>
+    </g>
   </svg>
   <h1>课程资料</h1>
-  <p class="meta" id="meta">加载中…</p>
-  <div class="search"><input id="q" placeholder="搜索文件名或课程" /></div>
-  <div id="list"></div>
+  <p class="meta" id="meta" aria-live="polite">加载中…</p>
+  <div class="search"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
+  <div id="list" aria-live="polite"></div>
   <footer id="foot"></footer>
 </div>
 <script>
 (function(){
-  var data = null;
-  function size(n){ if(n<1024) return n+' B'; if(n<1048576) return Math.round(n/1024)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+  var data=null,total=0;
+  function size(n){ if(n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
   function ext(n){ var i=n.lastIndexOf('.'); return i<0 ? 'FILE' : n.slice(i+1).toUpperCase().slice(0,4); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
-  function render(q){
-    var box = document.getElementById('list');
-    if(!data){ box.innerHTML = '<p class="empty">没有资料</p>'; return; }
-    var key = (q||'').trim().toLowerCase();
-    var html = '';
+  function render(q,animate){
+    var box=document.getElementById('list');
+    if(!data){ box.innerHTML=''; return; }
+    var key=(q||'').trim().toLowerCase(),html='',n=0;
     data.courses.forEach(function(c){
-      var items = c.items.filter(function(i){
-        return !key || i.name.toLowerCase().indexOf(key) >= 0 || c.name.toLowerCase().indexOf(key) >= 0;
+      var items=c.items.filter(function(i){
+        return !key || i.name.toLowerCase().indexOf(key)>=0 || c.name.toLowerCase().indexOf(key)>=0;
       });
       if(!items.length) return;
-      html += '<h2>' + esc(c.name) + '<span>' + items.length + ' 个文件</span></h2><ul>';
-      items.forEach(function(i){
-        html += '<li><a href="' + i.url + '" download>'
-             +  '<span class="ext">' + ext(i.name) + '</span>'
-             +  '<span class="n"><b>' + esc(i.name) + '</b><i>' + size(i.size) + '</i></span>'
-             +  '<span class="dl">下载</span></a></li>';
+      var i=Math.min(n,7),cls=animate?'g':'g s';
+      html+='<section class="'+cls+'" style="--i:'+i+'"><h2><span class="c">'+esc(c.name)+'</span><span class="k">'+items.length+' 个文件</span></h2><ul>';
+      items.forEach(function(f){
+        html+='<li><a href="'+esc(f.url)+'" download="'+esc(f.name)+'" aria-label="下载 '+esc(f.name)+'">'
+          +'<span class="ext">'+esc(ext(f.name))+'</span>'
+          +'<span class="n"><b>'+esc(f.name)+'</b><i>'+size(f.size)+'</i></span>'
+          +'<span class="dl">下载</span></a></li>';
       });
-      html += '</ul>';
+      html+='</ul></section>';n+=1;
     });
-    box.innerHTML = html || '<p class="empty">没有匹配的资料</p>';
+    box.innerHTML=html || (total ? '<p class="empty">没有匹配的资料</p>' : '<p class="empty">还没有资料</p>');
   }
-  fetch('manifest.json').then(function(r){ return r.json(); }).then(function(d){
-    data = d;
-    var n = d.courses.reduce(function(a,c){ return a + c.items.length; }, 0);
-    document.getElementById('meta').textContent = n + ' 个文件 · ' + d.courses.length + ' 门课';
-    var d2 = new Date(d.generatedAt);
-    document.getElementById('foot').textContent = isNaN(d2.getTime()) ? '点击文件名直接下载'
-      : '更新于 ' + (d2.getMonth()+1) + ' 月 ' + d2.getDate() + ' 日';
-    render('');
+  fetch('manifest.json').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
+    data=d;data.courses=Array.isArray(d.courses)?d.courses:[];
+    total=data.courses.reduce(function(a,c){ return a+c.items.length; },0);
+    document.getElementById('meta').textContent=total+' 个文件 · '+data.courses.length+' 门课';
+    var dt=new Date(d.generatedAt);
+    document.getElementById('foot').textContent=isNaN(dt.getTime())?'点击文件名直接下载':'更新于 '+(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日';
+    render('',true);
   }).catch(function(){
-    document.getElementById('meta').textContent = '清单读不出来，请刷新页面';
+    data=null;total=0;
+    document.getElementById('meta').textContent='清单读不出来，请刷新页面';
+    document.getElementById('list').innerHTML='';
+    document.getElementById('foot').textContent='';
   });
-  document.getElementById('q').addEventListener('input', function(e){ render(e.target.value); });
+  document.getElementById('q').addEventListener('input',function(e){ render(e.target.value,false); });
 })();
 </script>
 </body>
