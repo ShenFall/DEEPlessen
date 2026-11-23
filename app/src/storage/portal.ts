@@ -25,10 +25,11 @@ const PORTAL_HTML = `<!doctype html>
 <style>
   :root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20;--chip:#f0ebe1}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;background:var(--bg);color:var(--ink);
+  body{margin:0;color:var(--ink);background:radial-gradient(120% 55% at 82% -8%,#fdfaf3 0%,var(--bg) 58%);
     font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  .wrap{max-width:600px;margin:0 auto;padding:28px 16px 56px}
-  h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
+  .wrap{position:relative;max-width:600px;margin:0 auto;padding:28px 16px 56px;overflow:hidden}
+  .orbit{position:absolute;top:-70px;right:-60px;width:260px;height:260px;pointer-events:none;opacity:.5}
+  h1{position:relative;margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em}
   .meta{margin:6px 0 16px;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
   .search{position:sticky;top:0;z-index:5;padding:8px 0 12px;background:linear-gradient(var(--bg) 70%,transparent)}
   input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
@@ -53,6 +54,14 @@ const PORTAL_HTML = `<!doctype html>
 </head>
 <body>
 <div class="wrap">
+  <svg class="orbit" viewBox="0 0 260 260" fill="none" aria-hidden="true">
+    <circle cx="130" cy="130" r="118" stroke="#d9c9a8" stroke-width="1" stroke-dasharray="2 6"/>
+    <circle cx="130" cy="130" r="86" stroke="#d9c9a8" stroke-width="1" stroke-dasharray="1 7"/>
+    <circle cx="130" cy="130" r="54" stroke="#cdb894" stroke-width="1"/>
+    <circle cx="130" cy="16" r="2.5" fill="#c39a5c"/>
+    <circle cx="212" cy="176" r="1.8" fill="#c39a5c"/>
+    <circle cx="70" cy="205" r="1.4" fill="#d9c9a8"/>
+  </svg>
   <h1>课程资料</h1>
   <p class="meta" id="meta">加载中…</p>
   <div class="search"><input id="q" placeholder="搜索文件名或课程" /></div>
