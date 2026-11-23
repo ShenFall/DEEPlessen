@@ -43,6 +43,21 @@
   padding: 0 var(--pad-x);
 }
 
+.al-eyebrow-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.al-roster {
+  flex: none;
+  padding: 4px 0;
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+}
+
 .al-eyebrow {
   margin: 4px 0 10px;
   font-family: var(--font-mono);

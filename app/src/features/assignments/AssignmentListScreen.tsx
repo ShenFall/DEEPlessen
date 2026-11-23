@@ -154,18 +154,19 @@ export default function AssignmentListScreen({
 
   return (
     <main className="al">
-      <AppShellHeader
-        active="list"
-        onNav={onNav}
-        right={
-          <button type="button" onClick={onImportRoster}>
-            名单
-          </button>
-        }
-      />
+      <AppShellHeader active="list" onNav={onNav} />
 
       <div className="al-body">
-        <p className="al-eyebrow">进行中 · {running.length}</p>
+        <div className="al-eyebrow-row">
+          <p className="al-eyebrow">进行中 · {running.length}</p>
+          <button
+            type="button"
+            className="al-roster"
+            onClick={onImportRoster}
+          >
+            名单与导入
+          </button>
+        </div>
 
         {running.length === 0 && (
           <p className="al-empty">没有进行中的清点</p>
