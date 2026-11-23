@@ -197,27 +197,99 @@
 }
 
 /* 行动清单 */
+.db-add {
+  margin: 2px 0 4px;
+}
+
+.db-add input {
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: var(--font-sans);
+}
+
+.db-add input::placeholder {
+  color: rgba(154, 166, 184, 0.7);
+}
+
+.db-add input:focus {
+  outline: none;
+  border-bottom-color: rgba(233, 163, 65, 0.6);
+}
+
+.db-group {
+  margin-top: 14px;
+}
+
+.db-group-title {
+  margin: 0 0 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
 .db-actions {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.db-action {
+.db-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 14px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--hair);
   text-align: left;
 }
 
-.db-actions li:first-child .db-action {
+.db-actions li:first-child .db-row {
   border-top: 0;
 }
 
-.db-action-main {
+.db-check {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(242, 237, 228, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  transition: transform 120ms ease-out;
+}
+
+.db-check:active {
+  transform: scale(0.92);
+}
+
+.db-check[data-on='true'] {
+  border-color: var(--gold);
+  background:
+    radial-gradient(circle at 50% 50%, var(--gold) 0 45%, transparent 46%);
+}
+
+.db-row[data-done='true'] .db-row-title {
+  color: var(--dim);
+  text-decoration: line-through;
+  text-decoration-color: rgba(154, 166, 184, 0.5);
+}
+
+.db-del {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(154, 166, 184, 0.55);
+}
+
+.db-row-main {
   display: flex;
   flex: 1;
   min-width: 0;
@@ -225,8 +297,8 @@
   gap: 5px;
 }
 
-.db-action-title {
-  font-size: 15px;
+.db-row-title {
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -234,7 +306,7 @@
   text-overflow: ellipsis;
 }
 
-.db-action-sub {
+.db-row-sub {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -243,7 +315,7 @@
   color: var(--dim);
 }
 
-.db-action-sub [data-overdue='true'] {
+.db-row-sub [data-overdue='true'] {
   color: #e2603f;
 }
 
@@ -256,18 +328,16 @@
   color: var(--blue);
 }
 
-.db-action-go {
+.db-tag--todo {
+  border-color: rgba(211, 138, 67, 0.4);
+  color: var(--gold);
+}
+
+.db-row-go {
   flex: none;
   font-size: 12px;
   color: var(--gold);
   white-space: nowrap;
-}
-
-.db-more {
-  margin-top: 8px;
-  padding: 8px 0;
-  font-size: 12px;
-  color: var(--dim);
 }
 
 /* 时间轴 */

@@ -37,6 +37,15 @@ export type HandleRecord = { key: string; value: unknown }
 
 export type PublishItem = { name: string; size: number; file: string }
 
+export type Todo = {
+  id: string
+  title: string
+  done: boolean
+  due?: string
+  createdAt: string
+  doneAt?: string
+}
+
 export type Publish = {
   id: string
   course: string
@@ -52,6 +61,7 @@ class DeepDB extends Dexie {
   meta!: Table<Meta, string>
   handles!: Table<HandleRecord, string>
   publishes!: Table<Publish, string>
+  todos!: Table<Todo, string>
 
   constructor() {
     super('deep')
@@ -82,6 +92,10 @@ class DeepDB extends Dexie {
     this.version(4).stores({
       publishes: 'id, createdAt, state',
       submissions: 'key, assignmentId, studentId, state, submittedAt',
+    })
+    // v5：手动待办
+    this.version(5).stores({
+      todos: 'id, done, createdAt',
     })
   }
 }
@@ -252,6 +266,43 @@ export async function loadHandle<T>(key: string): Promise<T | null> {
   return (row?.value as T) ?? null
 }
 
+/* ---------- 待办 ---------- */
+
+export async function listTodos(): Promise<Todo[]> {
+  const all = await db.todos.toArray()
+  return all
+    .filter((t) => !t.done)
+    .sort((a, b) => {
+      const da = a.due ?? ''
+      const db_ = b.due ?? ''
+      if (da !== db_) return da.localeCompare(db_)
+      return b.createdAt.localeCompare(a.createdAt)
+    })
+}
+
+export async function createTodo(title: string, due?: string) {
+  const text = title.trim()
+  if (!text) return
+  await db.todos.put({
+    id: `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
+    title: text,
+    done: false,
+    due,
+    createdAt: new Date().toISOString(),
+  })
+}
+
+export async function setTodoDone(id: string, done: boolean) {
+  await db.todos.update(id, {
+    done,
+    doneAt: done ? new Date().toISOString() : undefined,
+  })
+}
+
+export async function deleteTodo(id: string) {
+  await db.todos.delete(id)
+}
+
 export async function savePublish(p: Publish) {
   await db.publishes.put(p)
 }
@@ -276,15 +327,17 @@ export type DashboardData = {
   publishCount: number
   materialCount: number
   marks: MarkRecord[]
+  todos: Todo[]
 }
 
 /** 看板一次取全，避免页面里散着查 */
 export async function loadDashboard(): Promise<DashboardData> {
-  const [assignments, subs, students, pubs] = await Promise.all([
+  const [assignments, subs, students, pubs, todos] = await Promise.all([
     listAssignments(),
     db.submissions.where('state').equals('paid').toArray(),
     db.students.toArray(),
     db.publishes.toArray(),
+    listTodos(),
   ])
 
   const paidBy = new Map<string, number>()
@@ -323,6 +376,7 @@ export async function loadDashboard(): Promise<DashboardData> {
     publishCount: pubs.filter((p) => p.state !== 'offline').length,
     materialCount: pubs.reduce((sum, p) => sum + p.items.length, 0),
     marks,
+    todos,
   }
 }
 

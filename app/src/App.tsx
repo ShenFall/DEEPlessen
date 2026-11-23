@@ -2,13 +2,16 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   cloneAssignment,
   createAssignment,
+  createTodo,
   deleteAssignment,
+  deleteTodo,
   ensureSeed,
   listAssignments,
   loadDashboard,
   loadWorkspace,
   paidCounts,
   setAssignmentStatus,
+  setTodoDone,
   syncAssignmentTotals,
   updateAssignment,
   type Assignment,
@@ -81,6 +84,21 @@ export default function App() {
     await bootstrap()
   }
 
+  async function addTodo(title: string) {
+    await createTodo(title)
+    await bootstrap()
+  }
+
+  async function toggleTodo(id: string, done: boolean) {
+    await setTodoDone(id, done)
+    await bootstrap()
+  }
+
+  async function removeTodo(id: string) {
+    await deleteTodo(id)
+    await bootstrap()
+  }
+
   async function toggleStatus() {
     if (!ws) return
     const next = ws.assignment.status === 'closed' ? 'reconciling' : 'closed'
@@ -142,6 +160,9 @@ export default function App() {
         onOpen={(id) => void open(id)}
         onAll={() => setView('list')}
         onLibrary={() => setView('library')}
+        onAddTodo={(title) => void addTodo(title)}
+        onToggleTodo={(id, done) => void toggleTodo(id, done)}
+        onDeleteTodo={(id) => void removeTodo(id)}
       />
     )
   }
