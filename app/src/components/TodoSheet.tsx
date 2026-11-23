@@ -10,17 +10,19 @@ type Props = {
   onDelete: (id: string) => void
 }
 
-function toDateValue(iso?: string) {
+function toDateTimeValue(iso?: string) {
   if (!iso) return ''
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
   const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(
+    d.getHours(),
+  )}:${p(d.getMinutes())}`
 }
 
-function fromDateValue(value: string): string | undefined {
+function fromDateTimeValue(value: string): string | undefined {
   if (!value) return undefined
-  const d = new Date(`${value}T23:59:00`)
+  const d = new Date(value)
   return Number.isNaN(d.getTime()) ? undefined : d.toISOString()
 }
 
@@ -33,18 +35,22 @@ export default function TodoSheet({
 }: Props) {
   const [title, setTitle] = useState(todo.title)
   const [note, setNote] = useState(todo.note ?? '')
-  const [date, setDate] = useState(toDateValue(todo.due))
+  const [date, setDate] = useState(toDateTimeValue(todo.due))
 
   useEffect(() => {
     setTitle(todo.title)
     setNote(todo.note ?? '')
-    setDate(toDateValue(todo.due))
+    setDate(toDateTimeValue(todo.due))
   }, [todo])
 
   function save() {
     const text = title.trim()
     if (!text) return
-    onSave(todo.id, { title: text, note: note.trim(), due: fromDateValue(date) })
+    onSave(todo.id, {
+      title: text,
+      note: note.trim(),
+      due: fromDateTimeValue(date),
+    })
     onClose()
   }
 
@@ -78,9 +84,9 @@ export default function TodoSheet({
         </label>
 
         <label className="sheet-field">
-          <span>日期</span>
+          <span>时间</span>
           <input
-            type="date"
+            type="datetime-local"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
