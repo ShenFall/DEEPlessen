@@ -395,3 +395,38 @@
   font-size: var(--fs-11);
   color: var(--red);
 }
+
+/* 资料条目上的删除 */
+.lb-drop-file {
+  flex: none;
+  min-width: 28px;
+  height: 28px;
+  margin-left: 6px;
+  padding: 0 4px;
+  border-radius: 6px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--mute);
+  cursor: pointer;
+}
+
+.lb-drop-file[data-armed='true'] {
+  padding: 0 10px;
+  border: 1px solid var(--red);
+  font-size: var(--fs-11);
+  color: var(--red);
+}
+
+/* 已下架折叠 */
+.lb-more {
+  margin-top: 10px;
+  padding: 4px 0;
+  font-size: var(--fs-11);
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.lb-list--gone {
+  margin-top: 8px;
+  opacity: 0.65;
+}

@@ -109,6 +109,22 @@ export async function listMaterials(
   return out.sort((a, b) => b.lastModified - a.lastModified)
 }
 
+/** 从库目录里删掉一个文件（materials/<课程>/<文件名>） */
+export async function removeMaterial(
+  root: FileSystemDirectoryHandle,
+  path: string,
+) {
+  const parts = path.split('/')
+  let dir: FileSystemDirectoryHandle = root
+  for (const part of parts.slice(0, -1)) {
+    dir = await dir.getDirectoryHandle(part)
+  }
+  const removable = dir as FileSystemDirectoryHandle & {
+    removeEntry(name: string): Promise<void>
+  }
+  await removable.removeEntry(parts[parts.length - 1])
+}
+
 export async function sha1(file: File): Promise<string> {
   const buf = await file.arrayBuffer()
   const digest = await crypto.subtle.digest('SHA-1', buf)

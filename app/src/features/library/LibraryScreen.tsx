@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import {
+  deletePublishRecord,
   exportAll,
   importAll,
   listPublishes,
@@ -14,6 +15,7 @@ import { publishCourseLocal, unpublishLocal } from '../../storage/local'
 import { exportPortal } from '../../storage/portal'
 import {
   copyIntoLibrary,
+  removeMaterial,
   ensureDir,
   hasPermission,
   isSupported,
@@ -85,8 +87,13 @@ export default function LibraryScreen({
   const [kind, setKind] = useState<Kind | 'all'>('all')
   const [sort, setSort] = useState<'recent' | 'name'>('recent')
   const [publishes, setPublishes] = useState<Publish[]>([])
+
+  const livePubs = publishes.filter((p) => p.state !== 'offline')
+  const gonePubs = publishes.filter((p) => p.state === 'offline')
   const [offarm, setOffarm] = useState<string | null>(null)
   const [pending, setPending] = useState<Backup | null>(null)
+  const [showGone, setShowGone] = useState(false)
+  const [killArm, setKillArm] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const groups = useMemo(() => {
@@ -226,6 +233,29 @@ export default function LibraryScreen({
       setNotice(e instanceof Error ? e.message : '下架失败')
     } finally {
       setBusy(false)
+    }
+  }
+
+  async function dropRecord(id: string) {
+    await deletePublishRecord(id)
+    setPublishes(await listPublishes())
+    setNotice('已删除发布记录')
+  }
+
+  async function dropFile(entry: LibraryEntry) {
+    if (!root) return
+    if (killArm !== entry.path) {
+      setKillArm(entry.path)
+      window.setTimeout(() => setKillArm(null), 3000)
+      return
+    }
+    try {
+      await removeMaterial(root, entry.path)
+      setKillArm(null)
+      await refresh(root)
+      setNotice(`已删除 ${entry.name}`)
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '删除失败')
     }
   }
 
@@ -468,6 +498,14 @@ export default function LibraryScreen({
                     <li key={e.path}>
                       <span className="lb-name">{e.name}</span>
                       <span className="lb-meta">{sizeText(e.size)}</span>
+                      <button
+                        type="button"
+                        className="lb-drop-file"
+                        data-armed={killArm === e.path}
+                        onClick={() => void dropFile(e)}
+                      >
+                        {killArm === e.path ? '确认删除' : '×'}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -479,7 +517,7 @@ export default function LibraryScreen({
                 <div className="lb-group-head">
                   <p className="lb-group-title">
                     已发布
-                    <span>{publishes.length}</span>
+                    <span>{livePubs.length}</span>
                   </p>
                   <button
                     type="button"
@@ -490,7 +528,7 @@ export default function LibraryScreen({
                   </button>
                 </div>
                 <ul className="lb-list">
-                  {publishes.map((p) => (
+                  {livePubs.map((p) => (
                     <li key={p.id} className="lb-pub-row">
                       <span className="lb-pub-main">
                         <span className="lb-name">
@@ -508,19 +546,50 @@ export default function LibraryScreen({
                       >
                         复制
                       </button>
-                      {p.state !== 'offline' && (
-                        <button
-                          type="button"
-                          className="lb-pub-act"
-                          data-armed={offarm === p.id}
-                          onClick={() => void unpublish(p)}
-                        >
-                          {offarm === p.id ? '确认下架' : '下架'}
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        className="lb-pub-act"
+                        data-armed={offarm === p.id}
+                        onClick={() => void unpublish(p)}
+                      >
+                        {offarm === p.id ? '确认下架' : '下架'}
+                      </button>
                     </li>
                   ))}
                 </ul>
+
+                {gonePubs.length > 0 && (
+                  <>
+                    <button
+                      type="button"
+                      className="lb-more"
+                      onClick={() => setShowGone((v) => !v)}
+                    >
+                      {showGone ? '收起已下架' : `已下架 ${gonePubs.length}`}
+                    </button>
+                    {showGone && (
+                      <ul className="lb-list lb-list--gone">
+                        {gonePubs.map((p) => (
+                          <li key={p.id} className="lb-pub-row">
+                            <span className="lb-pub-main">
+                              <span className="lb-name">
+                                {p.course} · {p.items.length} 个文件
+                              </span>
+                              <span className="lb-pub-slug">{p.id}</span>
+                            </span>
+                            <button
+                              type="button"
+                              className="lb-pub-act"
+                              onClick={() => void dropRecord(p.id)}
+                            >
+                              删除记录
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
               </section>
             )}
           </>

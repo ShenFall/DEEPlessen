@@ -397,6 +397,10 @@ export async function savePublish(p: Publish) {
   await db.publishes.put(p)
 }
 
+export async function deletePublishRecord(id: string) {
+  await db.publishes.delete(id)
+}
+
 export async function listPublishes(): Promise<Publish[]> {
   const all = await db.publishes.toArray()
   return all.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
