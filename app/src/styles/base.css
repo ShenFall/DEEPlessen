@@ -89,6 +89,22 @@ button {
   color: var(--dim);
 }
 
+.boot-stack {
+  max-width: 760px;
+  max-height: 220px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--mute);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
