@@ -11,6 +11,7 @@ import {
   type Publish,
 } from '../../db'
 import { publishCourseLocal, unpublishLocal } from '../../storage/local'
+import { exportPortal } from '../../storage/portal'
 import {
   copyIntoLibrary,
   ensureDir,
@@ -237,8 +238,22 @@ export default function LibraryScreen({
     }
   }
 
-  async function exportBackup() {
+  async function makePortal() {
+    if (!root || busy) return
+    setBusy(true)
     try {
+      const res = await exportPortal(root)
+      setNotice(
+        `学生门户已导出到 portal/（${res.courses} 门课 · ${res.files} 个文件）`,
+      )
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '导出失败')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function exportBackup() {    try {
       const data = await exportAll()
       const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: 'application/json',
@@ -462,6 +477,13 @@ export default function LibraryScreen({
                     已发布
                     <span>{publishes.length}</span>
                   </p>
+                  <button
+                    type="button"
+                    className="lb-publish"
+                    onClick={() => void makePortal()}
+                  >
+                    导出学生门户
+                  </button>
                 </div>
                 <ul className="lb-list">
                   {publishes.map((p) => (
