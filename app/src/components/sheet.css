@@ -98,6 +98,18 @@
   color: var(--red);
 }
 
+.sheet-hint {
+  margin: 8px 0 0 52px;
+  font-size: var(--fs-11);
+  color: var(--mute);
+}
+
+.sheet-error {
+  margin: 8px 0 0 52px;
+  font-size: var(--fs-11);
+  color: var(--red);
+}
+
 .sheet-main {
   flex: 1;
   min-height: 42px;
