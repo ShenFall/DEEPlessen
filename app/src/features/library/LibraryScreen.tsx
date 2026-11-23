@@ -243,8 +243,12 @@ export default function LibraryScreen({
     setBusy(true)
     try {
       const res = await exportPortal(root)
+      const big =
+        res.skipped.length > 0
+          ? `；${res.skipped.length} 个超 25MB 未打包，见 large-files.md`
+          : ''
       setNotice(
-        `学生门户已导出到 portal/（${res.courses} 门课 · ${res.files} 个文件）`,
+        `学生门户已导出到 portal/（${res.courses} 门课 · ${res.files} 个文件）${big}`,
       )
     } catch (e) {
       setNotice(e instanceof Error ? e.message : '导出失败')

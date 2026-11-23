@@ -112,7 +112,15 @@ const PORTAL_HTML = `<!doctype html>
 </body>
 </html>`
 
-export type PortalResult = { files: number; courses: number }
+export type PortalResult = {
+  files: number
+  courses: number
+  /** 超过单文件上限、没打进包的文件 */
+  skipped: { course: string; name: string; size: number }[]
+}
+
+/** EdgeOne Pages 单文件 25MB */
+const MAX_FILE = 25 * 1024 * 1024
 
 /**
  * 把已发布的资料打成一个可上传的静态站：
@@ -130,6 +138,7 @@ export async function exportPortal(
   const publishDir = (await root.getDirectoryHandle('publish')) as DirHandle
 
   const courses = new Map<string, { name: string; size: number; url: string }[]>()
+  const skipped: { course: string; name: string; size: number }[] = []
   let count = 0
 
   for (const m of manifests) {
@@ -140,6 +149,10 @@ export async function exportPortal(
     })) as DirHandle
 
     for (const item of m.items) {
+      if (item.size > MAX_FILE) {
+        skipped.push({ course: m.course, name: item.name, size: item.size })
+        continue
+      }
       try {
         const src = await srcFiles.getFileHandle(item.name)
         const data = await src.getFile()
@@ -170,5 +183,20 @@ export async function exportPortal(
   await writeText(portal, 'manifest.json', JSON.stringify(manifest, null, 2))
   await writeText(portal, 'index.html', PORTAL_HTML)
 
-  return { files: count, courses: courses.size }
+  if (skipped.length > 0) {
+    const rows = skipped
+      .map((s) => `| ${s.course} | ${s.name} | ${(s.size / 1048576).toFixed(1)} MB |  |`)
+      .join('\n')
+    await writeText(
+      portal,
+      'large-files.md',
+      `# 未打进包的文件\n\n` +
+        `EdgeOne Pages 单文件上限 25MB。下面这些文件没有复制到 portal/files，\n` +
+        `门户里也不会出现。请把它们传到别处（Gitee / GitHub Release、网盘），\n` +
+        `把链接填进最后一列，然后手工加到 manifest.json 对应课程里，再重新部署。\n\n` +
+        `| 课程 | 文件 | 大小 | 外链 |\n|---|---|---|---|\n${rows}\n`,
+    )
+  }
+
+  return { files: count, courses: courses.size, skipped }
 }
