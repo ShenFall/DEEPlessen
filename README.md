@@ -29,11 +29,27 @@
 
 ## 下载
 
-- **安卓 APK（Debug）**：直接去 [Releases](https://github.com/ShenFall/DEEPlessen/releases) 下载 `shenshi-latest` 里的 APK，公开后无需登录。每次 `app/` 有改动，CI 会自动重建并更新这个 Release。
-- **想看构建日志**：[Actions · 构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml)；登录用户也可从成功运行的 **Artifacts** 取包。
-- 首次使用需先跑一次 CI：在 Actions 页面点 **Run workflow** 手动触发；成功后 Release 才出现。
+| 想要什么 | 去哪拿 |
+|---|---|
+| **安卓 App** | [Releases · shenshi-latest](https://github.com/ShenFall/DEEPlessen/releases/latest) → `app-debug.apk` |
+| 只看构建日志 | [Actions · 构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml) |
 
-> Debug 包可直接安装，更新时需卸载重装。若要自己编译：本机需 JDK 17 + Android SDK，或直接用上面的云端 Actions。
+Release 由 CI 自动更新：`app/` 有改动 → 重新构建 → 覆盖 `shenshi-latest` 里的 APK。**仓库公开后无需登录即可下载。**
+
+> Debug 包可直接安装；升级时先卸载旧版再装。想自己编译需要 JDK 17 + Android SDK，或用上面的云端 Actions。
+
+## 两种构建
+
+一份代码，两个产物——手机端只做待办与点名，桌面端只做资料。
+
+| 命令 | 产物 | 用途 |
+|---|---|---|
+| `npm run dev:mobile` | 端口 5178 | 手机版，底部 tab，任意宽度单列 |
+| `npm run dev:desk` | 端口 5179 | 桌面版，只有资料库 |
+| `npm run build:mobile` | `dist/` | 打进 APK |
+| `npm run build:desk` | `dist-desk/` | 拖到 Cloudflare Pages |
+
+平台由 `--mode` 决定，写进 `index.html` 的 `data-platform`，样式与路由都按它分支。
 
 ## 快速开始
 
@@ -41,11 +57,12 @@
 git clone https://github.com/ShenFall/DEEPlessen.git
 cd DEEPlessen/app
 npm install          # .npmrc 已配国内镜像
-npm run dev          # http://127.0.0.1:5178
-npm run build        # tsc --noEmit + 生产构建
+npm run dev:desk     # 桌面：资料库 → http://127.0.0.1:5179
+npm run dev:mobile   # 手机：待办/点名 → http://127.0.0.1:5178
 ```
 
 学生门户的导出与部署见 [docs/25-publish-guide.md](docs/25-publish-guide.md)。
+双端拆分方案见 [docs/29-platform-split.md](docs/29-platform-split.md)。
 
 ## 设计基线
 

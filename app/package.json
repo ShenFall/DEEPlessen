@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "build:mobile": "tsc --noEmit && vite build --mode mobile --outDir dist-mobile",
+    "build:mobile": "tsc --noEmit && vite build --mode mobile",
     "build:desk": "tsc --noEmit && vite build --mode desk --outDir dist-desk",
     "dev:mobile": "vite --mode mobile --port 5178",
     "dev:desk": "vite --mode desk --port 5179"
