@@ -49,6 +49,23 @@ node tools/build-portal.mjs
 
 **优先拖文件夹。** 实测：把 59.7MB 的 zip 拖进 Cloudflare，会被当成"一个超过 25MB 的文件"直接拒收；拖文件夹则按单个文件逐个上传，23.7MB 的课件不会触发限制。
 
+## 一键部署（命令行）
+
+网页拖拽在这台机器上会报「N 个文件未知」，改用 wrangler：
+
+```bash
+# 首次准备（已做）
+npm i --registry=https://registry.npmmirror.com --prefix tools/.wrangler wrangler@3
+echo <你的 API Token> > tools/.cf-token     # 已 gitignore
+
+# 以后每次
+tools\部署.bat
+```
+
+它自动找桌面上最新的 `deep-portal-site-*` 目录并部署。
+
+**增量是真实的**：实测第二次部署输出 `Uploaded 0 files (46 already uploaded) (1.28 sec)`——只传变化的文件，加一份课件通常几秒传完。
+
 ## 依赖
 
 - 需要 Node.js（你机器上已有，WorkBuddy 自带）
