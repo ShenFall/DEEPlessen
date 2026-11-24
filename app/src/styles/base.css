@@ -393,3 +393,22 @@ html[data-platform='mobile'] .db-grid > * {
   grid-row: auto !important;
   margin-bottom: 12px;
 }
+
+/* 手机版：界面外壳锁死，不随窗口宽度变化 */
+html[data-platform='mobile'] .sh-nav {
+  display: none !important;
+}
+
+html[data-platform='mobile'] .mtabs {
+  display: flex !important;
+  justify-content: space-around;
+}
+
+html[data-platform='mobile'] body {
+  padding-bottom: 66px;
+}
+
+/* 顶栏厚度、字号也按手机来 */
+html[data-platform='mobile'] .sh-inner {
+  padding: 10px 14px;
+}
