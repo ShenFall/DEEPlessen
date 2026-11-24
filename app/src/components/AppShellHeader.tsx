@@ -35,6 +35,20 @@ export default function AppShellHeader({ active, onNav, right }: Props) {
         </button>
         <span className="sh-motto">十年饮冰　难凉热血</span>
 
+
+        <div className="sh-actions">
+        <nav className="sh-nav" aria-label="主导航">
+          {NAV.map((n) => (
+            <button
+              key={n.key}
+              type="button"
+              data-on={active === n.key}
+              onClick={() => onNav(n.key)}
+            >
+              {n.label}
+            </button>
+          ))}
+        </nav>
         <button
           type="button"
           className="sh-theme"
@@ -67,19 +81,7 @@ export default function AppShellHeader({ active, onNav, right }: Props) {
             </svg>
           )}
         </button>
-
-        <nav className="sh-nav" aria-label="主导航">
-          {NAV.map((n) => (
-            <button
-              key={n.key}
-              type="button"
-              data-on={active === n.key}
-              onClick={() => onNav(n.key)}
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
+        </div>
 
         {right ? <div className="sh-right">{right}</div> : null}
       </div>

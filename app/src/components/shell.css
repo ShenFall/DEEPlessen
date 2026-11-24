@@ -45,17 +45,31 @@
   color: var(--dim);
 }
 
+.sh-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.sh-actions .sh-nav {
+  margin-left: 0;
+}
+
+/* 主题切换：独立按钮，与品牌同高 */
 .sh-theme {
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin-left: 8px;
+  width: 30px;
+  height: 26px;
+  border: 1px solid var(--line);
   border-radius: 8px;
+  background: transparent;
   color: var(--dim);
   cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .sh-theme svg {
@@ -65,7 +79,8 @@
 
 .sh-theme:hover {
   color: var(--amber);
-  background: rgba(180, 118, 44, 0.08);
+  border-color: var(--amber);
+  background: rgba(180, 118, 44, 0.06);
 }
 
 .sh-motto {
