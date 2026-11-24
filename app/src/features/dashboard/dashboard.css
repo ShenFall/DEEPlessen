@@ -567,3 +567,8 @@
     border-top: 0;
   }
 }
+
+/* 勾选导致行位置变化时，不要触发浏览器的滚动锚定补偿 */
+.db-main {
+  overflow-anchor: none;
+}

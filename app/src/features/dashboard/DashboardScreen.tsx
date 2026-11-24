@@ -14,7 +14,7 @@ type Props = {
   onLibrary: () => void
   onTodos: () => void
   onAddTodo: (title: string, due?: string) => void
-  onToggleTodo: (id: string, done: boolean) => void
+  onToggleTodo: (id: string, done: boolean) => void | Promise<void>
   onDeleteTodo: (id: string) => void
   onOpenTodo: (todo: Todo) => void
   onOpenAssignment: (assignment: Assignment) => void
@@ -99,15 +99,18 @@ export default function DashboardScreen({
 
   const total = rows.length
 
-  function toggle(t: Todo, done: boolean) {
-    setJustDone((list) =>
-      done
-        ? list.some((x) => x.id === t.id)
-          ? list
-          : [...list, t]
-        : list.filter((x) => x.id !== t.id),
-    )
-    onToggleTodo(t.id, done)
+  async function toggle(t: Todo, done: boolean) {
+    if (done) {
+      setJustDone((list) =>
+        list.some((x) => x.id === t.id) ? list : [...list, t],
+      )
+      await onToggleTodo(t.id, done)
+      return
+    }
+    // 取消完成：先留在列表里，等数据库与看板数据同步后再移除，
+    // 否则这一行会短暂消失，列表高度变化会让页面往上跳
+    await onToggleTodo(t.id, done)
+    setJustDone((list) => list.filter((x) => x.id !== t.id))
   }
 
   return (

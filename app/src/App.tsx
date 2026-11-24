@@ -198,7 +198,7 @@ export default function App() {
         <TodosScreen
           todos={todosAll}
           onNav={(k) => setView(k)}
-          onToggle={(id, done) => void toggleTodo(id, done)}
+          onToggle={(id, done) => toggleTodo(id, done)}
           onDelete={(id) => void removeTodo(id)}
           onOpenTodo={setEditingTodo}
           onAdd={(title, due) => void addTodo(title, due)}
@@ -208,7 +208,7 @@ export default function App() {
             todo={editingTodo}
             onClose={() => setEditingTodo(null)}
             onSave={(id, patch) => void saveTodo(id, patch)}
-            onToggle={(id, done) => void toggleTodo(id, done)}
+            onToggle={(id, done) => toggleTodo(id, done)}
             onDelete={(id) => void removeTodo(id)}
           />
         )}
@@ -229,7 +229,7 @@ export default function App() {
         onLibrary={() => setView('library')}
         onTodos={() => setView('todos')}
         onAddTodo={(title, due) => void addTodo(title, due)}
-        onToggleTodo={(id, done) => void toggleTodo(id, done)}
+        onToggleTodo={(id, done) => toggleTodo(id, done)}
         onDeleteTodo={(id) => void removeTodo(id)}
         onOpenTodo={setEditingTodo}
         onOpenAssignment={setEditingAssignment}
@@ -239,7 +239,7 @@ export default function App() {
             todo={editingTodo}
             onClose={() => setEditingTodo(null)}
             onSave={(id, patch) => void saveTodo(id, patch)}
-            onToggle={(id, done) => void toggleTodo(id, done)}
+            onToggle={(id, done) => toggleTodo(id, done)}
             onDelete={(id) => {
               void removeTodo(id)
               setEditingTodo(null)
