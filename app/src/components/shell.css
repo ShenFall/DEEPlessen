@@ -45,6 +45,29 @@
   color: var(--dim);
 }
 
+.sh-theme {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
+  border-radius: 8px;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.sh-theme svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sh-theme:hover {
+  color: var(--amber);
+  background: rgba(180, 118, 44, 0.08);
+}
+
 .sh-motto {
   flex: none;
   padding-left: 10px;
@@ -58,7 +81,30 @@
 }
 
 @media (max-width: 380px) {
-  .sh-motto {
+  .sh-theme {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
+  border-radius: 8px;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.sh-theme svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sh-theme:hover {
+  color: var(--amber);
+  background: rgba(180, 118, 44, 0.08);
+}
+
+.sh-motto {
     display: none;
   }
 }

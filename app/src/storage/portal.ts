@@ -105,6 +105,13 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .motto{margin:34px 0 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;
   font-family:Georgia,"Songti SC",serif;font-size:13px;letter-spacing:.22em;color:var(--gold);opacity:.72}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0a1220;--card:#111c2e;--line:rgba(255,255,255,.12);--ink:#e9eef8;
+    --dim:#9aa8bd;--gold:#d38a43;--chip:#16233a}
+  body{background:radial-gradient(110% 46% at 84% -8%,rgba(91,140,240,.16),transparent 62%),var(--bg)}
+  .frag{mix-blend-mode:screen;filter:invert(1) brightness(1.1);opacity:.14}
+  .motto{border-top-color:var(--line)}
+}
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){
   .topbar,.topbar .inner,.topbar h1,.who,.meta,.field input,.kinds{transition:none}

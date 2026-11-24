@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { Boundary } from './Boundary'
+import { readTheme } from './lib/theme'
 import './styles/tokens.css'
 import './styles/base.css'
 
@@ -9,17 +10,20 @@ import './styles/base.css'
 const lightQuery = window.matchMedia('(prefers-color-scheme: light)')
 const narrowQuery = window.matchMedia('(max-width: 720px)')
 
-function applyTheme() {
-  document.documentElement.dataset.theme = narrowQuery.matches
-    ? 'paper'
-    : lightQuery.matches
-      ? 'paper'
-      : 'void'
+function systemTheme(): 'paper' | 'void' {
+  if (narrowQuery.matches) return 'paper'
+  return lightQuery.matches ? 'paper' : 'void'
 }
 
-applyTheme()
-lightQuery.addEventListener('change', applyTheme)
-narrowQuery.addEventListener('change', applyTheme)
+function sync() {
+  // 用户手动选过就以选择为准，否则跟随系统
+  const saved = readTheme()
+  document.documentElement.dataset.theme = saved ?? systemTheme()
+}
+
+sync()
+lightQuery.addEventListener('change', sync)
+narrowQuery.addEventListener('change', sync)
 
 /**
  * 开发环境不保留 Service Worker：

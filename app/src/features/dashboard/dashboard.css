@@ -531,9 +531,9 @@
   }
 }
 
-/* 手机端：看板并入纸白体系，与待办/作业一致 */
+/* 手机端：看板并入纸白体系，与待办/作业一致（仅纸白主题） */
 @media (max-width: 720px) {
-  .db {
+  [data-theme='paper'] .db {
     --void: transparent;
     --panel: #ffffff;
     --panel-solid: #ffffff;

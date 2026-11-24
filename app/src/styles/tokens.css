@@ -42,6 +42,26 @@
   color-scheme: dark;
 }
 
+
+/* 深夜：蓝黑纸面，线稿转白 */
+[data-theme="night"] {
+  --bg: #0a1220;
+  --surface: #111c2e;
+  --cell: #16233a;
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #e9eef8;
+  --dim: #9aa8bd;
+  --mute: #6f7f95;
+  --gold: #d38a43;
+  --amber: #d38a43;
+  --red: #e2603f;
+  --green: #6fa05a;
+  --signal: #5b8cf0;
+  --cell-edge: rgba(211, 138, 67, 0.5);
+  --paid-fill: rgba(255, 255, 255, 0.04);
+  color-scheme: dark;
+}
+
 /* 旧纸：白天 / 教室强光下用 */
 [data-theme="paper"] {
   --bg: #f7f4ee;

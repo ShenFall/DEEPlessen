@@ -275,3 +275,47 @@ button {
     animation: none;
   }
 }
+
+/* ---------- 深夜模式：线稿转白 ---------- */
+[data-theme='night'] body {
+  background: radial-gradient(120% 60% at 80% -10%, rgba(64, 108, 200, 0.18), transparent 62%), var(--bg);
+}
+
+[data-theme='night'] .app-art img {
+  filter: invert(1) brightness(1.15);
+  mix-blend-mode: screen;
+  opacity: 0.16;
+}
+
+[data-theme='night'] .mtabs {
+  background: rgba(10, 18, 32, 0.94);
+}
+
+/* 桌面也铺底纹，但更淡 */
+@media (min-width: 721px) {
+  .app-art {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .app-art img {
+    position: absolute;
+    mix-blend-mode: multiply;
+    opacity: 0.07;
+  }
+
+  .app-art img:first-child {
+    right: -14%;
+    top: -8%;
+    height: 96vh;
+    clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .app-art img:last-child {
+    display: none;
+  }
+}
