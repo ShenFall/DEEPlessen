@@ -105,13 +105,16 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .motto{margin:34px 0 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;
   font-family:Georgia,"Songti SC",serif;font-size:13px;letter-spacing:.22em;color:var(--gold);opacity:.72}
 @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media(prefers-color-scheme:dark){
-  :root{--bg:#0a1220;--card:#111c2e;--line:rgba(255,255,255,.12);--ink:#e9eef8;
-    --dim:#9aa8bd;--gold:#d38a43;--chip:#16233a}
-  body{background:radial-gradient(110% 46% at 84% -8%,rgba(91,140,240,.16),transparent 62%),var(--bg)}
-  .frag{mix-blend-mode:screen;filter:invert(1) brightness(1.1);opacity:.14}
-  .motto{border-top-color:var(--line)}
-}
+[data-theme='night']{--bg:#0a1220;--card:#111c2e;--line:rgba(255,255,255,.12);--ink:#e9eef8;
+  --dim:#9aa8bd;--gold:#d38a43;--chip:#16233a}
+[data-theme='night'] body{background:radial-gradient(110% 46% at 84% -8%,rgba(91,140,240,.16),transparent 62%),var(--bg)}
+[data-theme='night'] .frag{mix-blend-mode:screen;filter:invert(1) brightness(1.1);opacity:.14}
+[data-theme='night'] .motto{border-top-color:var(--line)}
+
+.theme{position:fixed;top:12px;right:12px;z-index:9;display:flex;align-items:center;justify-content:center;
+  width:34px;height:30px;border:1px solid var(--line);border-radius:9px;background:var(--card);
+  color:var(--gold);font-size:14px;line-height:1;cursor:pointer}
+.theme:active{opacity:.8}
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){
   .topbar,.topbar .inner,.topbar h1,.who,.meta,.field input,.kinds{transition:none}
@@ -129,7 +132,8 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 <header class="topbar" id="topbar">
   <div class="inner">
     <div class="who"><img class="ava" src="brand/avatar.png" alt="" onerror="this.remove()" />ShenFall</div>
-    <h1>课程资料</h1>
+    <button class="theme" id="themebtn" type="button" aria-label="切换深浅">☾</button>
+  <h1>课程资料</h1>
     <p class="meta" id="meta" aria-live="polite">加载中…</p>
     <div class="field"><input id="q" aria-label="搜索文件名或课程" placeholder="搜索文件名或课程" /></div>
     <div class="kinds" id="kinds"></div>
@@ -144,6 +148,20 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 <script>
 (function(){
   var data=null,total=0,kind='all',key='';
+
+  // 主题：默认纸白，按钮切换，选择记在本地
+  var KEY='shenshi:portal-theme', btn=document.getElementById('themebtn');
+  function applyT(t){
+    document.documentElement.dataset.theme = t;
+    try{ localStorage.setItem(KEY,t); }catch(e){}
+    if(btn) btn.textContent = t==='night' ? '☀' : '☾';
+  }
+  var saved='paper';
+  try{ saved = localStorage.getItem(KEY) || 'paper'; }catch(e){}
+  applyT(saved);
+  if(btn) btn.addEventListener('click',function(){
+    applyT(document.documentElement.dataset.theme==='night' ? 'paper' : 'night');
+  });
   var bar=document.getElementById('topbar'),q=document.getElementById('q');
   var MAP={pdf:'文档',doc:'文档',docx:'文档',dot:'文档',txt:'文档',md:'文档',
            xls:'表格',xlsx:'表格',csv:'表格',tsv:'表格',
