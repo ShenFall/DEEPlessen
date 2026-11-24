@@ -29,10 +29,11 @@
 
 ## 下载
 
-| 想要什么 | 去哪拿 |
-|---|---|
-| **安卓 App** | [Releases · shenshi-latest](https://github.com/ShenFall/DEEPlessen/releases/latest) → `app-debug.apk` |
-| 只看构建日志 | [Actions · 构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml) |
+| 想要什么 | 去哪拿 | 国内速度 |
+|---|---|---|
+| **安卓 App（推荐）** | **https://deep-apk-dv6.pages.dev/** —— 一个按钮直接下载 | 快 |
+| 安卓 App（备用） | [Releases · shenshi-latest](https://github.com/ShenFall/DEEPlessen/releases/latest) → `app-debug.apk` | 可能超时 |
+| 构建日志 | [Actions · 构建安卓 APK](https://github.com/ShenFall/DEEPlessen/actions/workflows/android.yml) | — |
 
 Release 由 CI 自动更新：`app/` 有改动 → 重新构建 → 覆盖 `shenshi-latest` 里的 APK。**仓库公开后无需登录即可下载。**
 
