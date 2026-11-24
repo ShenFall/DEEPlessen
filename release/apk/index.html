@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<meta name="theme-color" content="#f7f4ee" />
+<title>深时 · 下载</title>
+<style>
+:root{--bg:#f7f4ee;--card:#fff;--line:#e6e0d5;--ink:#1a1f2a;--dim:#616875;--gold:#8c5a20}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(110% 50% at 84% -8%,rgba(140,90,32,.06),transparent 62%),var(--bg);
+  color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:26px 22px;text-align:center}
+.mark{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:26px;
+  padding:0 10px;border:1px solid var(--gold);border-radius:8px;color:var(--gold);
+  font-family:Georgia,"Songti SC",serif;font-size:12px;letter-spacing:.04em}
+h1{margin:18px 0 6px;font-size:22px;font-weight:600;letter-spacing:-.01em}
+p{margin:0;font-size:13px;color:var(--dim)}
+a.btn{display:block;margin-top:22px;padding:13px;border-radius:10px;background:var(--gold);color:#fff;
+  text-decoration:none;font-size:15px;letter-spacing:.04em}
+a.btn:active{opacity:.9}
+.hint{margin-top:14px;font-size:12px;color:var(--dim);line-height:1.9}
+.motto{margin-top:22px;font-family:Georgia,"Songti SC",serif;font-size:12px;letter-spacing:.2em;color:var(--gold);opacity:.7}
+</style>
+</head>
+<body>
+  <main class="card">
+    <span class="mark">深时</span>
+    <h1>安卓版下载</h1>
+    <p>安装后无需联网也能点名与记待办</p>
+    <a class="btn" href="app-debug.apk" download>下载 APK</a>
+    <p class="hint">
+      下载后点击安装，允许「未知来源」。<br />
+      首次打开是空的，去「点名 → 名单与导入」导一次 Excel。
+    </p>
+    <p class="motto">十年饮冰　难凉热血</p>
+  </main>
+</body>
+</html>
