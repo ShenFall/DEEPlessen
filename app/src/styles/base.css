@@ -312,43 +312,43 @@ button {
     will-change: transform;
   }
 
-  /* 右主块：竖向长条，斜切左缘 */
+  /* 右侧大三角：斜边从右上压到左下，占满整条右边 */
   .app-art img:nth-child(1) {
-    right: -48px;
-    top: -56px;
-    height: 104vh;
-    opacity: 0.1;
-    clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 100%);
+    right: -56px;
+    top: -40px;
+    height: 122vh;
+    opacity: 0.09;
+    clip-path: polygon(100% 0, 100% 100%, 8% 100%);
   }
 
-  /* 左下块：反向，占比最小 */
+  /* 左上大三角：顶边宽、往左下收 */
   .app-art img:nth-child(2) {
     left: -64px;
-    bottom: -48px;
-    height: 52vh;
+    top: -56px;
+    height: 98vh;
     opacity: 0.06;
     transform: rotate(180deg);
-    clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+    clip-path: polygon(0 0, 0 100%, 92% 100%);
   }
 
-  /* 左上小块：横切一道，填顶部的空 */
+  /* 左下三角：竖边在左，斜边向上 */
   .app-art img:nth-child(3) {
-    left: -40px;
-    top: -72px;
-    height: 40vh;
+    left: -36px;
+    bottom: -48px;
+    height: 66vh;
     opacity: 0.05;
     transform: rotate(90deg);
-    clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
   }
 
-  /* 底部中间小块：避开右侧主块，只填页脚上方的空白 */
+  /* 中下偏右的小三角：补页脚上方的空白，不与右侧大三角相撞 */
   .app-art img:nth-child(4) {
-    left: 24%;
-    bottom: -72px;
-    height: 30vh;
-    opacity: 0.045;
+    right: 26%;
+    bottom: -36px;
+    height: 40vh;
+    opacity: 0.04;
     transform: rotate(-90deg);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 26% 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
   }
 
   #root {
@@ -368,18 +368,18 @@ button {
 /* 深夜下的桌面底纹：白线更亮一点，否则几乎看不见 */
 @media (min-width: 721px) {
   [data-theme='night'] .app-art img:nth-child(1) {
-    opacity: 0.16;
+    opacity: 0.14;
   }
 
   [data-theme='night'] .app-art img:nth-child(2) {
-    opacity: 0.1;
+    opacity: 0.09;
   }
 
   [data-theme='night'] .app-art img:nth-child(3) {
-    opacity: 0.12;
+    opacity: 0.08;
   }
 
   [data-theme='night'] .app-art img:nth-child(4) {
-    opacity: 0.11;
+    opacity: 0.07;
   }
 }
