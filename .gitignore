@@ -35,3 +35,6 @@ preview/
 # 分平台构建产物
 dist-mobile/
 dist-desk/
+
+# 分发的 APK 不入库
+release/apk/*.apk
