@@ -139,7 +139,8 @@
 .tz-row[data-done='true'] .tz-name {
   color: var(--dim);
   text-decoration: line-through;
-  text-decoration-color: rgba(154, 166, 184, 0.5);
+  text-decoration-color: var(--mute);
+  text-decoration-thickness: 1.5px;
 }
 
 .tz-due {

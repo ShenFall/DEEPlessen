@@ -356,7 +356,8 @@
 .db-row[data-done='true'] .db-row-title {
   color: var(--dim);
   text-decoration: line-through;
-  text-decoration-color: rgba(154, 166, 184, 0.5);
+  text-decoration-color: var(--mute);
+  text-decoration-thickness: 1.5px;
 }
 
 .db-del {
@@ -538,6 +539,12 @@
     --blue: #2f5bd8;
     --gold: #8c5a20;
     --hair: #e6e0d5;
+    /* 深色皮肤的录入框颜色要一并换掉，否则白底白字 */
+    --tc-text: #1a1f2a;
+    --tc-line: #e6e0d5;
+    --tc-bg: #ffffff;
+    --tc-dim: #616875;
+    --tc-accent: #8c5a20;
     background: transparent;
     color: var(--text);
   }
