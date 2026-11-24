@@ -22,7 +22,9 @@ node tools/build-portal.mjs
 2. 跳过 `portal`、`publish`、`node_modules`、`.git`、`Thumbs.db` 等
 3. 超过 **25MB** 的文件不打包，末尾列出来
 4. 在 `%TEMP%\shenshi-portal\` 拼出门户：`index.html` + `manifest.json` + `files/` + `brand/`
-5. 打包成 `桌面\deep-portal-YYYYMMDD.zip`（index.html 在根目录）
+5. 同时产出两样东西（都在桌面）：
+   - `深时门户-YYYYMMDD\` **文件夹**，拖它上传最稳
+   - `deep-portal-YYYYMMDD.zip` 压缩包，备用
 6. 自动打开 Cloudflare 上传页
 
 ## 输出示例
@@ -42,6 +44,10 @@ node tools/build-portal.mjs
     Capt 3_岩浆作用与岩浆岩 NEW.pptx（89.7 MB）
     Capt 4_外力地质作用与沉积岩NEW.pptx（103.2 MB）
 ```
+
+## 上传时拖哪个
+
+**优先拖文件夹。** 实测：把 59.7MB 的 zip 拖进 Cloudflare，会被当成"一个超过 25MB 的文件"直接拒收；拖文件夹则按单个文件逐个上传，23.7MB 的课件不会触发限制。
 
 ## 依赖
 

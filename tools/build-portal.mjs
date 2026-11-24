@@ -234,6 +234,12 @@ async function main() {
   await collect(TMP, '')
 
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+
+  // 同时产出一个可直接拖拽的文件夹：zip 太大时 Cloudflare 可能当成单文件拒收
+  const outDir = path.join(DESKTOP, `深时门户-${stamp}`)
+  await fsp.rm(outDir, { recursive: true, force: true })
+  await fsp.cp(TMP, outDir, { recursive: true })
+
   const zipPath = path.join(DESKTOP, `deep-portal-${stamp}.zip`)
   await fsp.writeFile(zipPath, buildZip(entries))
 
@@ -243,7 +249,10 @@ async function main() {
   log(`  分组：${courses.size} 个  ·  文件：${packed} 个`)
   log(`  体积：${(total / 1048576).toFixed(1)} MB`)
   log('')
-  log(`  ✅ 已生成：${zipPath}`)
+  log(`  ✅ 文件夹：${outDir}`)
+  log(`  ✅ 压缩包：${zipPath}`)
+  log('')
+  log('  上传时优先拖「文件夹」，zip 体积过大时平台会拒收。')
   if (skipped.length) {
     log('')
     log(`  ⚠️  ${skipped.length} 个文件超过 25MB，未打包：`)
