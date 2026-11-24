@@ -168,7 +168,11 @@ button {
     clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
   }
 
-  .app-art img:last-child {
+  .app-art img:nth-child(n + 3) {
+    display: none;
+  }
+
+  .app-art img:nth-child(2) {
     left: -26%;
     bottom: -12%;
     height: 46vh;
@@ -291,7 +295,7 @@ button {
   background: rgba(10, 18, 32, 0.94);
 }
 
-/* 桌面同款底纹：两块斜切碎片，浓度低于手机以免干扰数据 */
+/* 桌面底纹：四块碎片，钉在四个角上，互不重叠 */
 @media (min-width: 721px) {
   .app-art {
     display: block;
@@ -308,21 +312,43 @@ button {
     will-change: transform;
   }
 
-  .app-art img:first-child {
-    right: -10%;
-    top: -12%;
+  /* 右主块：竖向长条，斜切左缘 */
+  .app-art img:nth-child(1) {
+    right: -48px;
+    top: -56px;
     height: 104vh;
     opacity: 0.1;
     clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 100%);
   }
 
-  .app-art img:last-child {
-    left: -16%;
-    bottom: -16%;
-    height: 56vh;
+  /* 左下块：反向，占比最小 */
+  .app-art img:nth-child(2) {
+    left: -64px;
+    bottom: -48px;
+    height: 52vh;
     opacity: 0.06;
     transform: rotate(180deg);
     clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+  }
+
+  /* 左上小块：横切一道，填顶部的空 */
+  .app-art img:nth-child(3) {
+    left: -40px;
+    top: -72px;
+    height: 40vh;
+    opacity: 0.05;
+    transform: rotate(90deg);
+    clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
+  }
+
+  /* 底部中间小块：避开右侧主块，只填页脚上方的空白 */
+  .app-art img:nth-child(4) {
+    left: 24%;
+    bottom: -72px;
+    height: 30vh;
+    opacity: 0.045;
+    transform: rotate(-90deg);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 26% 100%);
   }
 
   #root {
@@ -341,11 +367,19 @@ button {
 
 /* 深夜下的桌面底纹：白线更亮一点，否则几乎看不见 */
 @media (min-width: 721px) {
-  [data-theme='night'] .app-art img:first-child {
-    opacity: 0.18;
+  [data-theme='night'] .app-art img:nth-child(1) {
+    opacity: 0.16;
   }
 
-  [data-theme='night'] .app-art img:last-child {
+  [data-theme='night'] .app-art img:nth-child(2) {
     opacity: 0.1;
+  }
+
+  [data-theme='night'] .app-art img:nth-child(3) {
+    opacity: 0.12;
+  }
+
+  [data-theme='night'] .app-art img:nth-child(4) {
+    opacity: 0.11;
   }
 }
