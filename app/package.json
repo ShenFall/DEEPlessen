@@ -7,10 +7,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "build:mobile": "VITE_PLATFORM=mobile npm run build",
-    "build:desk": "VITE_PLATFORM=desk npm run build",
-    "dev:mobile": "VITE_PLATFORM=mobile vite",
-    "dev:desk": "VITE_PLATFORM=desk vite"
+    "build:mobile": "tsc --noEmit && vite build --mode mobile --outDir dist-mobile",
+    "build:desk": "tsc --noEmit && vite build --mode desk --outDir dist-desk",
+    "dev:mobile": "vite --mode mobile --port 5178",
+    "dev:desk": "vite --mode desk --port 5179"
   },
   "dependencies": {
     "dexie": "^4.4.7",
