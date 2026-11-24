@@ -55,7 +55,7 @@ offline-first  pwa  capacitor  react  vite  education  classroom  chinese
 
 | 检查 | 现状 | 处理 |
 |---|---|---|
-| 示例名单 `app/src/data/roster.ts` | 30 条：林嘉禾、陈知远、王思睿、李子衿 … | **若这些是真实同学，请先换成假名**；看起来是编排的示例名，但需你确认 |
+| 示例名单 `app/src/data/roster.ts` | 30 条：林嘉禾、陈知远、王思睿、李子衿 … | 你已确认是**示例名单**，可公开；若后来换成真实名单，切记不要提交 |
 | 学号格式 | `0108260001` 起，规则化 | 同上，确认非真实学号 |
 | 设计素材 | `deep-visual-assets_assets/` 14 张、**17 MB** | 占了仓库一半体积。想瘦身可移到 `docs/images/` 压缩到 2 MB 以内；README 第 54 行有引用，移动后要同步改 |
 

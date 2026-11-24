@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import './mobile-tabs.css'
 
 export type TabKey = 'todos' | 'list' | 'dashboard'
@@ -28,6 +29,30 @@ export default function MobileTabs({
   active: TabKey
   onNav: (key: TabKey) => void
 }) {
+  /** 键盘弹起时把底栏藏起来，否则它会浮在键盘上方 */
+  useEffect(() => {
+    const root = document.body
+    const isField = (el: EventTarget | null) => {
+      const node = el as HTMLElement | null
+      if (!node) return false
+      const tag = node.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || node.isContentEditable
+    }
+    const onIn = (e: FocusEvent) => {
+      if (isField(e.target)) root.dataset.typing = 'true'
+    }
+    const onOut = (e: FocusEvent) => {
+      if (isField(e.target)) delete root.dataset.typing
+    }
+    document.addEventListener('focusin', onIn)
+    document.addEventListener('focusout', onOut)
+    return () => {
+      document.removeEventListener('focusin', onIn)
+      document.removeEventListener('focusout', onOut)
+      delete root.dataset.typing
+    }
+  }, [])
+
   return (
     <nav className="mtabs" aria-label="底部导航">
       {TABS.map((t) => (

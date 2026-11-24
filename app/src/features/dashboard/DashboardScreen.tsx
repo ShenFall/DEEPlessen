@@ -67,13 +67,16 @@ export default function DashboardScreen({
   /** 刚勾掉的先留在原地变灰，刷新后才归入已完成 */
   const [justDone, setJustDone] = useState<Todo[]>([])
 
+  const justIds = new Set(justDone.map((t) => t.id))
   const rows: Row[] = [
-    ...data.todos.map<Row>((t) => ({
-      kind: 'todo',
-      todo: t,
-      bucket: bucketOf(t.due),
-      done: false,
-    })),
+    ...data.todos
+      .filter((t) => !justIds.has(t.id))
+      .map<Row>((t) => ({
+        kind: 'todo',
+        todo: t,
+        bucket: bucketOf(t.due),
+        done: false,
+      })),
     ...justDone.map<Row>((t) => ({
       kind: 'todo',
       todo: t,
@@ -97,8 +100,13 @@ export default function DashboardScreen({
   const total = rows.length
 
   function toggle(t: Todo, done: boolean) {
-    if (done) setJustDone((list) => [...list, t])
-    else setJustDone((list) => list.filter((x) => x.id !== t.id))
+    setJustDone((list) =>
+      done
+        ? list.some((x) => x.id === t.id)
+          ? list
+          : [...list, t]
+        : list.filter((x) => x.id !== t.id),
+    )
     onToggleTodo(t.id, done)
   }
 

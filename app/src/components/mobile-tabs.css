@@ -9,6 +9,14 @@
   background: rgba(247, 244, 238, 0.94);
   border-top: 1px solid var(--line);
   backdrop-filter: blur(12px);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+/* 输入时隐藏，避免被软键盘顶起 */
+body[data-typing='true'] .mtabs {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .mtabs button {
