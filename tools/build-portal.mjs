@@ -21,7 +21,8 @@ const ROOT = process.env.SHENSHI_DATA || 'I:\\DataSystem'
 const REPO = path.resolve(import.meta.dirname, '..')
 const TMP = path.join(os.tmpdir(), 'shenshi-portal')
 const DESKTOP = path.join(os.homedir(), 'Desktop')
-const MAX_FILE = 25 * 1024 * 1024
+// 平台上限 25 MiB，留 1 MiB 余量，避免踩线
+const MAX_FILE = 24 * 1024 * 1024
 const UPLOAD_URL = 'https://dash.cloudflare.com/?to=/:account/workers-and-pages'
 
 const SKIP_DIRS = new Set(['portal', 'publish', 'node_modules', '.git', '$RECYCLE.BIN'])
@@ -255,7 +256,7 @@ async function main() {
   log('  上传时优先拖「文件夹」，zip 体积过大时平台会拒收。')
   if (skipped.length) {
     log('')
-    log(`  ⚠️  ${skipped.length} 个文件超过 25MB，未打包：`)
+    log(`  ⚠️  ${skipped.length} 个文件超过 24 MiB（平台上限 25），未打包：`)
     for (const s of skipped.slice(0, 5)) log(`      ${s.name}（${(s.size / 1048576).toFixed(1)} MB）`)
   }
   log('')
