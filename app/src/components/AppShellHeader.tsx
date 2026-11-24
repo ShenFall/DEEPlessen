@@ -1,14 +1,22 @@
 import { useState } from 'react'
 import { applyTheme, currentTheme, nextTheme } from '../lib/theme'
+import { isDesk, isMobile } from '../lib/platform'
 import './shell.css'
 
 export type ShellNav = 'dashboard' | 'todos' | 'list' | 'library'
 
-const NAV: { key: ShellNav; label: string }[] = [
+const ALL_NAV: { key: ShellNav; label: string }[] = [
   { key: 'dashboard', label: '看板' },
   { key: 'list', label: '作业' },
   { key: 'library', label: '资料' },
 ]
+
+/** 手机版不出现「资料」，桌面版只剩「资料」 */
+const NAV = isMobile
+  ? ALL_NAV.filter((n) => n.key !== 'library')
+  : isDesk
+    ? ALL_NAV.filter((n) => n.key === 'library')
+    : ALL_NAV
 
 type Props = {
   active: ShellNav

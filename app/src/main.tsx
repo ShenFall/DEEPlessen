@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import { Boundary } from './Boundary'
 import { readTheme } from './lib/theme'
+import { PLATFORM } from './lib/platform'
 import './styles/tokens.css'
 import './styles/base.css'
 
@@ -20,6 +21,8 @@ function sync() {
   const saved = readTheme()
   document.documentElement.dataset.theme = saved ?? systemTheme()
 }
+
+document.documentElement.dataset.platform = PLATFORM
 
 sync()
 lightQuery.addEventListener('change', sync)

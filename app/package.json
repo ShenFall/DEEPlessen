@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:mobile": "VITE_PLATFORM=mobile npm run build",
+    "build:desk": "VITE_PLATFORM=desk npm run build",
+    "dev:mobile": "VITE_PLATFORM=mobile vite",
+    "dev:desk": "VITE_PLATFORM=desk vite"
   },
   "dependencies": {
     "dexie": "^4.4.7",

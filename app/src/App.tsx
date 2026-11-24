@@ -30,6 +30,7 @@ import TodosScreen from './features/todos/TodosScreen'
 import TodoSheet from './components/TodoSheet'
 import AssignmentSheet from './components/AssignmentSheet'
 import MobileTabs from './components/MobileTabs'
+import { isDesk } from './lib/platform'
 
 type View = 'dashboard' | 'todos' | 'reconcile' | 'list' | 'import' | 'library'
 
@@ -158,6 +159,13 @@ export default function App() {
     )
   }
 
+  // 桌面版就是资料管理器：不挂看板/待办/点名
+  if (isDesk) {
+    return (
+      <LibraryScreen onNav={() => undefined} onRestored={() => undefined} />
+    )
+  }
+
   if (!ready) {
     return (
       <main className="boot">
@@ -212,7 +220,7 @@ export default function App() {
             onDelete={(id) => void removeTodo(id)}
           />
         )}
-        <MobileTabs active="todos" onNav={(k) => setView(k)} />
+        {!isDesk && <MobileTabs active="todos" onNav={(k) => setView(k)} />}
       </>
     )
   }
