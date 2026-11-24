@@ -222,6 +222,7 @@ export default function App() {
       <>
         <DashboardScreen
         data={dash}
+        doneTodos={todosAll.filter((t) => t.done)}
         paidCounts={counts}
         onNav={(k) => setView(k)}
         onOpen={(id) => void open(id)}

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import AppShellHeader, { type ShellNav } from '../../components/AppShellHeader'
 import TodoComposer from '../../components/TodoComposer'
 import type { Assignment, DashboardData, Todo } from '../../db'
@@ -14,6 +13,7 @@ type Props = {
   onLibrary: () => void
   onTodos: () => void
   onAddTodo: (title: string, due?: string) => void
+  doneTodos: Todo[]
   onToggleTodo: (id: string, done: boolean) => void | Promise<void>
   onDeleteTodo: (id: string) => void
   onOpenTodo: (todo: Todo) => void
@@ -52,6 +52,7 @@ type Row =
 
 export default function DashboardScreen({
   data,
+  doneTodos,
   paidCounts,
   onNav,
   onOpen,
@@ -65,19 +66,15 @@ export default function DashboardScreen({
   onOpenAssignment,
 }: Props) {
   /** 刚勾掉的先留在原地变灰，刷新后才归入已完成 */
-  const [justDone, setJustDone] = useState<Todo[]>([])
 
-  const justIds = new Set(justDone.map((t) => t.id))
   const rows: Row[] = [
-    ...data.todos
-      .filter((t) => !justIds.has(t.id))
-      .map<Row>((t) => ({
-        kind: 'todo',
-        todo: t,
-        bucket: bucketOf(t.due),
-        done: false,
-      })),
-    ...justDone.map<Row>((t) => ({
+    ...data.todos.map<Row>((t) => ({
+      kind: 'todo',
+      todo: t,
+      bucket: bucketOf(t.due),
+      done: false,
+    })),
+    ...doneTodos.map<Row>((t) => ({
       kind: 'todo',
       todo: t,
       bucket: bucketOf(t.due),
@@ -97,20 +94,11 @@ export default function DashboardScreen({
     }),
   ]
 
-  const total = rows.length
+  const isDone = (r: Row) => r.kind === 'todo' && r.done
+  const total = rows.filter((r) => !isDone(r)).length
 
-  async function toggle(t: Todo, done: boolean) {
-    if (done) {
-      setJustDone((list) =>
-        list.some((x) => x.id === t.id) ? list : [...list, t],
-      )
-      await onToggleTodo(t.id, done)
-      return
-    }
-    // 取消完成：先留在列表里，等数据库与看板数据同步后再移除，
-    // 否则这一行会短暂消失，列表高度变化会让页面往上跳
-    await onToggleTodo(t.id, done)
-    setJustDone((list) => list.filter((x) => x.id !== t.id))
+  function toggle(t: Todo, done: boolean) {
+    void onToggleTodo(t.id, done)
   }
 
   return (
@@ -151,7 +139,9 @@ export default function DashboardScreen({
             )}
 
             {BUCKETS.map(({ key, label }) => {
-              const group = rows.filter((r) => r.bucket === key)
+              const group = rows
+        .filter((r) => r.bucket === key)
+        .sort((a, b) => Number(isDone(a)) - Number(isDone(b)))
               if (group.length === 0) return null
               return (
                 <div key={key} className="db-group">
