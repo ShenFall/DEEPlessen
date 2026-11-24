@@ -26,6 +26,13 @@ const MAX_FILE = 24 * 1024 * 1024
 const UPLOAD_URL = 'https://dash.cloudflare.com/?to=/:account/workers-and-pages'
 
 const SKIP_DIRS = new Set(['portal', 'publish', 'node_modules', '.git', '$RECYCLE.BIN'])
+// SHENSHI_EXCLUDE=地科,答案  逗号分隔，用于分批上线
+const EXCLUDE = new Set(
+  (process.env.SHENSHI_EXCLUDE || '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean),
+)
 const SKIP_FILES = new Set(['Thumbs.db', 'desktop.ini', '.DS_Store'])
 
 function log(...args) {
@@ -163,6 +170,10 @@ async function main() {
     const full = path.join(ROOT, entry.name)
     if (entry.isDirectory()) {
       if (SKIP_DIRS.has(entry.name)) continue
+      if (EXCLUDE.has(entry.name)) {
+        log(`  跳过分组：${entry.name}`)
+        continue
+      }
       await walk(full, entry.name, files)
     } else if (!SKIP_FILES.has(entry.name)) {
       const stat = await fsp.stat(full)
@@ -237,7 +248,7 @@ async function main() {
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
 
   // 同时产出一个可直接拖拽的文件夹：zip 太大时 Cloudflare 可能当成单文件拒收
-  const outDir = path.join(DESKTOP, `深时门户-${stamp}`)
+  const outDir = path.join(DESKTOP, `deep-portal-site-${stamp}`)
   await fsp.rm(outDir, { recursive: true, force: true })
   await fsp.cp(TMP, outDir, { recursive: true })
 
