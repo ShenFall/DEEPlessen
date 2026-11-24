@@ -291,7 +291,7 @@ button {
   background: rgba(10, 18, 32, 0.94);
 }
 
-/* 桌面也铺底纹，但更淡 */
+/* 桌面同款底纹：两块斜切碎片，浓度低于手机以免干扰数据 */
 @media (min-width: 721px) {
   .app-art {
     display: block;
@@ -305,17 +305,47 @@ button {
   .app-art img {
     position: absolute;
     mix-blend-mode: multiply;
-    opacity: 0.07;
+    will-change: transform;
   }
 
   .app-art img:first-child {
-    right: -14%;
-    top: -8%;
-    height: 96vh;
-    clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 100%);
+    right: -10%;
+    top: -12%;
+    height: 104vh;
+    opacity: 0.1;
+    clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 100%);
   }
 
   .app-art img:last-child {
-    display: none;
+    left: -16%;
+    bottom: -16%;
+    height: 56vh;
+    opacity: 0.06;
+    transform: rotate(180deg);
+    clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* 页面根节点统一透明，底纹才能透到全局（含电脑端） */
+.tz,
+.al,
+.db,
+.lb {
+  background: transparent;
+}
+
+/* 深夜下的桌面底纹：白线更亮一点，否则几乎看不见 */
+@media (min-width: 721px) {
+  [data-theme='night'] .app-art img:first-child {
+    opacity: 0.18;
+  }
+
+  [data-theme='night'] .app-art img:last-child {
+    opacity: 0.1;
   }
 }
