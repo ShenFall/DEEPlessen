@@ -31,3 +31,7 @@ exports/
 
 # 本地门户预览（demo 数据，可随时重建）
 preview/
+
+# 分平台构建产物
+dist-mobile/
+dist-desk/
