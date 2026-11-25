@@ -115,6 +115,11 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
   width:34px;height:30px;border:1px solid var(--line);border-radius:9px;background:var(--card);
   color:var(--gold);font-size:14px;line-height:1;cursor:pointer}
 .theme:active{opacity:.8}
+/* 搜索态：收起首屏留白，让列表紧贴搜索栏 */
+body.searching .space{display:none}
+body.searching .topbar{position:static;transform:none;top:auto;padding-top:16px;padding-bottom:10px}
+body.searching .wrap{padding-top:4px}
+
 @media(hover:hover){a:hover{background:#faf7f1}}
 @media(prefers-reduced-motion:reduce){
   .topbar,.topbar .inner,.topbar h1,.who,.meta,.field input,.kinds{transition:none}
@@ -277,9 +282,35 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
     document.getElementById('kinds').innerHTML='';
   });
 
-  q.addEventListener('input',function(e){ key=(e.target.value||'').trim().toLowerCase(); render(false); sync(); });
-  q.addEventListener('focus',sync);
-  q.addEventListener('blur',function(){ setTimeout(sync,120); });
+  function setSearching(on){ document.body.classList.toggle('searching',!!on); }
+
+  q.addEventListener('input',function(e){
+    key=(e.target.value||'').trim().toLowerCase();
+    if(key) setSearching(true);
+    render(false); sync();
+  });
+  q.addEventListener('focus',function(){
+    setSearching(true);
+    // 键盘弹起后可视区变矮，把页面拉回顶部，列表才在眼前
+    window.scrollTo({top:0,behavior:'smooth'});
+    sync();
+  });
+  q.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      setSearching(true);
+      key=(q.value||'').trim().toLowerCase();
+      render(false); sync();
+      q.blur();                       // 收起软键盘
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  });
+  q.addEventListener('blur',function(){
+    setTimeout(function(){
+      if(!(q.value||'').trim()) setSearching(false);
+      sync();
+    },120);
+  });
   window.addEventListener('scroll',sync,{passive:true});
 })();
 </script>
