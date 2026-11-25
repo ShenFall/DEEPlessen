@@ -27,6 +27,9 @@ const UPLOAD_URL = 'https://dash.cloudflare.com/?to=/:account/workers-and-pages'
 
 const SKIP_DIRS = new Set(['portal', 'publish', 'node_modules', '.git', '$RECYCLE.BIN'])
 // SHENSHI_EXCLUDE=地科,答案  逗号分隔，用于分批上线
+// SHENSHI_FLAT=1 时直接用原始目录名（服务器上可读、可手动增删）
+const FLAT = process.env.SHENSHI_FLAT === '1'
+
 const EXCLUDE = new Set(
   (process.env.SHENSHI_EXCLUDE || '')
     .split(',')
@@ -197,10 +200,12 @@ async function main() {
       skipped.push(f)
       continue
     }
-    const folder = `${f.group}-${createHash('sha1')
-      .update(f.group + f.name)
-      .digest('hex')
-      .slice(0, 6)}`
+    const folder = FLAT
+      ? f.group
+      : `${f.group}-${createHash('sha1')
+          .update(f.group + f.name)
+          .digest('hex')
+          .slice(0, 6)}`
     const destDir = path.join(TMP, 'files', folder)
     await fsp.mkdir(destDir, { recursive: true })
     await fsp.copyFile(f.from, path.join(destDir, f.name))
