@@ -45,3 +45,4 @@ tools/.wrangler/
 
 # 本机实况（含 IP、端口、凭据），不入库
 local/
+tools/.cf-account

@@ -8,7 +8,7 @@
 param(
   [string]$Dir = "",
   [string]$Project = "deep-portal",
-  [string]$AccountId = "bda4b1da20fe4ba474d76807e9d7dd6f"
+  [string]$AccountId = ""
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,6 +21,16 @@ if (-not (Test-Path $tokenFile)) { throw "缺少 tools\.cf-token（内容为 Clo
 
 $token = (Get-Content $tokenFile -Raw).Trim()
 if (-not $token) { throw "tools\.cf-token 是空的" }
+
+# 账户 ID 不入库：优先参数 → 环境变量 → 本地文件
+if (-not $AccountId) { $AccountId = $env:CLOUDFLARE_ACCOUNT_ID }
+$accountFile = Join-Path $PSScriptRoot ".cf-account"
+if (-not $AccountId -and (Test-Path $accountFile)) {
+  $AccountId = (Get-Content $accountFile -Raw).Trim()
+}
+if (-not $AccountId) {
+  throw "缺少 Cloudflare 账户 ID：写入 tools\.cf-account（一行），或设置环境变量 CLOUDFLARE_ACCOUNT_ID"
+}
 
 if (-not $Dir) {
   $latest = Get-ChildItem "$env:USERPROFILE\Desktop" -Directory -Filter "deep-portal-site-*" |
