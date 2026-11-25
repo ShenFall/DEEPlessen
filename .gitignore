@@ -42,3 +42,6 @@ release/apk/*.apk
 # Cloudflare API Token（本机专用）
 tools/.cf-token
 tools/.wrangler/
+
+# 本机实况（含 IP、端口、凭据），不入库
+local/
