@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f7f4ee" />
+<title>ShenFall · 个人主页</title>
+<meta name="description" content="ShenFall 的个人主页：在读，课余写点代码。记录正在做的自用工具与日常整理。" />
+<meta property="og:title" content="ShenFall · 个人主页" />
+<meta property="og:description" content="在读，课余写点代码。把日常磨成工具。" />
+<meta property="og:type" content="website" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<script>document.documentElement.className += ' js'</script>
+<style>
+:root{
+  --bg:#f7f4ee; --panel:#fbf9f4; --ink:#171b22; --ink-2:#3d444f; --dim:#5c6472;
+  --line:rgba(23,27,34,.14); --line-soft:rgba(23,27,34,.08);
+  --gold:#8c5a20; --gold-soft:rgba(140,90,32,.10);
+  --sel:#eadfc9;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  --serif:Georgia,"Times New Roman","Songti SC","Noto Serif CJK SC",serif;
+}
+[data-theme="dark"]{
+  --bg:#0a0e16; --panel:#101623; --ink:#e9e7e1; --ink-2:#c3c6cd; --dim:#98a1b0;
+  --line:rgba(255,255,255,.14); --line-soft:rgba(255,255,255,.08);
+  --gold:#d8a05c; --gold-soft:rgba(216,160,92,.10);
+  --sel:rgba(216,160,92,.26);
+}
+*{box-sizing:border-box}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100dvh;display:flex;flex-direction:column;
+  color:var(--ink);background:var(--bg);font:16px/1.75 var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit}
+::selection{background:var(--sel);color:var(--ink)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+main{flex:1 0 auto}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
+.rule{height:1px;background:var(--line-soft);border:0;margin:0}
+
+/* 顶栏 */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  -webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1);
+  border-bottom:1px solid transparent;transition:border-color .3s var(--ease)}
+.top.stuck{border-bottom-color:var(--line-soft)}
+.top .wrap{display:flex;align-items:center;gap:14px;height:64px}
+.mark{flex:none;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;
+  display:grid;place-items:center;font-family:var(--serif);font-size:17px;line-height:1;
+  color:var(--ink);text-decoration:none}
+.mark:hover{border-color:var(--gold);color:var(--gold)}
+.brand{display:flex;flex-direction:column;line-height:1.25;text-decoration:none}
+.brand b{font-size:14px;font-weight:600;letter-spacing:.01em}
+.brand i{font-style:normal;font-size:11px;color:var(--dim);letter-spacing:.16em}
+.nav{margin-left:auto;display:flex;align-items:center;gap:26px}
+.nav a{font-size:13px;color:var(--dim);text-decoration:none;letter-spacing:.04em;
+  padding:4px 0;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.nav a:hover,.nav a:focus-visible{color:var(--ink);border-bottom-color:var(--gold)}
+.theme{flex:none;width:34px;height:30px;margin-left:6px;display:grid;place-items:center;
+  border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--gold);
+  cursor:pointer;font:inherit;font-size:13px;line-height:1}
+.theme:hover{background:var(--gold-soft)}
+
+/* 首屏 */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line-soft)}
+.hero .wrap{position:relative;z-index:1;padding-top:96px;padding-bottom:88px}
+.orbit{position:absolute;right:-90px;top:-70px;width:520px;height:520px;z-index:0;
+  color:var(--ink);opacity:.5;pointer-events:none;
+  -webkit-mask-image:radial-gradient(closest-side,#000 52%,transparent 100%);
+  mask-image:radial-gradient(closest-side,#000 52%,transparent 100%)}
+[data-theme="dark"] .orbit{opacity:.42}
+.kicker{font-family:var(--serif);font-style:italic;font-size:12px;letter-spacing:.2em;
+  color:var(--gold);margin:0 0 26px;text-transform:uppercase}
+h1{margin:0;font-size:clamp(34px,5.4vw,58px);line-height:1.24;font-weight:600;letter-spacing:-.025em}
+h1 em{font-style:normal;color:var(--dim);font-weight:400}
+.lede{max-width:34em;margin:26px 0 0;font-size:16px;color:var(--ink-2);line-height:1.85}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin:40px 0 0;padding:0;list-style:none;
+  font-size:12px;color:var(--dim);letter-spacing:.04em}
+.facts li{display:flex;align-items:center;gap:8px}
+.facts li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.75}
+
+/* 章节 */
+.sec{display:grid;grid-template-columns:96px minmax(0,1fr);gap:34px;
+  padding-top:74px;padding-bottom:74px}
+.sec + .sec{border-top:1px solid var(--line-soft)}
+.num{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:.12em;color:var(--gold);
+  padding-top:6px;font-variant-numeric:tabular-nums}
+.sec h2{margin:0 0 14px;font-size:22px;letter-spacing:-.01em;font-weight:600}
+.sec .intro{margin:0 0 36px;color:var(--ink-2);max-width:40em}
+
+/* 在做 */
+.works{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--line);
+  border-left:1px solid var(--line)}
+.work{display:flex;flex-direction:column;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:26px 24px 28px;
+  background:transparent;transition:background .25s var(--ease)}
+.work:hover{background:var(--panel)}
+.work .tag{display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.14em;
+  color:var(--gold);font-variant-numeric:tabular-nums;margin-bottom:16px}
+.work .tag s{width:14px;height:1px;background:currentColor;opacity:.6}
+.work h3{margin:0 0 10px;font-size:16px;font-weight:600;letter-spacing:.01em}
+.work p{margin:0;max-width:34em;font-size:13.5px;line-height:1.8;color:var(--dim)}
+.work .meta{margin-top:auto;padding-top:18px;font-size:11px;letter-spacing:.1em;color:var(--dim);opacity:.85;
+  font-variant-numeric:tabular-nums}
+
+/* 时间线 */
+.log{list-style:none;margin:0;padding:0;border-top:1px solid var(--line-soft)}
+.log li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:24px;padding:18px 0;
+  border-bottom:1px solid var(--line-soft)}
+.log time{font-family:var(--serif);font-style:italic;font-size:12.5px;letter-spacing:.1em;
+  color:var(--dim);font-variant-numeric:tabular-nums;padding-top:3px}
+.log p{margin:0;font-size:14.5px;color:var(--ink-2)}
+.log li:hover p{color:var(--ink)}
+
+/* 关于 */
+.about{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:52px}
+.about p{margin:0 0 18px;font-size:15px;line-height:1.95;color:var(--ink-2);max-width:36em}
+.about p:last-child{margin-bottom:0}
+.spec{margin:0;padding:0;border-top:1px solid var(--line)}
+.spec div{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line-soft);
+  font-size:12.5px}
+.spec dt{color:var(--dim);letter-spacing:.04em}
+.spec dd{margin:0;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.contact{margin:30px 0 0;font-size:13px;color:var(--dim)}
+.contact a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:1px}
+.contact a:hover{color:var(--gold)}
+
+/* 页脚 */
+.foot{padding:34px 0 46px;border-top:1px solid var(--line-soft)}
+.foot .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:baseline;
+  font-size:11.5px;color:var(--dim);letter-spacing:.05em}
+.foot .r{margin-left:auto;display:flex;gap:22px;flex-wrap:wrap}
+.foot a{text-decoration:none;color:var(--dim)}
+.foot a:hover{color:var(--gold)}
+.icp{color:var(--dim)}
+
+/* 入场（仅 JS 可用时才隐藏，否则内容直接可见） */
+.rv{transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.js .rv{opacity:0;transform:translateY(12px)}
+.js .rv.in{opacity:1;transform:none}
+.hero .rv{transition-delay:calc(var(--d,0) * 90ms)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none;transition:none}
+}
+
+@media (max-width:860px){
+  .hero .wrap{padding-top:72px;padding-bottom:64px}
+  .orbit{width:380px;height:380px;right:-150px;top:-90px;opacity:.3}
+  .o-dot{display:none}
+  .sec{grid-template-columns:1fr;gap:18px;padding-top:56px;padding-bottom:56px}
+  .num{padding-top:0}
+  .works{grid-template-columns:1fr}
+  .about{grid-template-columns:1fr;gap:32px}
+  .nav{gap:18px}
+  .nav a{font-size:12.5px}
+}
+@media (max-width:520px){
+  .wrap{padding:0 20px}
+  h1{font-size:30px;line-height:1.3}
+  .lede{font-size:15px}
+  .facts{gap:8px 18px}
+  .log li{grid-template-columns:1fr;gap:4px}
+  .brand i{display:none}
+  .foot .r{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="回到顶部">深</a>
+    <a class="brand" href="#top">
+      <b>ShenFall</b>
+      <i>个人主页</i>
+    </a>
+    <nav class="nav" aria-label="页面导航">
+      <a href="#works">在做</a>
+      <a href="#log">记</a>
+      <a href="#about">关于</a>
+      <button class="theme" id="theme" type="button" aria-label="切换深浅主题">◑</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <svg class="orbit" viewBox="0 0 520 520" fill="none" aria-hidden="true">
+      <g stroke="currentColor" stroke-opacity=".16">
+        <circle cx="260" cy="260" r="238" />
+        <circle cx="260" cy="260" r="186" stroke-dasharray="2 7" />
+        <circle cx="260" cy="260" r="134" />
+        <circle cx="260" cy="260" r="78" stroke-opacity=".1" />
+      </g>
+      <circle class="o-dot" cx="379.5" cy="117.5" r="3.2" fill="#8c5a20" />
+      <circle class="o-dot" cx="138.6" cy="203.4" r="2.2" fill="#8c5a20" fill-opacity=".7" />
+      <circle class="o-dot" cx="406" cy="418" r="1.8" fill="currentColor" fill-opacity=".4" />
+      <path class="o-dot" d="M379.5 117.5 L379.5 74" stroke="currentColor" stroke-opacity=".18" />
+    </svg>
+    <div class="wrap">
+      <p class="kicker rv" style="--d:0">ShenFall · a quiet workshop</p>
+      <h1 class="rv" style="--d:1">在读书，<br />顺手把日常<em>磨成工具。</em></h1>
+      <p class="lede rv" style="--d:2">
+        我是 ShenFall。在读，课余写点代码。点名、待办、资料整理——这些每天都要碰的琐事，
+        我习惯自己做一遍，做到顺手为止。
+      </p>
+      <ul class="facts rv" style="--d:3">
+        <li>2026 秋 · 在写「深时」</li>
+        <li>偏好静态与本地</li>
+        <li>不做账号，不设付费</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="works">
+    <p class="num">01 / 在做</p>
+    <div>
+      <h2 class="rv">三件自用的东西</h2>
+      <p class="intro rv">都从一个具体的小麻烦开始。顺手了才留下来，不顺手就删掉。</p>
+      <div class="works">
+        <article class="work rv">
+          <span class="tag"><s></s>手机端</span>
+          <h3>点名与待办</h3>
+          <p>一只手在讲台上就能点完。名单从表格导入，没网也能用。</p>
+          <p class="meta">ANDROID · OFFLINE</p>
+        </article>
+        <article class="work rv">
+          <span class="tag"><s></s>网页端</span>
+          <h3>资料归档</h3>
+          <p>把散在文件夹里的资料归到一处，脚本打成一页索引：按名字、跳字或拼音首字母都能找到。</p>
+          <p class="meta">SCRIPT · STATIC</p>
+        </article>
+        <article class="work rv">
+          <span class="tag"><s></s>只读页</span>
+          <h3>一页索引</h3>
+          <p>不注册、不登录，点开就能取。文件换了重跑一次索引，页面跟着变。</p>
+          <p class="meta">HTML · MANIFEST</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="log">
+    <p class="num">02 / 记</p>
+    <div>
+      <h2 class="rv">最近的几步</h2>
+      <p class="intro rv">不追进度，只记下真正改过的地方。</p>
+      <ol class="log">
+        <li class="rv"><time>2026 · 11</time><p>把索引搬上自己的服务器，不再依赖托管平台；文件保持原样，不再切分。</p></li>
+        <li class="rv"><time>2026 · 11</time><p>安卓包改成云端自动构建：改一次代码，出一个包，装的时候覆盖旧的。</p></li>
+        <li class="rv"><time>2026 · 11</time><p>界面收敛一轮：去掉拼凑的统计与装饰，只留待办、时间、资料。</p></li>
+        <li class="rv"><time>2026 · 10</time><p>深夜与纸白两套主题定稿，切换不再闪白。</p></li>
+        <li class="rv"><time>2026 · 09</time><p>「深时」开写：先把点名做顺，再加待办。</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="about">
+    <p class="num">03 / 关于</p>
+    <div>
+      <h2 class="sr-only">关于</h2>
+      <div class="about">
+        <div>
+          <p class="rv">我不太信「大而全」。工具应该只解决一件具体的事，做完就退到后面去。</p>
+          <p class="rv">所以「深时」是两条线：手机管人，网页管资料。两边数据各留各的，不联网也能用；代价是换设备要自己搬一份备份，我觉得划算。</p>
+          <p class="contact rv">想聊，可以在 <a href="https://github.com/ShenFall" target="_blank" rel="noopener">GitHub</a> 找我。</p>
+        </div>
+        <dl class="spec rv">
+          <div><dt>常用</dt><dd>React · TypeScript</dd></div>
+          <div><dt>构建</dt><dd>Vite · Capacitor</dd></div>
+          <div><dt>脚本</dt><dd>Node · Python</dd></div>
+          <div><dt>偏好</dt><dd>静态 · 本地优先</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 ShenFall · 个人主页，非经营性</span>
+    <span class="r">
+      <a href="https://github.com/ShenFall" target="_blank" rel="noopener">GitHub</a>
+      <!-- 备案下号后：把下面这行换成 <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">XICP备XXXXXXXX号</a> -->
+      <span class="icp">ICP 备案号待补充</span>
+    </span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem('sf-theme'); } catch(e) {}
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+
+  var meta = document.querySelector('meta[name="theme-color"]');
+  var applyMeta = function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (meta) meta.setAttribute('content', dark ? '#0a0e16' : '#f7f4ee');
+  };
+  applyMeta();
+
+  var btn = document.getElementById('theme');
+  btn.addEventListener('click', function(){
+    var now = root.getAttribute('data-theme') || 'light';
+    var next = now === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('sf-theme', next); } catch(e) {}
+    applyMeta();
+  });
+
+  var top = document.getElementById('top');
+  var onScroll = function(){ top.classList.toggle('stuck', window.scrollY > 8); };
+  onScroll(); addEventListener('scroll', onScroll, { passive: true });
+
+  var items = document.querySelectorAll('.rv');
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach(function(el){ el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function(list){
+      list.forEach(function(en){
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: .12 });
+    items.forEach(function(el){ io.observe(el); });
+    document.querySelectorAll('.hero .rv').forEach(function(el){ el.classList.add('in'); });
+  }
+})();
+</script>
+</body>
+</html>
