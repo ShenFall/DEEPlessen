@@ -111,6 +111,8 @@ npm run dev:desk     # 资料管理器 → http://127.0.0.1:5179
 | 文档 | 内容 |
 |---|---|
 | [docs/13-status.md](docs/13-status.md) | 当前进度：做到哪、下一步 |
+| [docs/35-handover.md](docs/35-handover.md) | 换账号/新会话接手说明（先读这页） |
+| [docs/36-personal-site.md](docs/36-personal-site.md) | 个人站 `shenfall.cn`：备案红线与部署 |
 | [docs/22-spec-v3.md](docs/22-spec-v3.md) | 主规格书 v3 |
 | [docs/25-publish-guide.md](docs/25-publish-guide.md) | 学生门户发布三步 |
 | [docs/29-platform-split.md](docs/29-platform-split.md) | 双端拆分：为什么用构建开关而不是分支 |

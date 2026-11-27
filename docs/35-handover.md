@@ -5,7 +5,7 @@
 
 ## 0. 一句话现状
 
-学生门户已从 Cloudflare Pages 迁到**用户自己的阿里云轻量服务器**，用 IP 访问、62 个文件全量在线；Android App 走 GitHub Actions 出包；域名已购已实名，**等备案**。
+学生门户已从 Cloudflare Pages 迁到**用户自己的阿里云轻量服务器**，用 IP 访问、**51 个文件**（约 392 MB）全量在线；Android App 走 GitHub Actions 出包；域名已购已实名，**等备案（待提交）**；个人站占位页已备好（`personal/`，见 36 号）。
 
 ## 1. 这个项目是什么
 
@@ -40,6 +40,7 @@ tools/
 docs/                    01~34 编号文档，35 是本页
   ../../13-status.md     每日进度（每次收工更新）
 release/apk/             APK 落地页（部署到 deep-apk 项目）
+personal/              **个人站（shenfall.cn 用）**：单文件静态页 + 404 + favicon，见 36 号
 local/                   **本机实况：IP、端口、账号（已 gitignore，不入库）**
 tools/.cf-token          Cloudflare API Token（已忽略）
 tools/.cf-account        Cloudflare 账户 ID（已忽略）
@@ -108,16 +109,18 @@ npm run build:mobile           # 输出 dist/（给 Capacitor）
 
 - 手机端：待办、点名、名单导入、纸白/深夜主题、APK 云端构建（`.github/workflows/android.yml`）
 - 学生端：门户模板、搜索、类型筛选、主题切换、**搜索时自动收起首屏留白**（`ba852fb`）
-- 服务器：系统调优、Nginx、站点上线、62 个文件（地科 20 / 高数上 38 / 通知 3 / 答案 1，约 317 MB）
+- 服务器：系统调优、Nginx、站点上线；索引 2026-11-27 重建后为 **51 个文件 / 391.5 MB**（地科 9 / 高数上 38 / 通知 3 / 答案 1）
 - 工具链：打包、清单重建、Cloudflare 部署、PPT 切分（备用）
 - 仓库：README 重写为双线结构、APK 下载页（`deep-apk-dv6.pages.dev`）
+- 个人站：占位页做完并本地验收（纸白/深夜、404、favicon），部署步骤见 36 号
+- APK 图标：11-25 那次构建的「生成应用图标与启动图」步骤是 success，**已不是 Capacitor 默认图标**
 
 ### 待办（按顺序）
 
-1. **备案**：域名注册满 3 天后在阿里云 App 提交（用户说 11-25 左右已满足，需确认是否已提）
-2. 备案下号后：主域名放**个人站**（备案抽查要看，内容须与备案一致）、`course` 子域名放门户、Let's Encrypt + 强制 HTTPS
-3. 个人站占位页（下号当天必须能用）
-4. 手机 APK 图标仍是 Capacitor 默认（CI 里 `@capacitor/assets` 设了 `continue-on-error`）
+1. **提交备案**：域名已实名且满 3 天，在阿里云 App 提交（网站名别带教育字样，备注别空）
+2. 备案下号当天：主域名上个人站（照 36 号，**先换页脚备案号**）、`course` 子域名指到 `/www/wwwroot/deep`、两个站各上 Let's Encrypt + 强制 HTTPS
+3. APK 图标小尺寸可读性：现用满幅线稿人脸（`app/resources/icon.png`），48px 下发灰；候选 `assets/icon-concepts/d-eye-light.png`（圆环 + 金「深」）
+4. 确认门户文件数从 62 降到 51 是有意合并（地科 20 → 9）
 5. 电脑端资料库空态、课程命名批量移动（低优先，UI 已停用）
 
 ## 8. 踩过的坑（别重复踩）
